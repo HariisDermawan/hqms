@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\AntrianController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DokterController;
 use App\Http\Controllers\Api\PasienController;
 use App\Http\Controllers\Api\PendaftaranController;
 use App\Http\Controllers\Api\PoliController;
@@ -21,5 +23,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
             Route::apiResource('polis', PoliController::class);
             Route::apiResource('pasiens', PasienController::class);
             Route::apiResource('pendaftarans', PendaftaranController::class);
+            Route::apiResource('antrians', AntrianController::class);
+            Route::apiResource('dokters', DokterController::class);
         });
     });
