@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
             PendaftaranSeeder::class,
             AntrianSeeder::class,
             DokterSeeder::class,
+            JadwalDokterSeeder::class,
+            PemeriksaanSeeder::class,
+            FaqSeeder::class,
+            TestimonialSeeder::class,
+            MessageSeeder::class,
         ]);
     }
 }
