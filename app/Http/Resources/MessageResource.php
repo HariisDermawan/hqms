@@ -17,9 +17,7 @@ class MessageResource extends JsonResource
             'phone' => $this->phone,
             'subject' => $this->subject,
             'message' => $this->message,
-
             'status' => $this->status,
-
             'admin_reply' => $this->admin_reply,
             'replied_at' => $this->replied_at?->toISOString(),
         ];

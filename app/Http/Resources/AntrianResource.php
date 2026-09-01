@@ -45,9 +45,6 @@ class AntrianResource extends JsonResource
                 'code' => $this->poli?->code,
                 'name' => $this->poli?->name,
             ],
-
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

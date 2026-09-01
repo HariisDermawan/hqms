@@ -46,8 +46,6 @@ class PemeriksaanResource extends JsonResource
             'treatment' => $this->treatment,
             'notes' => $this->notes,
 
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

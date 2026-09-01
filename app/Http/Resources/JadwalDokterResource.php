@@ -29,9 +29,6 @@ class JadwalDokterResource extends JsonResource
             'start_time' => $this->start_time,
             'end_time' => $this->end_time,
             'is_active' => $this->is_active,
-
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }

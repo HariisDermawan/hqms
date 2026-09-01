@@ -18,8 +18,6 @@ class TestimonialResource extends JsonResource
             'photo' => $this->photo,
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
-            'created_at' => $this->created_at?->toISOString(),
-            'updated_at' => $this->updated_at?->toISOString(),
         ];
     }
 }
