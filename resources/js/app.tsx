@@ -11,7 +11,9 @@ createInertiaApp({
     resolve: (name) =>
         resolvePageComponent<{ default: ResolvedComponent }>(
             `./pages/${name}.tsx`,
-            import.meta.glob<{ default: ResolvedComponent }>('./pages/**/*.tsx'),
+            import.meta.glob<{ default: ResolvedComponent }>(
+                './pages/**/*.tsx',
+            ),
         ).then((module) => module.default),
     setup({ el, App, props }) {
         const root = createRoot(el);
@@ -22,4 +24,3 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-

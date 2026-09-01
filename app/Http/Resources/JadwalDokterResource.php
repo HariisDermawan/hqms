@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class JadwalDokterResource extends JsonResource
 {
@@ -17,6 +18,10 @@ class JadwalDokterResource extends JsonResource
                 'code' => $this->dokter?->code,
                 'name' => $this->dokter?->name,
                 'specialization' => $this->dokter?->specialization,
+
+                'image_url' => $this->dokter?->image
+                    ? Storage::disk('public')->url($this->dokter->image)
+                    : null,
             ],
 
             'poli' => [
@@ -32,4 +37,3 @@ class JadwalDokterResource extends JsonResource
         ];
     }
 }
-

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Dokter;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class DokterSeeder extends Seeder
 {
@@ -16,6 +17,7 @@ class DokterSeeder extends Seeder
                 'specialization' => 'Dokter Umum',
                 'sip_number' => 'SIP-001-2026',
                 'phone' => '081234567101',
+                'image' => 'dokters/dok1.png',
                 'is_active' => true,
             ],
             [
@@ -24,6 +26,7 @@ class DokterSeeder extends Seeder
                 'specialization' => 'Dokter Gigi',
                 'sip_number' => 'SIP-002-2026',
                 'phone' => '081234567102',
+                'image' => 'dokters/dok2.png',
                 'is_active' => true,
             ],
             [
@@ -32,6 +35,7 @@ class DokterSeeder extends Seeder
                 'specialization' => 'Dokter Mata',
                 'sip_number' => 'SIP-003-2026',
                 'phone' => '081234567103',
+                'image' => 'dokters/dok3.png',
                 'is_active' => true,
             ],
             [
@@ -40,11 +44,22 @@ class DokterSeeder extends Seeder
                 'specialization' => 'Dokter Jantung',
                 'sip_number' => 'SIP-004-2026',
                 'phone' => '081234567104',
+                'image' => 'dokters/dok4.png',
                 'is_active' => true,
             ],
         ];
 
         foreach ($dokters as $dokter) {
+            $path = $dokter['image'];
+            $source = public_path('assets/'.basename($path));
+
+            if (is_file($source) && ! Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->put(
+                    $path,
+                    file_get_contents($source)
+                );
+            }
+
             Dokter::updateOrCreate(
                 [
                     'code' => $dokter['code'],
@@ -58,4 +73,3 @@ class DokterSeeder extends Seeder
         );
     }
 }
-

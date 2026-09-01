@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Dokter;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DokterService
 {
@@ -18,14 +20,17 @@ class DokterService
     public function create(array $data): Dokter
     {
         return DB::transaction(function () use ($data) {
-            return Dokter::create([
-                'code' => $data['code'],
-                'name' => $data['name'],
-                'specialization' => $data['specialization'] ?? null,
-                'sip_number' => $data['sip_number'],
-                'phone' => $data['phone'] ?? null,
-                'is_active' => $data['is_active'] ?? true,
-            ]);
+
+            /** @var UploadedFile|null $image */
+            $image = $data['image'] ?? null;
+
+            unset($data['image']);
+
+            if ($image) {
+                $data['image'] = $image->store('dokters', 'public');
+            }
+
+            return Dokter::create($data);
         });
     }
 
@@ -34,14 +39,21 @@ class DokterService
         array $data
     ): Dokter {
         return DB::transaction(function () use ($dokter, $data) {
-            $dokter->update([
-                'code' => $data['code'],
-                'name' => $data['name'],
-                'specialization' => $data['specialization'] ?? null,
-                'sip_number' => $data['sip_number'],
-                'phone' => $data['phone'] ?? null,
-                'is_active' => $data['is_active'] ?? $dokter->is_active,
-            ]);
+
+            /** @var UploadedFile|null $image */
+            $image = $data['image'] ?? null;
+
+            unset($data['image']);
+
+            if ($image) {
+                if ($dokter->image) {
+                    Storage::disk('public')->delete($dokter->image);
+                }
+
+                $data['image'] = $image->store('dokters', 'public');
+            }
+
+            $dokter->update($data);
 
             return $dokter->fresh();
         });
@@ -50,8 +62,12 @@ class DokterService
     public function delete(Dokter $dokter): void
     {
         DB::transaction(function () use ($dokter) {
+
+            if ($dokter->image) {
+                Storage::disk('public')->delete($dokter->image);
+            }
+
             $dokter->delete();
         });
     }
 }
-

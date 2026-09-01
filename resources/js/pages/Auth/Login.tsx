@@ -53,85 +53,31 @@ export default function Login() {
         <>
             <Head title="Login" />
 
-            <div className="min-h-screen bg-[#eef4f8] flex items-center justify-center lg:p-8">
-                <div
-                    className="
-                        w-full
-                        min-h-screen
-                        bg-white
-                        overflow-hidden
-                        lg:min-h-0
-                        lg:w-[410px]
-                        lg:rounded-[24px]
-                        lg:shadow-[0_15px_50px_rgba(0,0,0,0.10)]
-                    "
-                >
+            <div className="flex min-h-screen items-center justify-center bg-[#eef4f8] lg:p-8">
+                <div className="min-h-screen w-full overflow-hidden bg-white lg:min-h-0 lg:w-[410px] lg:rounded-[24px] lg:shadow-[0_15px_50px_rgba(0,0,0,0.10)]">
                     {/* HEADER */}
-                    <div
-                        className="
-                            relative
-                            h-[222px]
-                            bg-[#084e7a]
-                            rounded-b-[50%]
-                            lg:h-[225px]
-                        "
-                    >
-                        <div className="absolute top-[34px] left-0 right-0 flex flex-col items-center">
+                    <div className="relative h-[222px] rounded-b-[50%] bg-[#084e7a] lg:h-[225px]">
+                        <div className="absolute top-[34px] right-0 left-0 flex flex-col items-center">
                             <div className="relative flex items-center justify-center">
-                                <div
-                                    className="
-                                        w-[70px]
-                                        h-[60px]
-                                        bg-white
-                                        rounded-t-lg
-                                        rounded-b-sm
-                                        flex
-                                        items-end
-                                        justify-center
-                                        pb-2
-                                    "
-                                >
+                                <div className="flex h-[60px] w-[70px] items-end justify-center rounded-t-lg rounded-b-sm bg-white pb-2">
                                     <div className="grid grid-cols-2 gap-[8px]">
-                                        <div className="w-[11px] h-[13px] bg-[#084e7a]" />
-                                        <div className="w-[11px] h-[13px] bg-[#084e7a]" />
-                                        <div className="w-[11px] h-[13px] bg-[#084e7a]" />
-                                        <div className="w-[11px] h-[13px] bg-[#084e7a]" />
+                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
+                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
+                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
+                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
                                     </div>
                                 </div>
 
-                                <div
-                                    className="
-                                        absolute
-                                        -top-[14px]
-                                        w-[35px]
-                                        h-[35px]
-                                        bg-white
-                                        rounded-lg
-                                        flex
-                                        items-center
-                                        justify-center
-                                    "
-                                >
-                                    <div
-                                        className="
-                                            w-[27px]
-                                            h-[27px]
-                                            border-[3px]
-                                            border-[#084e7a]
-                                            rounded-md
-                                            flex
-                                            items-center
-                                            justify-center
-                                        "
-                                    >
-                                        <span className="text-[#084e7a] text-[24px] font-bold leading-none">
+                                <div className="absolute -top-[14px] flex h-[35px] w-[35px] items-center justify-center rounded-lg bg-white">
+                                    <div className="flex h-[27px] w-[27px] items-center justify-center rounded-md border-[3px] border-[#084e7a]">
+                                        <span className="text-[24px] leading-none font-bold text-[#084e7a]">
                                             +
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
-                            <h1 className="mt-[10px] text-white text-[21px] font-bold">
+                            <h1 className="mt-[10px] text-[21px] font-bold text-white">
                                 Rs Merdeka
                             </h1>
                         </div>
@@ -150,7 +96,7 @@ export default function Login() {
                             <div className="mb-[10px]">
                                 <label
                                     htmlFor="email"
-                                    className="block text-[13px] text-[#333] mb-[4px]"
+                                    className="mb-[4px] block text-[13px] text-[#333]"
                                 >
                                     Email
                                 </label>
@@ -164,21 +110,7 @@ export default function Login() {
                                     }
                                     placeholder="Masukan Email"
                                     autoComplete="email"
-                                    className="
-                                        w-full
-                                        h-[42px]
-                                        px-[12px]
-                                        rounded-[12px]
-                                        bg-[#d9d9d9]
-                                        text-[13px]
-                                        text-gray-700
-                                        placeholder:text-[#999]
-                                        outline-none
-                                        focus:bg-[#d5d5d5]
-                                        focus:ring-2
-                                        focus:ring-[#084e7a]/30
-                                        transition
-                                    "
+                                    className="h-[42px] w-full rounded-[12px] bg-[#d9d9d9] px-[12px] text-[13px] text-gray-700 transition outline-none placeholder:text-[#999] focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30"
                                 />
 
                                 {errors.email && (
@@ -192,7 +124,7 @@ export default function Login() {
                             <div className="mb-[30px]">
                                 <label
                                     htmlFor="password"
-                                    className="block text-[13px] text-[#333] mb-[4px]"
+                                    className="mb-[4px] block text-[13px] text-[#333]"
                                 >
                                     Password
                                 </label>
@@ -206,21 +138,7 @@ export default function Login() {
                                     }
                                     placeholder="Masukan Password"
                                     autoComplete="current-password"
-                                    className="
-                                        w-full
-                                        h-[42px]
-                                        px-[12px]
-                                        rounded-[12px]
-                                        bg-[#d9d9d9]
-                                        text-[13px]
-                                        text-gray-700
-                                        placeholder:text-[#999]
-                                        outline-none
-                                        focus:bg-[#d5d5d5]
-                                        focus:ring-2
-                                        focus:ring-[#084e7a]/30
-                                        transition
-                                    "
+                                    className="h-[42px] w-full rounded-[12px] bg-[#d9d9d9] px-[12px] text-[13px] text-gray-700 transition outline-none placeholder:text-[#999] focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30"
                                 />
 
                                 {errors.password && (
@@ -234,37 +152,17 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="
-                                    w-full
-                                    h-[43px]
-                                    rounded-[12px]
-                                    bg-[#084e7a]
-                                    text-white
-                                    text-[13px]
-                                    font-bold
-                                    hover:bg-[#063f62]
-                                    hover:shadow-md
-                                    active:scale-[0.99]
-                                    transition-all
-                                    duration-200
-                                    disabled:opacity-60
-                                    disabled:cursor-not-allowed
-                                "
+                                className="h-[43px] w-full rounded-[12px] bg-[#084e7a] text-[13px] font-bold text-white transition-all duration-200 hover:bg-[#063f62] hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 {processing ? 'Logging in...' : 'Login'}
                             </button>
                         </form>
 
                         {/* FORGOT PASSWORD */}
-                        <div className="flex justify-end mt-[14px]">
+                        <div className="mt-[14px] flex justify-end">
                             <Link
                                 href="/forgot-password"
-                                className="
-                                    text-[#73a1bd]
-                                    text-[12px]
-                                    hover:text-[#084e7a]
-                                    transition
-                                "
+                                className="text-[12px] text-[#73a1bd] transition hover:text-[#084e7a]"
                             >
                                 Forgot Password
                             </Link>
@@ -275,4 +173,3 @@ export default function Login() {
         </>
     );
 }
-

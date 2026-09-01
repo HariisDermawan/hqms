@@ -49,6 +49,13 @@ class UpdateDokterRequest extends FormRequest
                 'max:20',
             ],
 
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
+
             'is_active' => [
                 'sometimes',
                 'boolean',
@@ -56,4 +63,3 @@ class UpdateDokterRequest extends FormRequest
         ];
     }
 }
-

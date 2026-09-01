@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class DokterResource extends JsonResource
 {
@@ -16,8 +17,12 @@ class DokterResource extends JsonResource
             'specialization' => $this->specialization,
             'sip_number' => $this->sip_number,
             'phone' => $this->phone,
+
+            'image_url' => $this->image
+                ? Storage::disk('public')->url($this->image)
+                : null,
+
             'is_active' => $this->is_active,
         ];
     }
 }
-

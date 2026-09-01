@@ -37,7 +37,7 @@ class AuthService
 
     public function logout(): void
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         request()->session()->invalidate();
 

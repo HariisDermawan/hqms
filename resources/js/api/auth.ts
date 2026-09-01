@@ -5,6 +5,13 @@ export interface LoginPayload {
     password: string;
 }
 
+export interface RegisterPayload {
+    name: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+}
+
 export interface LoginResponse {
     success: boolean;
     message: string;
@@ -17,33 +24,40 @@ export interface LoginResponse {
     };
 }
 
-export const login = async (
-    payload: LoginPayload
-): Promise<LoginResponse> => {
-
+export const login = async (payload: LoginPayload): Promise<LoginResponse> => {
     // WAJIB untuk Sanctum SPA
     await api.get('/sanctum/csrf-cookie');
 
     const response = await api.post<LoginResponse>(
         '/api/v1/auth/login',
-        payload
+        payload,
+    );
+
+    return response.data;
+};
+
+export const register = async (
+    payload: RegisterPayload,
+): Promise<LoginResponse> => {
+    // WAJIB untuk Sanctum SPA
+    await api.get('/sanctum/csrf-cookie');
+
+    const response = await api.post<LoginResponse>(
+        '/api/v1/auth/register',
+        payload,
     );
 
     return response.data;
 };
 
 export const me = async (): Promise<LoginResponse> => {
-    const response = await api.get<LoginResponse>(
-        '/api/v1/auth/me'
-    );
+    const response = await api.get<LoginResponse>('/api/v1/auth/me');
 
     return response.data;
 };
 
 export const logout = async () => {
-    const response = await api.post(
-        '/api/v1/auth/logout'
-    );
+    const response = await api.post('/api/v1/auth/logout');
 
     return response.data;
 };

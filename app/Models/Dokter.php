@@ -18,6 +18,7 @@ class Dokter extends Model
         'specialization',
         'sip_number',
         'phone',
+        'image',
         'is_active',
     ];
 
@@ -25,4 +26,3 @@ class Dokter extends Model
         'is_active' => 'boolean',
     ];
 }
-
