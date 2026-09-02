@@ -253,7 +253,7 @@ export default function PasienForm({
                             onChange={(event) =>
                                 setBirthDate(event.target.value)
                             }
-                            className={inputClass}
+                            className={`${inputClass} min-w-0 flex-1`}
                         />
 
                         <div className="flex h-[42px] w-[80px] shrink-0 items-center justify-center rounded-[12px] bg-[#07577f]/10 text-[13px] font-bold text-[#07577f]">

@@ -1,8 +1,9 @@
 <?php
 
-use App\Models\Antrian;
 use App\Models\Dokter;
+use App\Models\Pasien;
 use App\Models\Pemeriksaan;
+use App\Models\Poli;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -49,26 +50,30 @@ it('can show a single pemeriksaan', function () {
         ->assertOk()
         ->assertJsonPath('data.pemeriksaan.id', $pemeriksaan->id)
         ->assertJsonPath(
-            'data.pemeriksaan.antrian.queue_number',
-            $pemeriksaan->antrian->queue_number
+            'data.pemeriksaan.pasien.name',
+            $pemeriksaan->pasien->name
         )
         ->assertJsonPath(
-            'data.pemeriksaan.pasien.name',
-            $pemeriksaan->antrian->pendaftaran->pasien->name
+            'data.pemeriksaan.poli.id',
+            $pemeriksaan->poli->id
         )
         ->assertJsonPath(
             'data.pemeriksaan.dokter.id',
             $pemeriksaan->dokter->id
-        );
+        )
+        ->assertJsonPath('data.pemeriksaan.category', $pemeriksaan->category);
 });
 
 it('can create a pemeriksaan', function () {
-    $antrian = Antrian::factory()->create();
+    $pasien = Pasien::factory()->create();
+    $poli = Poli::factory()->create();
     $dokter = Dokter::factory()->create();
 
     $payload = [
-        'antrian_id' => $antrian->id,
+        'pasien_id' => $pasien->id,
+        'poli_id' => $poli->id,
         'dokter_id' => $dokter->id,
+        'category' => 'Umum',
         'examined_at' => now()->toDateTimeString(),
         'complaint' => 'Demam tinggi',
         'diagnosis' => 'Demam berdarah',
@@ -78,12 +83,17 @@ it('can create a pemeriksaan', function () {
 
     $this->postJson('/api/v1/pemeriksaans', $payload)
         ->assertCreated()
-        ->assertJsonPath('data.pemeriksaan.antrian.id', $antrian->id)
+        ->assertJsonPath('data.pemeriksaan.pasien.id', $pasien->id)
+        ->assertJsonPath('data.pemeriksaan.poli.id', $poli->id)
         ->assertJsonPath('data.pemeriksaan.dokter.id', $dokter->id)
+        ->assertJsonPath('data.pemeriksaan.category', 'Umum')
         ->assertJsonPath('data.pemeriksaan.diagnosis', 'Demam berdarah');
 
     $this->assertDatabaseHas('pemeriksaans', [
-        'antrian_id' => $antrian->id,
+        'pasien_id' => $pasien->id,
+        'poli_id' => $poli->id,
+        'dokter_id' => $dokter->id,
+        'category' => 'Umum',
         'diagnosis' => 'Demam berdarah',
     ]);
 });
@@ -92,25 +102,28 @@ it('validates required fields when creating a pemeriksaan', function () {
     $this->postJson('/api/v1/pemeriksaans', [])
         ->assertStatus(422)
         ->assertJsonValidationErrors([
-            'antrian_id',
-            'dokter_id',
+            'pasien_id',
+            'poli_id',
+            'category',
             'examined_at',
         ]);
 });
 
 it('can update a pemeriksaan', function () {
     $pemeriksaan = Pemeriksaan::factory()->create();
-    $dokter = Dokter::factory()->create();
+    $poli = Poli::factory()->create();
 
     $this->putJson("/api/v1/pemeriksaans/{$pemeriksaan->id}", [
-        'antrian_id' => $pemeriksaan->antrian_id,
-        'dokter_id' => $dokter->id,
+        'pasien_id' => $pemeriksaan->pasien_id,
+        'poli_id' => $poli->id,
+        'category' => 'Bedah',
         'examined_at' => now()->toDateTimeString(),
         'diagnosis' => 'Diagnosis diperbarui',
     ])
         ->assertOk()
         ->assertJsonPath('data.pemeriksaan.id', $pemeriksaan->id)
-        ->assertJsonPath('data.pemeriksaan.dokter.id', $dokter->id)
+        ->assertJsonPath('data.pemeriksaan.poli.id', $poli->id)
+        ->assertJsonPath('data.pemeriksaan.category', 'Bedah')
         ->assertJsonPath('data.pemeriksaan.diagnosis', 'Diagnosis diperbarui');
 });
 

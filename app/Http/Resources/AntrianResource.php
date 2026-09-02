@@ -24,23 +24,25 @@ class AntrianResource extends JsonResource
 
             'notes' => $this->notes,
 
-            'pendaftaran' => [
-                'id' => $this->pendaftaran?->id,
-                'registration_number' => $this->pendaftaran?->registration_number,
-                'registration_date' => $this->pendaftaran?->registration_date?->format('Y-m-d'),
-            ],
-
-            'pasien' => [
-                'id' => $this->pendaftaran?->pasien?->id,
-                'medical_record_number' => $this->pendaftaran?->pasien?->medical_record_number,
-                'name' => $this->pendaftaran?->pasien?->name,
-            ],
-
             'poli' => [
                 'id' => $this->poli?->id,
                 'code' => $this->poli?->code,
                 'name' => $this->poli?->name,
             ],
+
+            'pendaftaran' => $this->whenLoaded('pendaftaran', function () {
+                return [
+                    'id' => $this->pendaftaran?->id,
+                    'registration_number' => $this->pendaftaran?->registration_number,
+                    'registration_date' => $this->pendaftaran?->registration_date?->format('Y-m-d'),
+                    'status' => $this->pendaftaran?->status,
+                    'pasien' => [
+                        'id' => $this->pendaftaran?->pasien?->id,
+                        'medical_record_number' => $this->pendaftaran?->pasien?->medical_record_number,
+                        'name' => $this->pendaftaran?->pasien?->name,
+                    ],
+                ];
+            }),
         ];
     }
 }

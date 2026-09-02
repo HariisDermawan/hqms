@@ -37,6 +37,14 @@ class PendaftaranResource extends JsonResource
                 'name' => $this->poli?->name,
             ],
 
+            'antrian' => $this->whenLoaded('antrian', function () {
+                return [
+                    'id' => $this->antrian?->id,
+                    'queue_number' => $this->antrian?->queue_number,
+                    'status' => $this->antrian?->status,
+                ];
+            }),
+
         ];
     }
 }

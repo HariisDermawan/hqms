@@ -14,8 +14,10 @@ class Pemeriksaan extends Model
     protected $table = 'pemeriksaans';
 
     protected $fillable = [
-        'antrian_id',
+        'pasien_id',
+        'poli_id',
         'dokter_id',
+        'category',
         'examined_at',
         'complaint',
         'diagnosis',
@@ -27,9 +29,14 @@ class Pemeriksaan extends Model
         'examined_at' => 'datetime',
     ];
 
-    public function antrian(): BelongsTo
+    public function pasien(): BelongsTo
     {
-        return $this->belongsTo(Antrian::class);
+        return $this->belongsTo(Pasien::class);
+    }
+
+    public function poli(): BelongsTo
+    {
+        return $this->belongsTo(Poli::class);
     }
 
     public function dokter(): BelongsTo

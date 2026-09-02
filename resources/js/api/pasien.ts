@@ -34,7 +34,7 @@ export interface Pasien {
 
 export interface PasienPayload {
     poli_id: number;
-    medical_record_number: string;
+    medical_record_number?: string;
     name: string;
     nik: string;
     gender: Gender;

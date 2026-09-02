@@ -24,6 +24,10 @@ class PasienService
             $data['age'] = Carbon::parse($data['birth_date'])
                 ->diffInYears(now());
 
+            if (blank($data['medical_record_number'] ?? null)) {
+                $data['medical_record_number'] = $this->generateMedicalRecordNumber();
+            }
+
             $pasien = Pasien::create($data);
 
             return $pasien->load('poli');
@@ -48,5 +52,20 @@ class PasienService
         DB::transaction(function () use ($pasien) {
             $pasien->delete();
         });
+    }
+
+    private function generateMedicalRecordNumber(): string
+    {
+        $last = Pasien::withTrashed()
+            ->where('medical_record_number', 'like', 'RM%')
+            ->lockForUpdate()
+            ->orderByDesc('id')
+            ->value('medical_record_number');
+
+        $lastSequence = $last
+            ? (int) preg_replace('/\D/', '', (string) $last)
+            : 0;
+
+        return 'RM'.str_pad($lastSequence + 1, 6, '0', STR_PAD_LEFT);
     }
 }

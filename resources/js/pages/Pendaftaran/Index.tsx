@@ -134,7 +134,7 @@ export default function PendaftaranIndex() {
             <Head title="Pendaftaran" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Pendaftaran
@@ -164,38 +164,37 @@ export default function PendaftaranIndex() {
                 </div>
 
                 <div className="mt-4">
-                    {/* SEARCH + FILTERS */}
-                    <div className="flex flex-col gap-2 sm:flex-row">
-                        <div className="flex h-11 flex-1 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="mr-3 h-[17px] w-[17px] text-gray-400"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                            >
-                                <circle cx="11" cy="11" r="7" />
-                                <path d="m20 20-4-4" />
-                            </svg>
+                    {/* SEARCH */}
+                    <div className="flex h-12 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mr-3 h-5 w-5 shrink-0 text-gray-400"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                        >
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-4-4" />
+                        </svg>
 
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(event) =>
-                                    setSearch(event.target.value)
-                                }
-                                placeholder="Cari nama pasien, No. RM, No. registrasi, atau poli..."
-                                className="w-full bg-transparent text-xs text-gray-700 outline-none placeholder:text-gray-400"
-                            />
-                        </div>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="Cari nama pasien, No. RM, No. registrasi, atau poli..."
+                            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                        />
+                    </div>
 
+                    {/* FILTERS */}
+                    <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                         <select
                             value={statusFilter}
                             onChange={(event) =>
                                 setStatusFilter(event.target.value)
                             }
-                            className="h-11 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[150px]"
+                            className="h-12 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[150px]"
                         >
                             <option value="">Semua Status</option>
                             <option value="waiting">Menunggu</option>
@@ -211,7 +210,7 @@ export default function PendaftaranIndex() {
                             onChange={(event) =>
                                 setDateFilter(event.target.value)
                             }
-                            className="h-11 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[170px]"
+                            className="h-12 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[170px]"
                         />
                     </div>
 
@@ -330,14 +329,14 @@ export default function PendaftaranIndex() {
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Link
                                                             href={`/pendaftarans/${pendaftaran.id}`}
-                                                            className="flex h-8 items-center gap-1.5 rounded-lg bg-[#07577f]/10 px-3 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20"
+                                                            className="flex h-10 items-center gap-1.5 rounded-lg bg-[#07577f]/10 px-3 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20 sm:h-8"
                                                         >
                                                             Detail
                                                         </Link>
 
                                                         <Link
                                                             href={`/pendaftarans/${pendaftaran.id}/edit`}
-                                                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100"
+                                                            className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100 sm:h-8 sm:w-8"
                                                         >
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -363,7 +362,7 @@ export default function PendaftaranIndex() {
                                                                 deletingId ===
                                                                 pendaftaran.id
                                                             }
-                                                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                                            className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-8 sm:w-8"
                                                         >
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -399,7 +398,7 @@ export default function PendaftaranIndex() {
                                     type="button"
                                     disabled={page <= 1}
                                     onClick={() => loadPendaftarans(page - 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
                                 >
                                     ‹
                                 </button>
@@ -412,7 +411,7 @@ export default function PendaftaranIndex() {
                                     type="button"
                                     disabled={page >= lastPage}
                                     onClick={() => loadPendaftarans(page + 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
                                 >
                                     ›
                                 </button>

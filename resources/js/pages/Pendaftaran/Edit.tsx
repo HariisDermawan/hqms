@@ -7,7 +7,7 @@ import {
     type PendaftaranPayload,
 } from '@/api/pendaftaran';
 import AppLayout from '@/Layouts/AppLayout';
-import PendaftaranForm from './Form';
+import PendaftaranForm, { type PendaftaranFormValues } from './Form';
 
 export default function PendaftaranEdit() {
     const { id } = usePage<{ id: number }>().props;
@@ -43,7 +43,15 @@ export default function PendaftaranEdit() {
             });
     }, [id]);
 
-    const handleSubmit = async (payload: PendaftaranPayload) => {
+    const handleSubmit = async (values: PendaftaranFormValues) => {
+        const payload: PendaftaranPayload = {
+            pasien_id: values.pasien_id ?? 0,
+            poli_id: values.poli_id ?? null,
+            registration_date: values.registration_date,
+            notes: values.notes,
+            status: values.status,
+        };
+
         setProcessing(true);
         setErrors({});
 

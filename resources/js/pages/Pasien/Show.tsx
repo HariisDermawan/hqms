@@ -61,7 +61,7 @@ export default function PasienShow() {
             <Head title={pasien ? `Detail ${pasien.name}` : 'Detail Pasien'} />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Pasien
@@ -148,7 +148,7 @@ export default function PasienShow() {
                             </div>
 
                             {/* DETAIL GRID */}
-                            <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
+                            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                                 {detailItem(
                                     'No. Rekam Medis',
                                     pasien.medical_record_number,

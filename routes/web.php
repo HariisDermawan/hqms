@@ -23,9 +23,21 @@ Route::get('/login', function () {
     return Inertia::render('Auth/Login');
 })->name('login');
 
+Route::get('/ticket', function () {
+    return Inertia::render('Kiosk/TicketDisplay');
+})->name('ticket');
+
+Route::get('/antrians-ticker', function () {
+    return Inertia::render('Kiosk/Ticker');
+})->name('antrians-ticker');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
+
+Route::get('/monitorings', function () {
+    return Inertia::render('Monitoring/Index');
+})->name('monitorings.index');
 
 Route::get('/pasiens/create', function () {
     return Inertia::render('Pasien/Create');
@@ -127,8 +139,10 @@ Route::get('/jadwal-dokters', function () {
     return Inertia::render('JadwalDokter/Index');
 })->name('jadwal-dokters.index');
 
-Route::get('/pendaftarans/create', function () {
-    return Inertia::render('Pendaftaran/Create');
+Route::get('/pendaftarans/create', function (Request $request) {
+    return Inertia::render('Pendaftaran/Create', [
+        'antrian_id' => (int) $request->query('antrian_id', 0),
+    ]);
 })->name('pendaftarans.create');
 
 Route::get('/pendaftarans/{pendaftaran}/edit', function (Pendaftaran $pendaftaran) {
@@ -149,7 +163,8 @@ Route::get('/pendaftarans', function () {
 
 Route::get('/pemeriksaans/create', function (Request $request) {
     return Inertia::render('Pemeriksaan/Create', [
-        'antrian_id' => (int) $request->query('antrian_id', 0),
+        'pasien_id' => (int) $request->query('pasien_id', 0),
+        'poli_id' => (int) $request->query('poli_id', 0),
     ]);
 })->name('pemeriksaans.create');
 

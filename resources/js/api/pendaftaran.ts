@@ -1,4 +1,5 @@
 import api from '@/lib/axios';
+import type { AntrianStatus } from './antrian';
 import type { Pagination } from './dokter';
 
 export type PendaftaranStatus =
@@ -22,11 +23,17 @@ export interface Pendaftaran {
         nik: string;
     } | null;
     poli: { id: number; code: string; name: string } | null;
+    antrian?: {
+        id: number;
+        queue_number: string;
+        status: AntrianStatus;
+    } | null;
 }
 
 export interface PendaftaranPayload {
+    antrian_id?: number | null;
     pasien_id: number;
-    poli_id: number;
+    poli_id?: number | null;
     registration_date: string;
     notes?: string;
     status?: PendaftaranStatus;

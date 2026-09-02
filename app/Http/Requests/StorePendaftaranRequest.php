@@ -14,6 +14,12 @@ class StorePendaftaranRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'antrian_id' => [
+                'nullable',
+                'integer',
+                'exists:antrians,id',
+            ],
+
             'pasien_id' => [
                 'required',
                 'integer',
@@ -21,9 +27,10 @@ class StorePendaftaranRequest extends FormRequest
             ],
 
             'poli_id' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:polis,id',
+                'required_without:antrian_id',
             ],
 
             'registration_date' => [

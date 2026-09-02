@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Models\Antrian;
-use App\Models\Pendaftaran;
+use App\Models\Poli;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class AntrianService
 {
@@ -14,9 +13,8 @@ class AntrianService
     {
         return Antrian::query()
             ->with([
-                'pendaftaran.pasien',
-                'pendaftaran.poli',
                 'poli',
+                'pendaftaran.pasien',
             ])
             ->latest()
             ->paginate($perPage);
@@ -26,43 +24,47 @@ class AntrianService
     {
         return DB::transaction(function () use ($data) {
 
-            $alreadyQueued = Antrian::withTrashed()
-                ->where('pendaftaran_id', $data['pendaftaran_id'])
-                ->exists();
+            $poli = Poli::query()->findOrFail($data['poli_id']);
+            $prefix = $poli->queue_prefix ?? 'A';
 
-            if ($alreadyQueued) {
-                throw ValidationException::withMessages([
-                    'pendaftaran_id' => 'Pendaftaran ini sudah masuk antrean.',
-                ]);
-            }
+            /*
+             * Nomor antrean real-time per poli dan tanggal pembuatan tiket.
+             */
+            $today = now()->toDateString();
 
-            $pendaftaran = Pendaftaran::with([
-                'pasien',
-                'poli',
-            ])->findOrFail($data['pendaftaran_id']);
+            $lastQueue = Antrian::withTrashed()
+                ->where('poli_id', $poli->id)
+                ->whereDate('created_at', $today)
+                ->lockForUpdate()
+                ->orderByDesc('id')
+                ->value('queue_number');
+
+            $lastSequence = $lastQueue
+                ? (int) preg_replace('/\D/', '', (string) $lastQueue)
+                : 0;
+
+            $nextSequence = $lastSequence + 1;
+
+            $sequence = str_pad($nextSequence, 3, '0', STR_PAD_LEFT);
+
+            $queueNumber = "{$prefix}-{$sequence}";
 
             $antrian = Antrian::create([
-                'pendaftaran_id' => $pendaftaran->id,
-                'poli_id' => $pendaftaran->poli_id,
-                'queue_number' => $pendaftaran->queue_number,
+                'poli_id' => $poli->id,
+                'queue_number' => $queueNumber,
                 'status' => 'waiting',
                 'notes' => $data['notes'] ?? null,
             ]);
 
-            $pendaftaran->update(['status' => 'waiting']);
-
             return $antrian->load([
-                'pendaftaran.pasien',
-                'pendaftaran.poli',
                 'poli',
+                'pendaftaran.pasien',
             ]);
         });
     }
 
-    public function update(
-        Antrian $antrian,
-        array $data
-    ): Antrian {
+    public function update(Antrian $antrian, array $data): Antrian
+    {
         return DB::transaction(function () use ($antrian, $data) {
 
             $status = $data['status'];
@@ -73,12 +75,11 @@ class AntrianService
             ];
 
             /*
-             * Jaga status pendaftaran tetap sinkron dengan status antrean.
+             * Jaga status pendaftaran tetap sinkron dengan status antrean
+             * bila tiket ini sudah terhubung ke pendaftaran.
              */
-            $pendaftaran = $antrian->pendaftaran;
-
-            if ($pendaftaran) {
-                $pendaftaran->update([
+            if ($antrian->pendaftaran) {
+                $antrian->pendaftaran->update([
                     'status' => $status === 'skipped'
                         ? 'waiting'
                         : $status,
@@ -95,8 +96,6 @@ class AntrianService
             if ($status === 'serving' && ! $antrian->started_at) {
                 $updateData['started_at'] = now();
 
-                // Kalau langsung serving tanpa status called,
-                // tetap catat waktu pemanggilan.
                 if (! $antrian->called_at) {
                     $updateData['called_at'] = now();
                 }
@@ -105,7 +104,6 @@ class AntrianService
             if ($status === 'completed' && ! $antrian->completed_at) {
                 $updateData['completed_at'] = now();
 
-                // Jika langsung completed, pastikan timestamp sebelumnya ada.
                 if (! $antrian->called_at) {
                     $updateData['called_at'] = now();
                 }
@@ -118,9 +116,8 @@ class AntrianService
             $antrian->update($updateData);
 
             return $antrian->fresh()->load([
-                'pendaftaran.pasien',
-                'pendaftaran.poli',
                 'poli',
+                'pendaftaran.pasien',
             ]);
         });
     }

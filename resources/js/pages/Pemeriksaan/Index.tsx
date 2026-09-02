@@ -77,7 +77,7 @@ export default function PemeriksaanIndex() {
 
     const handleDelete = async (pemeriksaan: Pemeriksaan) => {
         const confirmed = window.confirm(
-            `Hapus pemeriksaan antrean ${pemeriksaan.antrian?.queue_number ?? ''}? Tindakan ini tidak bisa dibatalkan.`,
+            `Hapus pemeriksaan ${pemeriksaan.pasien?.name ?? ''}? Tindakan ini tidak bisa dibatalkan.`,
         );
 
         if (!confirmed) {
@@ -119,14 +119,15 @@ export default function PemeriksaanIndex() {
             const patientName = pemeriksaan.pasien?.name.toLowerCase() ?? '';
             const mrNumber =
                 pemeriksaan.pasien?.medical_record_number.toLowerCase() ?? '';
-            const queueNumber =
-                pemeriksaan.antrian?.queue_number.toLowerCase() ?? '';
+            const category = (pemeriksaan.category ?? '').toLowerCase();
+            const poliName = pemeriksaan.poli?.name.toLowerCase() ?? '';
             const dokterName = pemeriksaan.dokter?.name.toLowerCase() ?? '';
 
             return (
                 patientName.includes(keyword) ||
                 mrNumber.includes(keyword) ||
-                queueNumber.includes(keyword) ||
+                category.includes(keyword) ||
+                poliName.includes(keyword) ||
                 dokterName.includes(keyword)
             );
         })
@@ -142,7 +143,7 @@ export default function PemeriksaanIndex() {
             <Head title="Pemeriksaan" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Pemeriksaan
@@ -157,10 +158,10 @@ export default function PemeriksaanIndex() {
                 <div className="mt-4">
                     {/* SEARCH + FILTERS */}
                     <div className="flex flex-col gap-2 sm:flex-row">
-                        <div className="flex h-11 flex-1 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
+                        <div className="flex h-12 w-full flex-1 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="mr-3 h-[17px] w-[17px] text-gray-400"
+                                className="mr-3 h-5 w-5 shrink-0 text-gray-400"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
@@ -176,8 +177,8 @@ export default function PemeriksaanIndex() {
                                 onChange={(event) =>
                                     setSearch(event.target.value)
                                 }
-                                placeholder="Cari nama pasien, No. RM, antrean, atau dokter..."
-                                className="w-full bg-transparent text-xs text-gray-700 outline-none placeholder:text-gray-400"
+                                placeholder="Cari nama pasien, No. RM, kategori, poli, atau dokter..."
+                                className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                             />
                         </div>
 
@@ -219,10 +220,10 @@ export default function PemeriksaanIndex() {
                                     <thead>
                                         <tr className="border-b border-gray-100 text-[11px] tracking-wide text-gray-400 uppercase">
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Antrean
+                                                Pasien
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Pasien
+                                                Kategori
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
                                                 Poli / Dokter
@@ -246,14 +247,6 @@ export default function PemeriksaanIndex() {
                                                 className="border-b border-gray-50 last:border-0 hover:bg-[#f7f9fb]/60"
                                             >
                                                 <td className="px-5 py-3.5">
-                                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#07577f]/10 text-[12px] font-bold text-[#07577f]">
-                                                        {pemeriksaan.antrian
-                                                            ?.queue_number ??
-                                                            '-'}
-                                                    </span>
-                                                </td>
-
-                                                <td className="px-5 py-3.5">
                                                     <p className="text-[13px] font-semibold text-gray-800">
                                                         {pemeriksaan.pasien
                                                             ?.name ?? '-'}
@@ -265,6 +258,13 @@ export default function PemeriksaanIndex() {
                                                             ?.medical_record_number ??
                                                             '-'}
                                                     </p>
+                                                </td>
+
+                                                <td className="px-5 py-3.5">
+                                                    <span className="inline-flex rounded-md bg-[#07577f]/10 px-2 py-1 text-[11px] font-bold text-[#07577f]">
+                                                        {pemeriksaan.category ??
+                                                            '-'}
+                                                    </span>
                                                 </td>
 
                                                 <td className="px-5 py-3.5">
@@ -296,14 +296,14 @@ export default function PemeriksaanIndex() {
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Link
                                                             href={`/pemeriksaans/${pemeriksaan.id}`}
-                                                            className="flex h-8 items-center gap-1.5 rounded-lg bg-[#07577f]/10 px-3 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20"
+                                                            className="flex h-10 items-center gap-1.5 rounded-lg bg-[#07577f]/10 px-3 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20 sm:h-8"
                                                         >
                                                             Detail
                                                         </Link>
 
                                                         <Link
                                                             href={`/pemeriksaans/${pemeriksaan.id}/edit`}
-                                                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100"
+                                                            className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100 sm:h-8 sm:w-8"
                                                         >
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -329,7 +329,7 @@ export default function PemeriksaanIndex() {
                                                                     pemeriksaan,
                                                                 )
                                                             }
-                                                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                                            className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-8 sm:w-8"
                                                         >
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg"
@@ -365,7 +365,7 @@ export default function PemeriksaanIndex() {
                                     type="button"
                                     disabled={page <= 1}
                                     onClick={() => setPage(page - 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
                                 >
                                     ‹
                                 </button>
@@ -378,7 +378,7 @@ export default function PemeriksaanIndex() {
                                     type="button"
                                     disabled={page >= lastPage}
                                     onClick={() => setPage(page + 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
                                 >
                                     ›
                                 </button>

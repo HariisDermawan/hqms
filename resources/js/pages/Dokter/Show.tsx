@@ -117,7 +117,7 @@ export default function DokterShow() {
             <Head title={dokter ? `Detail ${dokter.name}` : 'Detail Dokter'} />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Dokter
@@ -209,7 +209,7 @@ export default function DokterShow() {
                                     </span>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                     {detailItem('ID', String(dokter.id), true)}
                                     {detailItem('Kode', dokter.code, true)}
                                     {detailItem('Nama Dokter', dokter.name)}

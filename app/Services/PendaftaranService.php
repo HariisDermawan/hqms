@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Antrian;
 use App\Models\Pendaftaran;
 use App\Models\Poli;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -23,50 +24,43 @@ class PendaftaranService
 
             $registrationDate = $data['registration_date'];
 
-            $poli = Poli::query()->findOrFail($data['poli_id']);
-            $prefix = $poli->queue_prefix;
-
             /*
-             * Ambil nomor antrean terakhir
-             * berdasarkan poli dan tanggal pendaftaran.
+             * Pendaftaran dibuat dari tiket antrean yang sudah dipanggil.
+             * Nomor antrean & poli diambil dari tiket tersebut.
              */
-            $lastQueue = Pendaftaran::withTrashed()
-                ->where('poli_id', $data['poli_id'])
-                ->whereDate('registration_date', $registrationDate)
-                ->lockForUpdate()
-                ->orderByDesc('id')
-                ->value('queue_number');
+            $antrian = isset($data['antrian_id'])
+                ? Antrian::with(['poli'])->findOrFail($data['antrian_id'])
+                : null;
 
-            $lastSequence = $lastQueue
-                ? (int) preg_replace(
-                    '/\D/',
-                    '',
-                    (string) $lastQueue
-                )
-                : 0;
+            if ($antrian) {
+                $poli = $antrian->poli;
+                $queueNumber = $antrian->queue_number;
+                $data['poli_id'] = $antrian->poli_id;
+            } else {
+                $poli = Poli::query()->findOrFail($data['poli_id']);
 
-            $nextSequence = $lastSequence + 1;
-
-            $sequence = str_pad(
-                $nextSequence,
-                3,
-                '0',
-                STR_PAD_LEFT
-            );
-
-            $queueNumber = $prefix
-                ? "{$prefix}-{$sequence}"
-                : $sequence;
+                $queueNumber = $this->generateQueueNumber(
+                    $data['poli_id'],
+                    $poli->queue_prefix,
+                    $registrationDate
+                );
+            }
 
             /*
              * Nomor registrasi otomatis.
              */
+            $sequence = $queueNumber
+                ? (int) preg_replace('/\D/', '', (string) $queueNumber)
+                : 0;
+
+            $prefix = $poli->queue_prefix;
+
             $registrationNumber =
                 'REG-'.
                 date('Ymd', strtotime($registrationDate)).
                 '-'.
                 ($prefix ? $prefix : '').
-                $sequence;
+                str_pad($sequence, 3, '0', STR_PAD_LEFT);
 
             $data['queue_number'] = $queueNumber;
             $data['registration_number'] = $registrationNumber;
@@ -74,9 +68,21 @@ class PendaftaranService
 
             $pendaftaran = Pendaftaran::create($data);
 
+            /*
+             * Tandai tiket antrean sebagai sudah dipanggil
+             * ketika pasien selesai didaftarkan.
+             */
+            if ($antrian) {
+                $antrian->update([
+                    'status' => 'called',
+                    'called_at' => $antrian->called_at ?? now(),
+                ]);
+            }
+
             return $pendaftaran->load([
                 'pasien',
                 'poli',
+                'antrian',
             ]);
         });
     }
@@ -103,5 +109,28 @@ class PendaftaranService
         DB::transaction(function () use ($pendaftaran) {
             $pendaftaran->delete();
         });
+    }
+
+    private function generateQueueNumber(
+        int $poliId,
+        ?string $prefix,
+        string $registrationDate
+    ): string {
+        $lastQueue = Pendaftaran::withTrashed()
+            ->where('poli_id', $poliId)
+            ->whereDate('registration_date', $registrationDate)
+            ->lockForUpdate()
+            ->orderByDesc('id')
+            ->value('queue_number');
+
+        $lastSequence = $lastQueue
+            ? (int) preg_replace('/\D/', '', (string) $lastQueue)
+            : 0;
+
+        $sequence = str_pad($lastSequence + 1, 3, '0', STR_PAD_LEFT);
+
+        return $prefix
+            ? "{$prefix}-{$sequence}"
+            : $sequence;
     }
 }

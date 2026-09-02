@@ -5,7 +5,10 @@ import AppLayout from '@/Layouts/AppLayout';
 import PemeriksaanForm from './Form';
 
 export default function PemeriksaanCreate() {
-    const { antrian_id: antrianId } = usePage<{ antrian_id?: number }>().props;
+    const { pasien_id: pasienId, poli_id: poliId } = usePage<{
+        pasien_id?: number;
+        poli_id?: number;
+    }>().props;
 
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -61,7 +64,8 @@ export default function PemeriksaanCreate() {
                 </div>
 
                 <PemeriksaanForm
-                    initialAntrianId={antrianId}
+                    initialPasienId={pasienId}
+                    initialPoliId={poliId}
                     processing={processing}
                     errors={errors}
                     onSubmit={handleSubmit}

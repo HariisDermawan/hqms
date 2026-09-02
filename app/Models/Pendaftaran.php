@@ -14,6 +14,7 @@ class Pendaftaran extends Model
     protected $table = 'pendaftarans';
 
     protected $fillable = [
+        'antrian_id',
         'pasien_id',
         'poli_id',
         'registration_number',
@@ -35,5 +36,10 @@ class Pendaftaran extends Model
     public function poli(): BelongsTo
     {
         return $this->belongsTo(Poli::class);
+    }
+
+    public function antrian(): BelongsTo
+    {
+        return $this->belongsTo(Antrian::class);
     }
 }

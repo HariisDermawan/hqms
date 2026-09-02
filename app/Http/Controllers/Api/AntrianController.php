@@ -78,7 +78,6 @@ class AntrianController extends Controller
 
         $antrian->load([
             'pendaftaran.pasien',
-            'pendaftaran.poli',
             'poli',
         ]);
 

@@ -2,9 +2,10 @@
 
 namespace Database\Factories;
 
-use App\Models\Antrian;
 use App\Models\Dokter;
+use App\Models\Pasien;
 use App\Models\Pemeriksaan;
+use App\Models\Poli;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,8 +21,18 @@ class PemeriksaanFactory extends Factory
     public function definition(): array
     {
         return [
-            'antrian_id' => Antrian::factory(),
+            'pasien_id' => Pasien::factory(),
+            'poli_id' => Poli::factory(),
             'dokter_id' => Dokter::factory(),
+            'category' => fake()->randomElement([
+                'Umum',
+                'Gigi',
+                'Anak',
+                'Mata',
+                'THT',
+                'Kandungan',
+                'Bedah',
+            ]),
             'examined_at' => now(),
             'complaint' => $this->faker->sentence(),
             'diagnosis' => $this->faker->sentence(),

@@ -24,6 +24,19 @@ const STATUS_ORDER: Record<AntrianStatus, number> = {
     skipped: 4,
 };
 
+const waktuLabel = (antrian: Antrian): string => {
+    switch (antrian.status) {
+        case 'called':
+            return `Panggil ${formatTime(antrian.called_at)}`;
+        case 'serving':
+            return `Mulai ${formatTime(antrian.started_at)}`;
+        case 'completed':
+            return `Selesai ${formatTime(antrian.completed_at)}`;
+        default:
+            return '—';
+    }
+};
+
 export default function AntrianIndex() {
     const [antrians, setAntrians] = useState<Antrian[]>([]);
     const [polis, setPolis] = useState<Poli[]>([]);
@@ -84,7 +97,7 @@ export default function AntrianIndex() {
         label: string,
     ) => {
         const confirmed = window.confirm(
-            `Pindahkan antrean ${antrian.queue_number} (${antrian.pasien?.name ?? 'pasien'}) ke status "${label}"?`,
+            `Pindahkan antrean ${antrian.queue_number} ke status "${label}"?`,
         );
 
         if (!confirmed) {
@@ -93,6 +106,12 @@ export default function AntrianIndex() {
 
         try {
             setBusyId(antrian.id);
+
+            setAntrians((current) =>
+                current.map((item) =>
+                    item.id === antrian.id ? { ...item, status } : item,
+                ),
+            );
 
             await updateAntrian(antrian.id, { status });
 
@@ -108,6 +127,8 @@ export default function AntrianIndex() {
                 error.response?.data?.message ||
                     'Gagal memperbarui status antrean.',
             );
+
+            await loadAntrians(true);
         } finally {
             setBusyId(null);
         }
@@ -141,11 +162,14 @@ export default function AntrianIndex() {
 
     const filtered = antrians
         .filter((antrian) => {
-            if (
-                scope === 'today' &&
-                antrian.pendaftaran?.registration_date !== todayLocal()
-            ) {
-                return false;
+            if (scope === 'today') {
+                const registeredToday =
+                    antrian.pendaftaran?.registration_date === todayLocal();
+                const isFreshTicket = !antrian.pendaftaran;
+
+                if (!registeredToday && !isFreshTicket) {
+                    return false;
+                }
             }
 
             if (
@@ -158,17 +182,12 @@ export default function AntrianIndex() {
             const keyword = search.toLowerCase().trim();
 
             if (keyword) {
-                const patientName = antrian.pasien?.name.toLowerCase() ?? '';
-                const mrNumber =
-                    antrian.pasien?.medical_record_number.toLowerCase() ?? '';
-                const registrationNumber =
-                    antrian.pendaftaran?.registration_number.toLowerCase() ??
-                    '';
+                const queueNumber = antrian.queue_number.toLowerCase();
+                const poliName = antrian.poli?.name.toLowerCase() ?? '';
 
                 if (
-                    !patientName.includes(keyword) &&
-                    !mrNumber.includes(keyword) &&
-                    !registrationNumber.includes(keyword)
+                    !queueNumber.includes(keyword) &&
+                    !poliName.includes(keyword)
                 ) {
                     return false;
                 }
@@ -200,7 +219,7 @@ export default function AntrianIndex() {
             <Head title="Antrean" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Antrean
@@ -245,17 +264,39 @@ export default function AntrianIndex() {
                                         </span>
 
                                         <div>
-                                            <p className="text-base font-bold sm:text-lg">
-                                                {nowServing.pasien?.name ?? '-'}
-                                            </p>
+                                            {nowServing.pendaftaran?.pasien ? (
+                                                <>
+                                                    <p className="text-base font-bold sm:text-lg">
+                                                        {
+                                                            nowServing
+                                                                .pendaftaran
+                                                                .pasien.name
+                                                        }
+                                                    </p>
 
-                                            <p className="text-[12px] text-white/60">
-                                                {nowServing.poli?.name ?? '-'} ·{' '}
-                                                No. RM{' '}
-                                                {nowServing.pasien
-                                                    ?.medical_record_number ??
-                                                    '-'}
-                                            </p>
+                                                    <p className="text-[12px] text-white/60">
+                                                        {nowServing.poli?.name}{' '}
+                                                        · No. RM{' '}
+                                                        {
+                                                            nowServing
+                                                                .pendaftaran
+                                                                .pasien
+                                                                .medical_record_number
+                                                        }
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p className="text-base font-bold text-white/80">
+                                                        Pasien belum didaftarkan
+                                                    </p>
+
+                                                    <p className="text-[12px] text-white/60">
+                                                        {nowServing.poli
+                                                            ?.name ?? '-'}
+                                                    </p>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 ) : (
@@ -293,38 +334,37 @@ export default function AntrianIndex() {
                         </div>
                     </div>
 
-                    {/* SEARCH + FILTERS */}
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                        <div className="flex h-11 flex-1 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="mr-3 h-[17px] w-[17px] text-gray-400"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                            >
-                                <circle cx="11" cy="11" r="7" />
-                                <path d="m20 20-4-4" />
-                            </svg>
+                    {/* SEARCH */}
+                    <div className="mt-4 flex h-12 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="mr-3 h-5 w-5 shrink-0 text-gray-400"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                        >
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-4-4" />
+                        </svg>
 
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(event) =>
-                                    setSearch(event.target.value)
-                                }
-                                placeholder="Cari nama pasien, No. RM, atau No. registrasi..."
-                                className="w-full bg-transparent text-xs text-gray-700 outline-none placeholder:text-gray-400"
-                            />
-                        </div>
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="Cari nomor antrean atau poli..."
+                            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
+                        />
+                    </div>
 
+                    {/* FILTERS */}
+                    <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                         <select
                             value={poliFilter}
                             onChange={(event) =>
                                 setPoliFilter(event.target.value)
                             }
-                            className="h-11 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[190px]"
+                            className="h-12 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[190px]"
                         >
                             <option value="all">Semua Poli</option>
                             {polis.map((poli) => (
@@ -334,7 +374,7 @@ export default function AntrianIndex() {
                             ))}
                         </select>
 
-                        <div className="flex h-11 items-center overflow-hidden rounded-full border border-gray-200 bg-white shadow-sm">
+                        <div className="flex h-12 items-center overflow-hidden rounded-full border border-gray-200 bg-white shadow-sm">
                             <button
                                 type="button"
                                 onClick={() => setScope('today')}
@@ -367,7 +407,7 @@ export default function AntrianIndex() {
                         </div>
                     )}
 
-                    {/* TABLE */}
+                    {/* CARDS */}
                     {loading ? (
                         <div className="mt-4 rounded-xl bg-white p-10 text-center text-sm text-gray-400 shadow-sm">
                             Memuat data...
@@ -377,240 +417,158 @@ export default function AntrianIndex() {
                             Tidak ada antrean yang cocok.
                         </div>
                     ) : (
-                        <div className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm">
-                            <div className="overflow-x-auto">
-                                <table className="w-full min-w-[880px] text-left">
-                                    <thead>
-                                        <tr className="border-b border-gray-100 text-[11px] tracking-wide text-gray-400 uppercase">
-                                            <th className="px-5 py-3.5 font-semibold">
-                                                Antrean
-                                            </th>
-                                            <th className="px-5 py-3.5 font-semibold">
-                                                Pasien
-                                            </th>
-                                            <th className="px-5 py-3.5 font-semibold">
-                                                Poli
-                                            </th>
-                                            <th className="px-5 py-3.5 font-semibold">
-                                                Status
-                                            </th>
-                                            <th className="px-5 py-3.5 font-semibold">
-                                                Waktu
-                                            </th>
-                                            <th className="px-5 py-3.5 text-right font-semibold">
-                                                Aksi
-                                            </th>
-                                        </tr>
-                                    </thead>
+                        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {filtered.map((antrian) => (
+                                <div
+                                    key={antrian.id}
+                                    className={`rounded-xl border bg-white p-4 shadow-sm ${
+                                        antrian.status === 'serving'
+                                            ? 'border-indigo-200 ring-1 ring-indigo-100'
+                                            : antrian.status === 'completed' ||
+                                                antrian.status === 'skipped'
+                                              ? 'border-gray-100 opacity-55'
+                                              : 'border-gray-100'
+                                    }`}
+                                >
+                                    <div className="flex items-start justify-between gap-3">
+                                        <span
+                                            className={`flex h-12 items-center justify-center rounded-xl px-3 text-lg font-black tracking-tight ${
+                                                antrian.status === 'serving'
+                                                    ? 'bg-indigo-100 text-indigo-600'
+                                                    : 'bg-[#07577f]/10 text-[#07577f]'
+                                            }`}
+                                        >
+                                            {antrian.queue_number}
+                                        </span>
 
-                                    <tbody>
-                                        {filtered.map((antrian) => (
-                                            <tr
-                                                key={antrian.id}
-                                                className={`border-b border-gray-50 last:border-0 ${
-                                                    antrian.status === 'serving'
-                                                        ? 'bg-indigo-50/40 '
-                                                        : antrian.status ===
-                                                                'completed' ||
-                                                            antrian.status ===
-                                                                'skipped'
-                                                          ? 'opacity-55 '
-                                                          : 'hover:bg-[#f7f9fb]/60'
-                                                }`}
+                                        <span
+                                            className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${statusBadgeClass(antrian.status)}`}
+                                        >
+                                            {statusLabel(antrian.status)}
+                                        </span>
+                                    </div>
+
+                                    <div className="mt-3">
+                                        <p className="text-[13px] font-bold text-gray-800">
+                                            {antrian.poli?.name ?? '-'}
+                                        </p>
+
+                                        <p className="mt-0.5 text-[11px] text-gray-400">
+                                            {waktuLabel(antrian)}
+                                        </p>
+                                    </div>
+
+                                    <div className="mt-4 space-y-2">
+                                        {antrian.status === 'waiting' && (
+                                            <button
+                                                type="button"
+                                                disabled={busyId === antrian.id}
+                                                onClick={() =>
+                                                    changeStatus(
+                                                        antrian,
+                                                        'called',
+                                                        'Dipanggil',
+                                                    )
+                                                }
+                                                className="flex h-10 w-full items-center justify-center gap-1 rounded-lg bg-[#07577f] text-[12px] font-semibold text-white transition hover:bg-[#063f62] disabled:cursor-not-allowed disabled:opacity-60"
                                             >
-                                                <td className="px-5 py-3.5">
-                                                    <div className="flex items-center gap-3">
-                                                        <span
-                                                            className={`flex h-10 w-10 items-center justify-center rounded-lg text-[13px] font-bold ${
-                                                                antrian.status ===
-                                                                'serving'
-                                                                    ? 'bg-indigo-100 text-indigo-600'
-                                                                    : 'bg-[#07577f]/10 text-[#07577f]'
-                                                            }`}
-                                                        >
-                                                            {
-                                                                antrian.queue_number
-                                                            }
-                                                        </span>
+                                                Panggil
+                                            </button>
+                                        )}
 
-                                                        <Link
-                                                            href={`/antrians/${antrian.id}`}
-                                                            className="text-[11px] font-semibold text-[#07577f] hover:underline"
-                                                        >
-                                                            Detail
-                                                        </Link>
-                                                    </div>
-                                                </td>
+                                        {antrian.status === 'called' && (
+                                            <button
+                                                type="button"
+                                                disabled={busyId === antrian.id}
+                                                onClick={() =>
+                                                    changeStatus(
+                                                        antrian,
+                                                        'serving',
+                                                        'Dilayani',
+                                                    )
+                                                }
+                                                className="flex h-10 w-full items-center justify-center gap-1 rounded-lg bg-indigo-600 text-[12px] font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                Mulai
+                                            </button>
+                                        )}
 
-                                                <td className="px-5 py-3.5">
-                                                    <div>
-                                                        <p className="text-[13px] font-semibold text-gray-800">
-                                                            {antrian.pasien
-                                                                ?.name ?? '-'}
-                                                        </p>
+                                        {antrian.status === 'serving' && (
+                                            <button
+                                                type="button"
+                                                disabled={busyId === antrian.id}
+                                                onClick={() =>
+                                                    changeStatus(
+                                                        antrian,
+                                                        'completed',
+                                                        'Selesai',
+                                                    )
+                                                }
+                                                className="flex h-10 w-full items-center justify-center gap-1 rounded-lg bg-green-600 text-[12px] font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                                            >
+                                                Selesai
+                                            </button>
+                                        )}
 
-                                                        <p className="text-[11px] text-gray-400">
-                                                            No. RM{' '}
-                                                            {antrian.pasien
-                                                                ?.medical_record_number ??
-                                                                '-'}
-                                                        </p>
-                                                    </div>
-                                                </td>
+                                        <div className="flex items-center justify-between gap-2">
+                                            <Link
+                                                href={`/antrians/${antrian.id}`}
+                                                className="text-[12px] font-semibold text-[#07577f] hover:underline"
+                                            >
+                                                Detail
+                                            </Link>
 
-                                                <td className="px-5 py-3.5">
-                                                    <span className="rounded-md bg-[#07577f]/10 px-2 py-1 text-[11px] font-semibold text-[#07577f]">
-                                                        {antrian.poli?.name ||
-                                                            '-'}
-                                                    </span>
-                                                </td>
-
-                                                <td className="px-5 py-3.5">
-                                                    <span
-                                                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${statusBadgeClass(antrian.status)}`}
+                                            <div className="flex items-center gap-2">
+                                                {(antrian.status ===
+                                                    'waiting' ||
+                                                    antrian.status ===
+                                                        'called') && (
+                                                    <button
+                                                        type="button"
+                                                        disabled={
+                                                            busyId ===
+                                                            antrian.id
+                                                        }
+                                                        onClick={() =>
+                                                            changeStatus(
+                                                                antrian,
+                                                                'skipped',
+                                                                'Dilewati',
+                                                            )
+                                                        }
+                                                        className="flex h-8 items-center rounded-lg bg-gray-100 px-3 text-[11px] font-semibold text-gray-500 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
                                                     >
-                                                        {statusLabel(
-                                                            antrian.status,
-                                                        )}
-                                                    </span>
-                                                </td>
+                                                        Lewati
+                                                    </button>
+                                                )}
 
-                                                <td className="px-5 py-3.5 text-[12px] text-gray-500">
-                                                    {antrian.status ===
-                                                    'waiting'
-                                                        ? '—'
-                                                        : antrian.status ===
-                                                            'called'
-                                                          ? `Panggil ${formatTime(antrian.called_at)}`
-                                                          : antrian.status ===
-                                                              'serving'
-                                                            ? `Mulai ${formatTime(antrian.started_at)}`
-                                                            : antrian.status ===
-                                                                'completed'
-                                                              ? `Selesai ${formatTime(antrian.completed_at)}`
-                                                              : '—'}
-                                                </td>
-
-                                                <td className="px-5 py-3.5">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        {antrian.status ===
-                                                            'waiting' && (
-                                                            <button
-                                                                type="button"
-                                                                disabled={
-                                                                    busyId ===
-                                                                    antrian.id
-                                                                }
-                                                                onClick={() =>
-                                                                    changeStatus(
-                                                                        antrian,
-                                                                        'called',
-                                                                        'Dipanggil',
-                                                                    )
-                                                                }
-                                                                className="flex h-8 items-center gap-1 rounded-lg bg-[#07577f] px-3 text-[11px] font-semibold text-white transition hover:bg-[#063f62] disabled:cursor-not-allowed disabled:opacity-60"
-                                                            >
-                                                                Panggil
-                                                            </button>
-                                                        )}
-
-                                                        {antrian.status ===
-                                                            'called' && (
-                                                            <button
-                                                                type="button"
-                                                                disabled={
-                                                                    busyId ===
-                                                                    antrian.id
-                                                                }
-                                                                onClick={() =>
-                                                                    changeStatus(
-                                                                        antrian,
-                                                                        'serving',
-                                                                        'Dilayani',
-                                                                    )
-                                                                }
-                                                                className="flex h-8 items-center gap-1 rounded-lg bg-indigo-600 px-3 text-[11px] font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
-                                                            >
-                                                                Mulai
-                                                            </button>
-                                                        )}
-
-                                                        {antrian.status ===
-                                                            'serving' && (
-                                                            <button
-                                                                type="button"
-                                                                disabled={
-                                                                    busyId ===
-                                                                    antrian.id
-                                                                }
-                                                                onClick={() =>
-                                                                    changeStatus(
-                                                                        antrian,
-                                                                        'completed',
-                                                                        'Selesai',
-                                                                    )
-                                                                }
-                                                                className="flex h-8 items-center gap-1 rounded-lg bg-green-600 px-3 text-[11px] font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
-                                                            >
-                                                                Selesai
-                                                            </button>
-                                                        )}
-
-                                                        {(antrian.status ===
-                                                            'waiting' ||
-                                                            antrian.status ===
-                                                                'called') && (
-                                                            <button
-                                                                type="button"
-                                                                disabled={
-                                                                    busyId ===
-                                                                    antrian.id
-                                                                }
-                                                                onClick={() =>
-                                                                    changeStatus(
-                                                                        antrian,
-                                                                        'skipped',
-                                                                        'Dilewati',
-                                                                    )
-                                                                }
-                                                                className="flex h-8 items-center gap-1 rounded-lg bg-gray-100 px-3 text-[11px] font-semibold text-gray-500 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
-                                                            >
-                                                                Lewati
-                                                            </button>
-                                                        )}
-
-                                                        <button
-                                                            type="button"
-                                                            disabled={
-                                                                busyId ===
-                                                                antrian.id
-                                                            }
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    antrian,
-                                                                )
-                                                            }
-                                                            className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                className="h-[15px] w-[15px]"
-                                                                viewBox="0 0 24 24"
-                                                                fill="none"
-                                                                stroke="currentColor"
-                                                                strokeWidth="1.8"
-                                                            >
-                                                                <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                                                <path d="M10 11v6M14 11v6" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        busyId === antrian.id
+                                                    }
+                                                    onClick={() =>
+                                                        handleDelete(antrian)
+                                                    }
+                                                    className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-[15px] w-[15px]"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.8"
+                                                    >
+                                                        <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                                        <path d="M10 11v6M14 11v6" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>

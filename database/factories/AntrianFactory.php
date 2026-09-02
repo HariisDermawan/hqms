@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Antrian;
-use App\Models\Pendaftaran;
+use App\Models\Poli;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,13 +19,11 @@ class AntrianFactory extends Factory
     public function definition(): array
     {
         return [
-            'pendaftaran_id' => Pendaftaran::factory(),
-            'poli_id' => fn (array $attrs) => Pendaftaran::query()
-                ->findOrFail($attrs['pendaftaran_id'])
-                ->poli_id,
-            'queue_number' => fn (array $attrs) => Pendaftaran::query()
-                ->findOrFail($attrs['pendaftaran_id'])
-                ->queue_number,
+            'poli_id' => Poli::factory(),
+            'queue_number' => fn (array $attrs) => sprintf(
+                'A-%03d',
+                $this->faker->unique()->numberBetween(1, 999)
+            ),
             'status' => 'waiting',
             'called_at' => null,
             'started_at' => null,

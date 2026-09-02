@@ -14,10 +14,10 @@ class StoreAntrianRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pendaftaran_id' => [
+            'poli_id' => [
                 'required',
                 'integer',
-                'exists:pendaftarans,id',
+                'exists:polis,id',
             ],
 
             'notes' => [

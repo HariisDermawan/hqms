@@ -26,6 +26,7 @@ class PendaftaranFactory extends Factory
         $sequence = sprintf('%03d', fake()->unique()->numberBetween(1, 999));
 
         return [
+            'antrian_id' => null,
             'pasien_id' => Pasien::factory(),
             'poli_id' => $poli->id,
             'registration_number' => 'REG-'.now()->format('Ymd').'-A'.$sequence,

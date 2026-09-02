@@ -100,7 +100,7 @@ export default function JadwalDokterShow() {
             <Head title="Detail Jadwal Dokter" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Jadwal Dokter
@@ -200,7 +200,7 @@ export default function JadwalDokterShow() {
                                     </span>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                     {detailItem('ID', String(jadwal.id), true)}
                                     {detailItem('Dokter', dokter?.name ?? '-')}
                                     {detailItem(

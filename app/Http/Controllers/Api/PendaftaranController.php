@@ -81,6 +81,7 @@ class PendaftaranController extends Controller
         $pendaftaran->load([
             'pasien',
             'poli',
+            'antrian',
         ]);
 
         return response()->json([

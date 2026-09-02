@@ -114,7 +114,7 @@ export default function RuanganIndex() {
             <Head title="Ruangan" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Ruangan
@@ -145,10 +145,10 @@ export default function RuanganIndex() {
 
                 <div className="mt-4">
                     {/* SEARCH */}
-                    <div className="flex h-11 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
+                    <div className="flex h-12 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="mr-3 h-[17px] w-[17px] text-gray-400"
+                            className="mr-3 h-5 w-5 shrink-0 text-gray-400"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -163,7 +163,7 @@ export default function RuanganIndex() {
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
                             placeholder="Cari nama, kode, atau kategori ruangan..."
-                            className="w-full bg-transparent text-xs text-gray-700 outline-none placeholder:text-gray-400"
+                            className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                         />
                     </div>
 
@@ -252,14 +252,14 @@ export default function RuanganIndex() {
                                                 <div className="mt-4 flex items-center gap-2 border-t border-gray-50 pt-3">
                                                     <Link
                                                         href={`/ruangans/${ruangan.id}`}
-                                                        className="flex h-8 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#07577f]/10 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20"
+                                                        className="flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#07577f]/10 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20 sm:h-8"
                                                     >
                                                         Detail
                                                     </Link>
 
                                                     <Link
                                                         href={`/ruangans/${ruangan.id}/edit`}
-                                                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100"
+                                                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100 sm:h-8 sm:w-8"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -285,7 +285,7 @@ export default function RuanganIndex() {
                                                             deletingId ===
                                                             ruangan.id
                                                         }
-                                                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-8 sm:w-8"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -320,7 +320,7 @@ export default function RuanganIndex() {
                                     type="button"
                                     disabled={page <= 1}
                                     onClick={() => loadRuangans(page - 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
                                 >
                                     ‹
                                 </button>
@@ -333,7 +333,7 @@ export default function RuanganIndex() {
                                     type="button"
                                     disabled={page >= lastPage}
                                     onClick={() => loadRuangans(page + 1)}
-                                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
                                 >
                                     ›
                                 </button>

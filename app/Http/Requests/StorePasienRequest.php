@@ -21,7 +21,7 @@ class StorePasienRequest extends FormRequest
             ],
 
             'medical_record_number' => [
-                'required',
+                'nullable',
                 'string',
                 'max:50',
                 'unique:pasiens,medical_record_number',

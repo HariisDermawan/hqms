@@ -1,9 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { getAntrians, storeAntrian, type AntrianPayload } from '@/api/antrian';
-import { getPendaftarans, type Pendaftaran } from '@/api/pendaftaran';
+import { storeAntrian } from '@/api/antrian';
+import { getPolis, type Poli } from '@/api/poli';
 import AppLayout from '@/Layouts/AppLayout';
-import { todayLocal } from './status';
 
 const inputClass =
     'w-full h-[42px] px-[12px] rounded-[12px] bg-[#d9d9d9] text-[13px] text-gray-700 placeholder:text-[#999] outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 transition';
@@ -11,34 +10,20 @@ const inputClass =
 const labelClass = 'block text-[13px] text-[#333] mb-[4px]';
 
 export default function AntrianCreate() {
-    const [pendaftarans, setPendaftarans] = useState<Pendaftaran[]>([]);
+    const [polis, setPolis] = useState<Poli[]>([]);
     const [optionsLoaded, setOptionsLoaded] = useState(false);
-    const [pendaftaranId, setPendaftaranId] = useState('');
+    const [poliId, setPoliId] = useState('');
     const [notes, setNotes] = useState('');
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
-        Promise.all([getPendaftarans(1, 100), getAntrians({ perPage: 100 })])
-            .then(([pendaftaransResponse, antriansResponse]) => {
-                const queuedIds = new Set(
-                    (antriansResponse.data?.items ?? []).map(
-                        (antrian) => antrian.pendaftaran?.id,
-                    ),
-                );
-
-                setPendaftarans(
-                    (pendaftaransResponse.data?.items ?? []).filter(
-                        (pendaftaran) =>
-                            pendaftaran.status === 'waiting' &&
-                            pendaftaran.registration_date === todayLocal() &&
-                            pendaftaran.id !== undefined &&
-                            !queuedIds.has(pendaftaran.id),
-                    ),
-                );
+        getPolis(1, 100)
+            .then((polisResponse) => {
+                setPolis(polisResponse.data?.items ?? []);
             })
             .catch((error: any) => {
-                console.error('Gagal memuat pendaftaran', error);
+                console.error('Gagal memuat poli', error);
 
                 if (error.response?.status === 401) {
                     window.location.href = '/login';
@@ -55,9 +40,9 @@ export default function AntrianCreate() {
 
         try {
             await storeAntrian({
-                pendaftaran_id: Number(pendaftaranId),
+                poli_id: Number(poliId),
                 notes: notes.trim() || undefined,
-            } as AntrianPayload);
+            });
 
             router.visit('/antrians');
         } catch (error: any) {
@@ -88,16 +73,16 @@ export default function AntrianCreate() {
 
     return (
         <>
-            <Head title="Tambah Antrean" />
+            <Head title="Ambil Antrean" />
 
             <AppLayout wide>
                 <div>
                     <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
-                        Tambah Antrean
+                        Ambil Antrean
                     </h2>
 
                     <p className="mt-1 text-xs text-gray-400 sm:text-sm">
-                        Masukkan pendaftaran pasien hari ini ke antrean
+                        Ambil tiket antrean untuk poli tujuan
                     </p>
                 </div>
 
@@ -110,56 +95,46 @@ export default function AntrianCreate() {
 
                     {!optionsLoaded ? (
                         <div className="p-10 text-center text-sm text-gray-400">
-                            Memuat pendaftaran...
+                            Memuat poli...
                         </div>
                     ) : (
                         <>
                             <div>
-                                <label
-                                    htmlFor="pendaftaran_id"
-                                    className={labelClass}
-                                >
-                                    Pendaftaran (hari ini, status menunggu)
+                                <label htmlFor="poli_id" className={labelClass}>
+                                    Poli
                                 </label>
 
-                                {pendaftarans.length === 0 ? (
-                                    <div className="rounded-[10px] bg-amber-50 px-3 py-2.5 text-[12px] text-amber-600">
-                                        Tidak ada pendaftaran tersedia. Pastikan
-                                        ada pendaftaran hari ini dengan status
-                                        menunggu.
-                                    </div>
-                                ) : (
-                                    <select
-                                        id="pendaftaran_id"
-                                        value={pendaftaranId}
-                                        onChange={(event) =>
-                                            setPendaftaranId(event.target.value)
-                                        }
-                                        className={inputClass}
-                                    >
-                                        <option value="">
-                                            Pilih pendaftaran...
+                                <select
+                                    id="poli_id"
+                                    value={poliId}
+                                    onChange={(event) =>
+                                        setPoliId(event.target.value)
+                                    }
+                                    className={inputClass}
+                                >
+                                    <option value="">Pilih poli...</option>
+
+                                    {polis.map((poli) => (
+                                        <option key={poli.id} value={poli.id}>
+                                            {poli.name}
+                                            {poli.queue_prefix
+                                                ? ` — antrean ${poli.queue_prefix}-001..`
+                                                : ''}
                                         </option>
+                                    ))}
+                                </select>
 
-                                        {pendaftarans.map((pendaftaran) => (
-                                            <option
-                                                key={pendaftaran.id}
-                                                value={pendaftaran.id}
-                                            >
-                                                {pendaftaran.queue_number} ·{' '}
-                                                {pendaftaran.pasien?.name} ·{' '}
-                                                {pendaftaran.poli?.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                )}
-
-                                {errors.pendaftaran_id && (
+                                {errors.poli_id && (
                                     <p className="mt-1 text-[11px] text-red-500">
-                                        {errors.pendaftaran_id}
+                                        {errors.poli_id}
                                     </p>
                                 )}
                             </div>
+
+                            <p className="mt-2 text-[11px] text-gray-400">
+                                Nomor antrean dibuat otomatis oleh sistem
+                                berdasarkan poli dan urutan antrean hari ini.
+                            </p>
 
                             <div className="mt-4">
                                 <label htmlFor="notes" className={labelClass}>
@@ -198,12 +173,12 @@ export default function AntrianCreate() {
                                 <button
                                     type="button"
                                     onClick={handleSubmit}
-                                    disabled={processing || !pendaftaranId}
+                                    disabled={processing || !poliId}
                                     className="h-[43px] rounded-[12px] bg-[#084e7a] px-6 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
                                 >
                                     {processing
                                         ? 'Menambahkan...'
-                                        : 'Tambah ke Antrean'}
+                                        : 'Ambil Tiket'}
                                 </button>
                             </div>
                         </>

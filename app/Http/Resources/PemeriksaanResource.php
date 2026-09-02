@@ -12,22 +12,16 @@ class PemeriksaanResource extends JsonResource
         return [
             'id' => $this->id,
 
-            'antrian' => [
-                'id' => $this->antrian?->id,
-                'queue_number' => $this->antrian?->queue_number,
-                'status' => $this->antrian?->status,
-            ],
-
             'pasien' => [
-                'id' => $this->antrian?->pendaftaran?->pasien?->id,
-                'medical_record_number' => $this->antrian?->pendaftaran?->pasien?->medical_record_number,
-                'name' => $this->antrian?->pendaftaran?->pasien?->name,
+                'id' => $this->pasien?->id,
+                'medical_record_number' => $this->pasien?->medical_record_number,
+                'name' => $this->pasien?->name,
             ],
 
             'poli' => [
-                'id' => $this->antrian?->poli?->id,
-                'code' => $this->antrian?->poli?->code,
-                'name' => $this->antrian?->poli?->name,
+                'id' => $this->poli?->id,
+                'code' => $this->poli?->code,
+                'name' => $this->poli?->name,
             ],
 
             'dokter' => [
@@ -37,6 +31,7 @@ class PemeriksaanResource extends JsonResource
                 'specialization' => $this->dokter?->specialization,
             ],
 
+            'category' => $this->category,
             'examined_at' => $this->examined_at?->toISOString(),
             'complaint' => $this->complaint,
             'diagnosis' => $this->diagnosis,

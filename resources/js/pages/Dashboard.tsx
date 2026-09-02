@@ -83,7 +83,7 @@ export default function Dashboard() {
     return (
         <AppLayout>
             <section>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Service
@@ -230,7 +230,7 @@ export default function Dashboard() {
             </section>
 
             <section className="mt-8">
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Doctor
@@ -298,7 +298,7 @@ export default function Dashboard() {
             </section>
 
             <section className="mt-8">
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Jadwal Doctor

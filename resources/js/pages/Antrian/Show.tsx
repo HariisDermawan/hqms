@@ -148,7 +148,7 @@ export default function AntrianShow({ id }: { id: number }) {
             <Head title={`Antrean ${antrian.queue_number}`} />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Antrean {antrian.queue_number}
@@ -190,13 +190,13 @@ export default function AntrianShow({ id }: { id: number }) {
 
                             <div className="mt-5">
                                 <p className="text-lg font-bold">
-                                    {antrian.pasien?.name ?? '-'}
+                                    {antrian.pendaftaran?.pasien?.name ?? '-'}
                                 </p>
 
                                 <p className="text-[12px] text-white/60">
                                     No. RM{' '}
-                                    {antrian.pasien?.medical_record_number ??
-                                        '-'}
+                                    {antrian.pendaftaran?.pasien
+                                        ?.medical_record_number ?? '-'}
                                 </p>
                             </div>
                         </div>
@@ -230,7 +230,7 @@ export default function AntrianShow({ id }: { id: number }) {
                                             </div>
 
                                             <p
-                                                className={`mt-2 text-[10px] font-semibold ${
+                                                className={`mt-2 text-[9px] font-semibold whitespace-nowrap sm:text-[10px] ${
                                                     reached
                                                         ? 'text-[#07577f]'
                                                         : 'text-gray-400'
@@ -338,7 +338,8 @@ export default function AntrianShow({ id }: { id: number }) {
                                         Nama Pasien
                                     </span>
                                     <span className="max-w-[55%] text-right text-[12px] font-semibold text-gray-700">
-                                        {antrian.pasien?.name || '-'}
+                                        {antrian.pendaftaran?.pasien?.name ||
+                                            '-'}
                                     </span>
                                 </div>
                             </div>
@@ -352,16 +353,12 @@ export default function AntrianShow({ id }: { id: number }) {
 
                             <div className="mt-3 flex flex-col gap-2">
                                 {antrian.status === 'waiting' && (
-                                    <button
-                                        type="button"
-                                        disabled={processing}
-                                        onClick={() =>
-                                            changeStatus('called', 'Dipanggil')
-                                        }
-                                        className="flex h-[43px] items-center justify-center gap-2 rounded-[12px] bg-[#07577f] text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+                                    <Link
+                                        href={`/pendaftarans/create?antrian_id=${antrian.id}`}
+                                        className="flex h-[43px] items-center justify-center gap-2 rounded-[12px] bg-[#07577f] text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
                                     >
-                                        Panggil Pasien
-                                    </button>
+                                        Panggil &amp; Daftarkan Pasien
+                                    </Link>
                                 )}
 
                                 {antrian.status === 'called' && (
@@ -379,7 +376,7 @@ export default function AntrianShow({ id }: { id: number }) {
 
                                 {antrian.status === 'serving' && (
                                     <Link
-                                        href={`/pemeriksaans/create?antrian_id=${antrian.id}`}
+                                        href={`/pemeriksaans/create?pasien_id=${antrian.pendaftaran?.pasien?.id ?? ''}&poli_id=${antrian.poli?.id ?? ''}`}
                                         className="flex h-[43px] items-center justify-center gap-2 rounded-[12px] bg-green-600 text-[13px] font-bold text-white transition hover:bg-green-700 hover:shadow-md active:scale-[0.99]"
                                     >
                                         Lanjut ke Pemeriksaan

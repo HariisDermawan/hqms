@@ -5,7 +5,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DokterController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\JadwalDokterController;
+use App\Http\Controllers\Api\KioskController;
 use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\MonitoringController;
 use App\Http\Controllers\Api\PasienController;
 use App\Http\Controllers\Api\PemeriksaanController;
 use App\Http\Controllers\Api\PendaftaranController;
@@ -20,6 +22,13 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
     });
+
+    Route::prefix('kiosk')->group(function () {
+        Route::get('/polis', [KioskController::class, 'polis']);
+        Route::post('/tickets', [KioskController::class, 'store']);
+        Route::get('/now-serving', [KioskController::class, 'nowServing']);
+    });
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::prefix('auth')->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
@@ -47,5 +56,10 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::apiResource('faqs', FaqController::class);
         Route::apiResource('testimonials', TestimonialController::class);
         Route::apiResource('messages', MessageController::class);
+
+        Route::get('monitoring', [
+            MonitoringController::class,
+            'index',
+        ]);
     });
 });

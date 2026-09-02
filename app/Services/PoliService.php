@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Poli;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,17 @@ class PoliService
             ->with('jadwalDokters.dokter')
             ->latest()
             ->paginate($perPage);
+    }
+
+    /**
+     * @return Collection<int, Poli>
+     */
+    public function getActive(): Collection
+    {
+        return Poli::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
     }
 
     public function create(array $data): Poli

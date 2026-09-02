@@ -12,8 +12,8 @@ class PemeriksaanService
     {
         return Pemeriksaan::query()
             ->with([
-                'antrian.pendaftaran.pasien',
-                'antrian.poli',
+                'pasien',
+                'poli',
                 'dokter',
             ])
             ->latest()
@@ -25,8 +25,10 @@ class PemeriksaanService
         return DB::transaction(function () use ($data) {
 
             $pemeriksaan = Pemeriksaan::create([
-                'antrian_id' => $data['antrian_id'],
-                'dokter_id' => $data['dokter_id'],
+                'pasien_id' => $data['pasien_id'],
+                'poli_id' => $data['poli_id'],
+                'dokter_id' => $data['dokter_id'] ?? null,
+                'category' => $data['category'],
                 'examined_at' => $data['examined_at'],
                 'complaint' => $data['complaint'] ?? null,
                 'diagnosis' => $data['diagnosis'] ?? null,
@@ -35,8 +37,8 @@ class PemeriksaanService
             ]);
 
             return $pemeriksaan->load([
-                'antrian.pendaftaran.pasien',
-                'antrian.poli',
+                'pasien',
+                'poli',
                 'dokter',
             ]);
         });
@@ -51,8 +53,10 @@ class PemeriksaanService
             $data
         ) {
             $pemeriksaan->update([
-                'antrian_id' => $data['antrian_id'],
-                'dokter_id' => $data['dokter_id'],
+                'pasien_id' => $data['pasien_id'],
+                'poli_id' => $data['poli_id'],
+                'dokter_id' => $data['dokter_id'] ?? null,
+                'category' => $data['category'],
                 'examined_at' => $data['examined_at'],
                 'complaint' => $data['complaint'] ?? null,
                 'diagnosis' => $data['diagnosis'] ?? null,
@@ -61,8 +65,8 @@ class PemeriksaanService
             ]);
 
             return $pemeriksaan->fresh([
-                'antrian.pendaftaran.pasien',
-                'antrian.poli',
+                'pasien',
+                'poli',
                 'dokter',
             ]);
         });

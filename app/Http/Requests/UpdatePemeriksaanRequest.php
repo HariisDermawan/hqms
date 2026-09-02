@@ -14,16 +14,28 @@ class UpdatePemeriksaanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'antrian_id' => [
+            'pasien_id' => [
                 'required',
                 'integer',
-                'exists:antrians,id',
+                'exists:pasiens,id',
+            ],
+
+            'poli_id' => [
+                'required',
+                'integer',
+                'exists:polis,id',
             ],
 
             'dokter_id' => [
-                'required',
+                'nullable',
                 'integer',
                 'exists:dokters,id',
+            ],
+
+            'category' => [
+                'required',
+                'string',
+                'max:100',
             ],
 
             'examined_at' => [

@@ -20,17 +20,18 @@ export interface Antrian {
         id: number;
         registration_number: string;
         registration_date: string;
-    } | null;
-    pasien: {
-        id: number;
-        medical_record_number: string;
-        name: string;
+        status: AntrianStatus;
+        pasien: {
+            id: number;
+            medical_record_number: string;
+            name: string;
+        };
     } | null;
     poli: { id: number; code: string; name: string } | null;
 }
 
 export interface AntrianPayload {
-    pendaftaran_id: number;
+    poli_id: number;
     notes?: string;
 }
 

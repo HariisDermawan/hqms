@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Antrian extends Model
@@ -14,7 +15,6 @@ class Antrian extends Model
     protected $table = 'antrians';
 
     protected $fillable = [
-        'pendaftaran_id',
         'poli_id',
         'queue_number',
         'status',
@@ -30,13 +30,13 @@ class Antrian extends Model
         'completed_at' => 'datetime',
     ];
 
-    public function pendaftaran(): BelongsTo
-    {
-        return $this->belongsTo(Pendaftaran::class);
-    }
-
     public function poli(): BelongsTo
     {
         return $this->belongsTo(Poli::class);
+    }
+
+    public function pendaftaran(): HasOne
+    {
+        return $this->hasOne(Pendaftaran::class);
     }
 }

@@ -49,7 +49,7 @@ export default function FaqShow() {
             <Head title="Detail FAQ" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail FAQ

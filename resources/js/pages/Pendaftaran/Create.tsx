@@ -1,19 +1,58 @@
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { storePendaftaran, type PendaftaranPayload } from '@/api/pendaftaran';
+import { storePasien } from '@/api/pasien';
+import { storePendaftaran } from '@/api/pendaftaran';
 import AppLayout from '@/Layouts/AppLayout';
-import PendaftaranForm from './Form';
+import PendaftaranForm, { type PendaftaranFormValues } from './Form';
 
-export default function PendaftaranCreate() {
+export default function PendaftaranCreate({
+    antrianId,
+}: {
+    antrianId?: number;
+}) {
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleSubmit = async (payload: PendaftaranPayload) => {
+    const handleSubmit = async (values: PendaftaranFormValues) => {
         setProcessing(true);
         setErrors({});
 
         try {
-            await storePendaftaran(payload);
+            if (!values.pasien?.name || !values.pasien.nik) {
+                setErrors({
+                    general: 'Data pasien (nama dan NIK) wajib diisi.',
+                });
+
+                return;
+            }
+
+            const pasienResponse = await storePasien({
+                poli_id: values.poli_id ?? 0,
+                name: values.pasien.name,
+                nik: values.pasien.nik,
+                gender: values.pasien.gender,
+                birth_date: values.pasien.birth_date,
+                phone: values.pasien.phone,
+                address: values.pasien.address,
+            });
+
+            const pasienId = pasienResponse.data?.pasien?.id;
+
+            if (!pasienId) {
+                setErrors({
+                    general: 'Gagal menyimpan data pasien.',
+                });
+
+                return;
+            }
+
+            await storePendaftaran({
+                antrian_id: values.antrian_id ?? null,
+                pasien_id: pasienId,
+                poli_id: values.poli_id ?? null,
+                registration_date: values.registration_date,
+                notes: values.notes,
+            });
 
             router.visit('/pendaftarans');
         } catch (error: any) {
@@ -59,6 +98,7 @@ export default function PendaftaranCreate() {
                 </div>
 
                 <PendaftaranForm
+                    antrianId={antrianId ?? 0}
                     processing={processing}
                     errors={errors}
                     onSubmit={handleSubmit}

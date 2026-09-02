@@ -2,6 +2,7 @@
 
 use App\Models\Antrian;
 use App\Models\Pendaftaran;
+use App\Models\Poli;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -51,39 +52,55 @@ it('can show a single antrian', function () {
         ->assertJsonPath('data.antrian.status', 'waiting');
 });
 
-it('can create an antrian from a waiting pendaftaran', function () {
-    $pendaftaran = Pendaftaran::factory()->create();
+it('can take a queue number ticket from a poli', function () {
+    $poli = Poli::factory()->create(['queue_prefix' => 'B']);
 
     $this->postJson('/api/v1/antrians', [
-        'pendaftaran_id' => $pendaftaran->id,
+        'poli_id' => $poli->id,
     ])
         ->assertCreated()
-        ->assertJsonPath('data.antrian.pendaftaran.id', $pendaftaran->id)
-        ->assertJsonPath('data.antrian.queue_number', $pendaftaran->queue_number)
-        ->assertJsonPath('data.antrian.status', 'waiting');
+        ->assertJsonPath('data.antrian.poli.id', $poli->id)
+        ->assertJsonPath('data.antrian.status', 'waiting')
+        ->assertJsonPath('data.antrian.queue_number', 'B-001');
 
     $this->assertDatabaseHas('antrians', [
-        'pendaftaran_id' => $pendaftaran->id,
+        'poli_id' => $poli->id,
+        'queue_number' => 'B-001',
         'status' => 'waiting',
     ]);
 });
 
-it('cannot create an antrian for a pendaftaran that is already queued', function () {
-    $antrian = Antrian::factory()->create();
+it('assigns an incrementing real-time queue number per poli', function () {
+    $poli = Poli::factory()->create(['queue_prefix' => 'C']);
 
-    $this->postJson('/api/v1/antrians', [
-        'pendaftaran_id' => $antrian->pendaftaran_id,
-    ])
-        ->assertStatus(422)
-        ->assertJsonValidationErrors('pendaftaran_id');
+    $this->postJson('/api/v1/antrians', ['poli_id' => $poli->id])
+        ->assertCreated();
+
+    $this->postJson('/api/v1/antrians', ['poli_id' => $poli->id])
+        ->assertJsonPath('data.antrian.queue_number', 'C-002');
 });
 
-it('cannot create an antrian for a nonexistent pendaftaran', function () {
-    $this->postJson('/api/v1/antrians', [
-        'pendaftaran_id' => 99999,
-    ])
+it('uses an independent prefix and sequence for each poli', function () {
+    $poliUmum = Poli::factory()->create(['queue_prefix' => 'A']);
+    $poliGigi = Poli::factory()->create(['queue_prefix' => 'B']);
+
+    $this->postJson('/api/v1/antrians', ['poli_id' => $poliGigi->id])
+        ->assertJsonPath('data.antrian.queue_number', 'B-001');
+
+    $this->postJson('/api/v1/antrians', ['poli_id' => $poliUmum->id])
+        ->assertJsonPath('data.antrian.queue_number', 'A-001');
+
+    $this->postJson('/api/v1/antrians', ['poli_id' => $poliUmum->id])
+        ->assertJsonPath('data.antrian.queue_number', 'A-002');
+
+    $this->postJson('/api/v1/antrians', ['poli_id' => $poliGigi->id])
+        ->assertJsonPath('data.antrian.queue_number', 'B-002');
+});
+
+it('cannot create an antrian without a poli', function () {
+    $this->postJson('/api/v1/antrians', [])
         ->assertStatus(422)
-        ->assertJsonValidationErrors('pendaftaran_id');
+        ->assertJsonValidationErrors('poli_id');
 });
 
 it('records called_at when status is changed to called', function () {
@@ -102,9 +119,11 @@ it('records called_at when status is changed to called', function () {
 
 it('keeps pendaftaran status in sync with the antrian status', function () {
     $antrian = Antrian::factory()->create();
-    $pendaftaran = $antrian->pendaftaran;
+    $pendaftaran = Pendaftaran::factory()->create([
+        'antrian_id' => $antrian->id,
+    ]);
 
-    expect($pendaftaran->status)->toBe('waiting');
+    expect($pendaftaran->fresh()->status)->toBe('waiting');
 
     $this->putJson("/api/v1/antrians/{$antrian->id}", ['status' => 'called'])
         ->assertOk();
@@ -121,7 +140,9 @@ it('keeps pendaftaran status in sync with the antrian status', function () {
 
 it('resets pendaftaran status to waiting when antrian is skipped', function () {
     $antrian = Antrian::factory()->create();
-    $pendaftaran = $antrian->pendaftaran;
+    $pendaftaran = Pendaftaran::factory()->create([
+        'antrian_id' => $antrian->id,
+    ]);
 
     $this->putJson("/api/v1/antrians/{$antrian->id}", ['status' => 'called'])
         ->assertOk();
@@ -136,7 +157,9 @@ it('resets pendaftaran status to waiting when antrian is skipped', function () {
 
 it('resets pendaftaran status to waiting when antrian is deleted', function () {
     $antrian = Antrian::factory()->create();
-    $pendaftaran = $antrian->pendaftaran;
+    $pendaftaran = Pendaftaran::factory()->create([
+        'antrian_id' => $antrian->id,
+    ]);
 
     $this->putJson("/api/v1/antrians/{$antrian->id}", ['status' => 'called'])
         ->assertOk();

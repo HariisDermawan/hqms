@@ -68,8 +68,8 @@ class PemeriksaanController extends Controller
         Gate::authorize('view', $pemeriksaan);
 
         $pemeriksaan->load([
-            'antrian.pendaftaran.pasien',
-            'antrian.poli',
+            'pasien',
+            'poli',
             'dokter',
         ]);
 

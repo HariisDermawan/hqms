@@ -1,11 +1,8 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState, type FormEvent } from 'react';
-import { getPasiens, type Pasien } from '@/api/pasien';
-import {
-    type Pendaftaran,
-    type PendaftaranPayload,
-    type PendaftaranStatus,
-} from '@/api/pendaftaran';
+import { getAntrian, type Antrian } from '@/api/antrian';
+import type { Gender } from '@/api/pasien';
+import { type Pendaftaran, type PendaftaranStatus } from '@/api/pendaftaran';
 import { getPolis, type Poli } from '@/api/poli';
 
 export const STATUS_OPTIONS: {
@@ -49,13 +46,54 @@ const todayLocal = (): string => {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
+const calcAge = (birthDate: string): number => {
+    if (!birthDate) {
+        return 0;
+    }
+
+    const birth = new Date(birthDate);
+    const today = new Date();
+
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+        age -= 1;
+    }
+
+    return age;
+};
+
+export interface PendaftaranPasienValues {
+    name: string;
+    nik: string;
+    gender: Gender;
+    birth_date: string;
+    phone?: string;
+    address?: string;
+}
+
+export interface PendaftaranFormValues {
+    antrian_id?: number | null;
+    pasien_id?: number;
+    poli_id?: number | null;
+    registration_date: string;
+    notes?: string;
+    status?: PendaftaranStatus;
+    pasien?: PendaftaranPasienValues;
+}
+
 interface PendaftaranFormProps {
+    antrianId?: number;
     initial?: Pendaftaran | null;
     processing: boolean;
     errors?: Record<string, string | undefined> & {
         general?: string;
     };
-    onSubmit: (payload: PendaftaranPayload) => void;
+    onSubmit: (payload: PendaftaranFormValues) => void;
 }
 
 const inputClass =
@@ -64,29 +102,35 @@ const inputClass =
 const labelClass = 'block text-[13px] text-[#333] mb-[4px]';
 
 export default function PendaftaranForm({
+    antrianId = 0,
     initial,
     processing,
     errors = {},
     onSubmit,
 }: PendaftaranFormProps) {
-    const [pasiens, setPasiens] = useState<Pasien[]>([]);
     const [polis, setPolis] = useState<Poli[]>([]);
     const [optionsLoaded, setOptionsLoaded] = useState(false);
+    const [antrian, setAntrian] = useState<Antrian | null>(null);
 
-    const [pasienId, setPasienId] = useState('');
+    const [name, setName] = useState(initial?.pasien?.name ?? '');
+    const [nik, setNik] = useState(initial?.pasien?.nik ?? '');
+    const [gender, setGender] = useState<Gender>('L');
+    const [birthDate, setBirthDate] = useState('');
+    const [phone, setPhone] = useState('');
+    const [address, setAddress] = useState('');
+
     const [poliId, setPoliId] = useState('');
     const [registrationDate, setRegistrationDate] = useState('');
     const [status, setStatus] = useState<PendaftaranStatus>('waiting');
     const [notes, setNotes] = useState('');
 
     useEffect(() => {
-        Promise.all([getPasiens(1, 100), getPolis(1, 100)])
-            .then(([pasiensResponse, polisResponse]) => {
-                setPasiens(pasiensResponse.data?.items ?? []);
+        getPolis(1, 100)
+            .then((polisResponse) => {
                 setPolis(polisResponse.data?.items ?? []);
             })
             .catch((error: any) => {
-                console.error('Gagal memuat opsi pasien/poli', error);
+                console.error('Gagal memuat opsi poli', error);
 
                 if (error.response?.status === 401) {
                     window.location.href = '/login';
@@ -98,26 +142,69 @@ export default function PendaftaranForm({
     }, []);
 
     useEffect(() => {
+        if (!antrianId) {
+            setAntrian(null);
+            return;
+        }
+
+        getAntrian(antrianId)
+            .then((response) => {
+                setAntrian(response.data?.antrian ?? null);
+            })
+            .catch((error: any) => {
+                console.error('Gagal memuat tiket antrean', error);
+
+                if (error.response?.status === 401) {
+                    window.location.href = '/login';
+                }
+            });
+    }, [antrianId]);
+
+    useEffect(() => {
         if (!optionsLoaded) {
             return;
         }
 
-        setPasienId(initial?.pasien?.id ? String(initial.pasien.id) : '');
-        setPoliId(initial?.poli?.id ? String(initial.poli.id) : '');
+        setPoliId(
+            initial?.poli?.id
+                ? String(initial.poli.id)
+                : antrian?.poli?.id
+                  ? String(antrian.poli.id)
+                  : '',
+        );
         setRegistrationDate(initial?.registration_date ?? todayLocal());
         setStatus(initial?.status ?? 'waiting');
         setNotes(initial?.notes ?? '');
-    }, [optionsLoaded, initial]);
+    }, [optionsLoaded, initial, antrian]);
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
+        if (initial) {
+            onSubmit({
+                pasien_id: initial.pasien?.id ?? 0,
+                poli_id: Number(poliId),
+                registration_date: registrationDate,
+                notes: notes.trim() || undefined,
+                status,
+            });
+
+            return;
+        }
+
         onSubmit({
-            pasien_id: Number(pasienId),
+            antrian_id: antrian ? antrian.id : null,
             poli_id: Number(poliId),
             registration_date: registrationDate,
             notes: notes.trim() || undefined,
-            status: initial ? status : undefined,
+            pasien: {
+                name: name.trim(),
+                nik: nik.trim(),
+                gender,
+                birth_date: birthDate,
+                phone: phone.trim() || undefined,
+                address: address.trim() || undefined,
+            },
         });
     };
 
@@ -132,37 +219,227 @@ export default function PendaftaranForm({
                 </div>
             )}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {/* PASIEN */}
-                <div className="sm:col-span-2">
-                    <label htmlFor="pasien_id" className={labelClass}>
-                        Pasien
-                    </label>
-
-                    <select
-                        id="pasien_id"
-                        value={pasienId}
-                        onChange={(event) => setPasienId(event.target.value)}
-                        className={inputClass}
-                    >
-                        <option value="">Pilih pasien...</option>
-
-                        {pasiens.map((pasien) => (
-                            <option key={pasien.id} value={pasien.id}>
-                                {pasien.name} — {pasien.medical_record_number}
-                            </option>
-                        ))}
-                    </select>
-
-                    {errors.pasien_id && (
-                        <p className="mt-1 text-[11px] text-red-500">
-                            {errors.pasien_id}
+            {antrian && (
+                <div className="mb-5 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-[#07577f] px-4 py-3 text-white">
+                    <div>
+                        <p className="text-[10px] font-semibold tracking-[0.14em] text-white/50 uppercase">
+                            Tiket antrean dipanggil
                         </p>
-                    )}
-                </div>
+                        <p className="text-sm font-bold">
+                            {antrian.queue_number}
+                        </p>
+                    </div>
 
+                    <div className="text-right">
+                        <p className="text-[10px] font-semibold tracking-[0.14em] text-white/50 uppercase">
+                            Poli
+                        </p>
+                        <p className="text-sm font-bold">
+                            {antrian.poli?.name ?? '-'}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            <h3 className="text-[11px] font-bold tracking-wide text-gray-400 uppercase">
+                Data Pasien
+            </h3>
+
+            {initial ? (
+                <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                        <label className={labelClass}>Pasien</label>
+
+                        <p className="mt-[6px] rounded-[12px] bg-[#f7f9fb] px-[12px] py-[10px] text-[13px] font-semibold text-gray-700">
+                            {initial.pasien?.name ?? '-'}
+                        </p>
+                    </div>
+
+                    <div>
+                        <label className={labelClass}>No. Rekam Medis</label>
+
+                        <p className="mt-[6px] rounded-[12px] bg-[#f7f9fb] px-[12px] py-[10px] text-[13px] font-semibold text-gray-700">
+                            {initial.pasien?.medical_record_number ?? '-'}
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {/* NAMA */}
+                    <div className="sm:col-span-2">
+                        <label htmlFor="name" className={labelClass}>
+                            Nama Lengkap
+                        </label>
+
+                        <input
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                            placeholder="Nama pasien"
+                            className={inputClass}
+                        />
+
+                        {errors.name && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.name}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* NIK */}
+                    <div>
+                        <label htmlFor="nik" className={labelClass}>
+                            NIK
+                        </label>
+
+                        <input
+                            id="nik"
+                            type="text"
+                            value={nik}
+                            onChange={(event) => setNik(event.target.value)}
+                            placeholder="16 digit NIK"
+                            maxLength={16}
+                            className={inputClass}
+                        />
+
+                        {errors.nik && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.nik}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* TANGGAL LAHIR + UMUR */}
+                    <div>
+                        <label htmlFor="birth_date" className={labelClass}>
+                            Tanggal Lahir
+                        </label>
+
+                        <div className="flex gap-3">
+                            <input
+                                id="birth_date"
+                                type="date"
+                                value={birthDate}
+                                onChange={(event) =>
+                                    setBirthDate(event.target.value)
+                                }
+                                className={`${inputClass} min-w-0 flex-1`}
+                            />
+
+                            <div className="flex h-[42px] w-[70px] shrink-0 items-center justify-center rounded-[12px] bg-[#07577f]/10 text-[13px] font-bold text-[#07577f]">
+                                {calcAge(birthDate)} th
+                            </div>
+                        </div>
+
+                        {errors.birth_date && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.birth_date}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* JENIS KELAMIN */}
+                    <div className="sm:col-span-2">
+                        <span className={labelClass}>Jenis Kelamin</span>
+
+                        <div className="flex gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setGender('L')}
+                                className={`h-[42px] flex-1 rounded-[12px] border-2 text-[13px] font-semibold transition ${
+                                    gender === 'L'
+                                        ? 'border-[#084e7a] bg-[#084e7a]/10 text-[#084e7a]'
+                                        : 'border-[#d9d9d9] bg-[#d9d9d9] text-gray-500'
+                                }`}
+                            >
+                                Laki-laki
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setGender('P')}
+                                className={`h-[42px] flex-1 rounded-[12px] border-2 text-[13px] font-semibold transition ${
+                                    gender === 'P'
+                                        ? 'border-[#084e7a] bg-[#084e7a]/10 text-[#084e7a]'
+                                        : 'border-[#d9d9d9] bg-[#d9d9d9] text-gray-500'
+                                }`}
+                            >
+                                Perempuan
+                            </button>
+                        </div>
+
+                        {errors.gender && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.gender}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* NO. HP */}
+                    <div>
+                        <label htmlFor="phone" className={labelClass}>
+                            No. HP{' '}
+                            <span className="font-normal text-gray-400">
+                                (opsional)
+                            </span>
+                        </label>
+
+                        <input
+                            id="phone"
+                            type="text"
+                            value={phone}
+                            onChange={(event) => setPhone(event.target.value)}
+                            placeholder="Contoh: 081234567890"
+                            className={inputClass}
+                        />
+
+                        {errors.phone && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.phone}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* ALAMAT */}
+                    <div>
+                        <label htmlFor="address" className={labelClass}>
+                            Alamat{' '}
+                            <span className="font-normal text-gray-400">
+                                (opsional)
+                            </span>
+                        </label>
+
+                        <textarea
+                            id="address"
+                            value={address}
+                            onChange={(event) => setAddress(event.target.value)}
+                            placeholder="Alamat lengkap pasien"
+                            rows={2}
+                            className="w-full rounded-[12px] bg-[#d9d9d9] px-[12px] py-[10px] text-[13px] text-gray-700 transition outline-none placeholder:text-[#999] focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30"
+                        />
+
+                        {errors.address && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.address}
+                            </p>
+                        )}
+                    </div>
+
+                    <p className="text-[11px] text-gray-400 sm:col-span-2">
+                        No. Rekam Medis dibuat otomatis oleh sistem setelah
+                        pasien terdaftar.
+                    </p>
+                </div>
+            )}
+
+            <h3 className="mt-6 text-[11px] font-bold tracking-wide text-gray-400 uppercase">
+                Pendaftaran
+            </h3>
+
+            <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* POLI */}
-                <div className="sm:col-span-2">
+                <div>
                     <label htmlFor="poli_id" className={labelClass}>
                         Poli
                     </label>
@@ -171,16 +448,20 @@ export default function PendaftaranForm({
                         id="poli_id"
                         value={poliId}
                         onChange={(event) => setPoliId(event.target.value)}
-                        className={inputClass}
+                        disabled={
+                            Boolean(antrian) ||
+                            !optionsLoaded ||
+                            Boolean(initial)
+                        }
+                        className={`${inputClass} disabled:cursor-not-allowed disabled:opacity-60`}
                     >
-                        <option value="">Pilih poli...</option>
+                        <option value="">
+                            {optionsLoaded ? 'Pilih poli...' : 'Memuat poli...'}
+                        </option>
 
                         {polis.map((poli) => (
                             <option key={poli.id} value={poli.id}>
                                 {poli.name}
-                                {poli.queue_prefix
-                                    ? ` — antrean ${poli.queue_prefix}-001..`
-                                    : ''}
                             </option>
                         ))}
                     </select>
@@ -216,7 +497,7 @@ export default function PendaftaranForm({
                 </div>
 
                 {/* STATUS (hanya edit) */}
-                {initial ? (
+                {initial && (
                     <div>
                         <label htmlFor="status" className={labelClass}>
                             Status
@@ -244,13 +525,6 @@ export default function PendaftaranForm({
                                 {errors.status}
                             </p>
                         )}
-                    </div>
-                ) : (
-                    <div className="flex items-end">
-                        <p className="w-full rounded-[10px] bg-[#f7f9fb] px-3 py-2.5 text-[12px] text-gray-500">
-                            Nomor antrean & nomor registrasi dibuat otomatis
-                            oleh sistem.
-                        </p>
                     </div>
                 )}
 

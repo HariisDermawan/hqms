@@ -2,7 +2,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { getPemeriksaan, type Pemeriksaan } from '@/api/pemeriksaan';
 import AppLayout from '@/Layouts/AppLayout';
-import { statusBadgeClass, statusLabel } from '@/pages/Antrian/status';
 
 const formatDate = (value: string | null): string => {
     if (!value) {
@@ -82,7 +81,7 @@ export default function PemeriksaanShow() {
             <Head title="Detail Pemeriksaan" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Pemeriksaan
@@ -137,30 +136,20 @@ export default function PemeriksaanShow() {
                                                 {poli?.name ?? '-'}
                                             </span>
 
-                                            <span
-                                                className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${statusBadgeClass(pemeriksaan.antrian?.status ?? 'waiting')}`}
-                                            >
-                                                {statusLabel(
-                                                    pemeriksaan.antrian
-                                                        ?.status ?? 'waiting',
-                                                )}
+                                            <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-600">
+                                                {pemeriksaan.category ?? '-'}
                                             </span>
                                         </div>
 
                                         <p className="mt-1 text-[13px] text-gray-500">
                                             No. RM{' '}
                                             {pasien?.medical_record_number ??
-                                                '-'}{' '}
-                                            · Antrean{' '}
-                                            <span className="font-bold text-[#07577f]">
-                                                {pemeriksaan.antrian
-                                                    ?.queue_number ?? '-'}
-                                            </span>
+                                                '-'}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                     {detailItem(
                                         'Waktu',
                                         formatDate(pemeriksaan.examined_at),
@@ -171,15 +160,10 @@ export default function PemeriksaanShow() {
                                         poli?.name ?? '-',
                                         true,
                                     )}
+                                    {detailItem('Dokter', dokter?.name ?? '-')}
                                     {detailItem(
-                                        'Dokter',
-                                        dokter?.name ?? '-',
-                                        true,
-                                    )}
-                                    {detailItem(
-                                        'Antrean',
-                                        pemeriksaan.antrian?.queue_number ??
-                                            '-',
+                                        'Kategori',
+                                        pemeriksaan.category ?? '-',
                                         true,
                                     )}
                                     {detailItem('Pasien', pasien?.name ?? '-')}

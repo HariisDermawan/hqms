@@ -1,12 +1,13 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState, type FormEvent } from 'react';
-import { getAntrians, type Antrian } from '@/api/antrian';
-import { getDokters, type Dokter } from '@/api/dokter';
+import { getPasiens, type Pasien } from '@/api/pasien';
+import { getPolis, type Poli } from '@/api/poli';
 import { type Pemeriksaan, type PemeriksaanPayload } from '@/api/pemeriksaan';
 
 interface PemeriksaanFormProps {
     initial?: Pemeriksaan | null;
-    initialAntrianId?: number;
+    initialPasienId?: number;
+    initialPoliId?: number;
     processing: boolean;
     errors?: Record<string, string | undefined> & {
         general?: string;
@@ -18,6 +19,17 @@ const inputClass =
     'w-full h-[42px] px-[12px] rounded-[12px] bg-[#d9d9d9] text-[13px] text-gray-700 placeholder:text-[#999] outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 transition';
 
 const labelClass = 'block text-[13px] text-[#333] mb-[4px]';
+
+const categories = [
+    'Umum',
+    'Gigi',
+    'Anak',
+    'Mata',
+    'THT',
+    'Kandungan',
+    'Bedah',
+    'Penyakit Dalam',
+];
 
 const nowLocal = (): string => {
     const now = new Date();
@@ -45,17 +57,20 @@ const toLocalInput = (value: string | null): string => {
 
 export default function PemeriksaanForm({
     initial,
-    initialAntrianId,
+    initialPasienId,
+    initialPoliId,
     processing,
     errors = {},
     onSubmit,
 }: PemeriksaanFormProps) {
-    const [antrians, setAntrians] = useState<Antrian[]>([]);
-    const [dokters, setDokters] = useState<Dokter[]>([]);
+    const [pasiens, setPasiens] = useState<Pasien[]>([]);
+    const [polis, setPolis] = useState<Poli[]>([]);
     const [optionsLoaded, setOptionsLoaded] = useState(false);
 
-    const [antrianId, setAntrianId] = useState('');
+    const [pasienId, setPasienId] = useState('');
+    const [poliId, setPoliId] = useState('');
     const [dokterId, setDokterId] = useState('');
+    const [category, setCategory] = useState('');
     const [examinedAt, setExaminedAt] = useState(nowLocal());
     const [complaint, setComplaint] = useState('');
     const [diagnosis, setDiagnosis] = useState('');
@@ -63,13 +78,13 @@ export default function PemeriksaanForm({
     const [notes, setNotes] = useState('');
 
     useEffect(() => {
-        Promise.all([getAntrians({ perPage: 100 }), getDokters(1, 100)])
-            .then(([antriansResponse, doktersResponse]) => {
-                setAntrians(antriansResponse.data?.items ?? []);
-                setDokters(doktersResponse.data?.items ?? []);
+        Promise.all([getPasiens(1, 100), getPolis(1, 100)])
+            .then(([pasienResponse, poliResponse]) => {
+                setPasiens(pasienResponse.data?.items ?? []);
+                setPolis(poliResponse.data?.items ?? []);
             })
             .catch((error: any) => {
-                console.error('Gagal memuat opsi antrean/dokter', error);
+                console.error('Gagal memuat opsi pasien/poli', error);
 
                 if (error.response?.status === 401) {
                     window.location.href = '/login';
@@ -85,14 +100,22 @@ export default function PemeriksaanForm({
             return;
         }
 
-        setAntrianId(
-            initial?.antrian?.id
-                ? String(initial.antrian.id)
-                : initialAntrianId
-                  ? String(initialAntrianId)
+        setPasienId(
+            initial?.pasien?.id
+                ? String(initial.pasien.id)
+                : initialPasienId
+                  ? String(initialPasienId)
+                  : '',
+        );
+        setPoliId(
+            initial?.poli?.id
+                ? String(initial.poli.id)
+                : initialPoliId
+                  ? String(initialPoliId)
                   : '',
         );
         setDokterId(initial?.dokter?.id ? String(initial.dokter.id) : '');
+        setCategory(initial?.category ?? '');
         setExaminedAt(
             initial?.examined_at
                 ? toLocalInput(initial.examined_at)
@@ -102,14 +125,16 @@ export default function PemeriksaanForm({
         setDiagnosis(initial?.diagnosis ?? '');
         setTreatment(initial?.treatment ?? '');
         setNotes(initial?.notes ?? '');
-    }, [initial, initialAntrianId, optionsLoaded]);
+    }, [initial, initialPasienId, initialPoliId, optionsLoaded]);
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         onSubmit({
-            antrian_id: Number(antrianId),
-            dokter_id: Number(dokterId),
+            pasien_id: Number(pasienId),
+            poli_id: Number(poliId),
+            dokter_id: dokterId ? Number(dokterId) : undefined,
+            category: category.trim(),
             examined_at: examinedAt,
             complaint: complaint.trim() || undefined,
             diagnosis: diagnosis.trim() || undefined,
@@ -130,33 +155,61 @@ export default function PemeriksaanForm({
             )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {/* ANTREAN */}
+                {/* PASIEN */}
                 <div className="sm:col-span-2">
-                    <label htmlFor="antrian_id" className={labelClass}>
-                        Antrean
+                    <label htmlFor="pasien_id" className={labelClass}>
+                        Pasien
                     </label>
 
                     <select
-                        id="antrian_id"
-                        value={antrianId}
-                        onChange={(event) => setAntrianId(event.target.value)}
+                        id="pasien_id"
+                        value={pasienId}
+                        onChange={(event) => setPasienId(event.target.value)}
                         className={inputClass}
                     >
-                        <option value="">Pilih antrean...</option>
+                        <option value="">Pilih pasien...</option>
 
-                        {antrians.map((antrian) => (
-                            <option key={antrian.id} value={antrian.id}>
-                                {antrian.queue_number}
-                                {antrian.pasien?.name
-                                    ? ` — ${antrian.pasien.name}`
-                                    : ''}
+                        {pasiens.map((pasien) => (
+                            <option key={pasien.id} value={pasien.id}>
+                                {pasien.name} — {pasien.medical_record_number}
                             </option>
                         ))}
                     </select>
 
-                    {errors.antrian_id && (
+                    {errors.pasien_id && (
                         <p className="mt-1 text-[11px] text-red-500">
-                            {errors.antrian_id}
+                            {errors.pasien_id}
+                        </p>
+                    )}
+                </div>
+
+                {/* POLI */}
+                <div>
+                    <label htmlFor="poli_id" className={labelClass}>
+                        Poli
+                    </label>
+
+                    <select
+                        id="poli_id"
+                        value={poliId}
+                        onChange={(event) => {
+                            setPoliId(event.target.value);
+                            setDokterId('');
+                        }}
+                        className={inputClass}
+                    >
+                        <option value="">Pilih poli...</option>
+
+                        {polis.map((poli) => (
+                            <option key={poli.id} value={poli.id}>
+                                {poli.name}
+                            </option>
+                        ))}
+                    </select>
+
+                    {errors.poli_id && (
+                        <p className="mt-1 text-[11px] text-red-500">
+                            {errors.poli_id}
                         </p>
                     )}
                 </div>
@@ -164,7 +217,10 @@ export default function PemeriksaanForm({
                 {/* DOKTER */}
                 <div>
                     <label htmlFor="dokter_id" className={labelClass}>
-                        Dokter
+                        Dokter{' '}
+                        <span className="font-normal text-gray-400">
+                            (opsional)
+                        </span>
                     </label>
 
                     <select
@@ -172,17 +228,19 @@ export default function PemeriksaanForm({
                         value={dokterId}
                         onChange={(event) => setDokterId(event.target.value)}
                         className={inputClass}
+                        disabled={!poliId}
                     >
-                        <option value="">Pilih dokter...</option>
+                        <option value="">
+                            {poliId ? 'Pilih dokter...' : 'Pilih poli dahulu'}
+                        </option>
 
-                        {dokters.map((dokter) => (
-                            <option key={dokter.id} value={dokter.id}>
-                                {dokter.name}
-                                {dokter.specialization
-                                    ? ` (${dokter.specialization})`
-                                    : ''}
-                            </option>
-                        ))}
+                        {polis
+                            .find((poli) => String(poli.id) === poliId)
+                            ?.dokters?.map((dokter) => (
+                                <option key={dokter.id} value={dokter.id}>
+                                    {dokter.name}
+                                </option>
+                            ))}
                     </select>
 
                     {errors.dokter_id && (
@@ -192,8 +250,36 @@ export default function PemeriksaanForm({
                     )}
                 </div>
 
-                {/* WAKTU */}
+                {/* KATEGORI */}
                 <div>
+                    <label htmlFor="category" className={labelClass}>
+                        Kategori
+                    </label>
+
+                    <select
+                        id="category"
+                        value={category}
+                        onChange={(event) => setCategory(event.target.value)}
+                        className={inputClass}
+                    >
+                        <option value="">Pilih kategori...</option>
+
+                        {categories.map((item) => (
+                            <option key={item} value={item}>
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+
+                    {errors.category && (
+                        <p className="mt-1 text-[11px] text-red-500">
+                            {errors.category}
+                        </p>
+                    )}
+                </div>
+
+                {/* WAKTU */}
+                <div className="sm:col-span-2">
                     <label htmlFor="examined_at" className={labelClass}>
                         Waktu pemeriksaan
                     </label>

@@ -2,20 +2,31 @@
 
 namespace Database\Seeders;
 
-use App\Models\Antrian;
 use App\Models\Dokter;
+use App\Models\Pasien;
 use App\Models\Pemeriksaan;
+use App\Models\Poli;
 use Illuminate\Database\Seeder;
 
 class PemeriksaanSeeder extends Seeder
 {
     public function run(): void
     {
-        $antrian = Antrian::first();
+        $pasien = Pasien::first();
 
-        if (! $antrian) {
+        if (! $pasien) {
             $this->command->warn(
-                'Belum ada data antrian. Jalankan AntrianSeeder terlebih dahulu.'
+                'Belum ada data pasien. Jalankan PasienSeeder terlebih dahulu.'
+            );
+
+            return;
+        }
+
+        $poli = $pasien->poli ?? Poli::first();
+
+        if (! $poli) {
+            $this->command->warn(
+                'Belum ada data poli. Jalankan PoliSeeder terlebih dahulu.'
             );
 
             return;
@@ -23,20 +34,14 @@ class PemeriksaanSeeder extends Seeder
 
         $dokter = Dokter::first();
 
-        if (! $dokter) {
-            $this->command->warn(
-                'Belum ada data dokter. Jalankan DokterSeeder terlebih dahulu.'
-            );
-
-            return;
-        }
-
         Pemeriksaan::updateOrCreate(
             [
-                'antrian_id' => $antrian->id,
+                'pasien_id' => $pasien->id,
+                'poli_id' => $poli->id,
             ],
             [
-                'dokter_id' => $dokter->id,
+                'dokter_id' => $dokter?->id,
+                'category' => 'Umum',
                 'examined_at' => now(),
                 'complaint' => 'Demam dan sakit kepala',
                 'diagnosis' => 'Infeksi saluran pernapasan ringan',

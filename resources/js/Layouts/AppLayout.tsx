@@ -15,6 +15,11 @@ const linkNav = (active: boolean): string =>
         ? 'flex w-full items-center gap-3 rounded-lg bg-white/15 px-3 py-2.5 text-left text-[13px] font-medium text-white'
         : staticNav;
 
+const navBottom = (active: boolean): string =>
+    active
+        ? 'flex h-full flex-1 flex-col items-center justify-center gap-1 px-1 text-white'
+        : 'flex h-full flex-1 flex-col items-center justify-center gap-1 px-1 text-white/55';
+
 export default function AppLayout({ children, wide = false }: AppLayoutProps) {
     const { url } = usePage();
     const [loggingOut, setLoggingOut] = useState(false);
@@ -104,7 +109,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </Link>
 
                             {/* Monitoring */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/monitorings"
+                                className={linkNav(isActive('/monitorings'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -117,7 +125,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Monitoring</span>
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
@@ -652,10 +660,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                 </div>
 
                 {/* SEARCH */}
-                <div className="relative z-10 mt-5 flex h-11 items-center rounded-full bg-white px-4 text-gray-400">
+                <div className="relative z-10 mt-5 flex h-12 items-center rounded-full bg-white px-4 text-gray-400">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="mr-3 h-[18px] w-[18px]"
+                        className="mr-3 h-5 w-5 shrink-0"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -668,7 +676,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                     <input
                         type="text"
                         placeholder="Cari pasien, dokter, poli..."
-                        className="w-full bg-transparent text-xs text-gray-700 outline-none placeholder:text-gray-400"
+                        className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                     />
                 </div>
             </header>
@@ -757,131 +765,169 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
             {/* BOTTOM MOBILE NAV */}
             <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-[#07577f] shadow-[0_-5px_25px_rgba(0,0,0,0.12)] lg:hidden">
                 <div className="mx-auto flex h-[70px] w-full max-w-[900px] items-center px-1 sm:h-[76px] sm:px-3">
-                    {/* DASHBOARD */}
-                    <Link
-                        href="/dashboard"
-                        className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
+                    <div className="flex w-full items-center">
+                        {/* DASHBOARD */}
+                        <Link
+                            href="/dashboard"
+                            className={navBottom(isActive('/dashboard'))}
                         >
-                            <rect x="3" y="3" width="7" height="7" rx="1" />
-                            <rect x="14" y="3" width="7" height="7" rx="1" />
-                            <rect x="3" y="14" width="7" height="7" rx="1" />
-                            <rect x="14" y="14" width="7" height="7" rx="1" />
-                        </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                            >
+                                <rect x="3" y="3" width="7" height="7" rx="1" />
+                                <rect
+                                    x="14"
+                                    y="3"
+                                    width="7"
+                                    height="7"
+                                    rx="1"
+                                />
+                                <rect
+                                    x="3"
+                                    y="14"
+                                    width="7"
+                                    height="7"
+                                    rx="1"
+                                />
+                                <rect
+                                    x="14"
+                                    y="14"
+                                    width="7"
+                                    height="7"
+                                    rx="1"
+                                />
+                            </svg>
 
-                        <span className="text-[9px] font-medium">
-                            Dashboard
-                        </span>
-                    </Link>
+                            <span className="text-[9px] font-medium">
+                                Dashboard
+                            </span>
+                        </Link>
 
-                    {/* PASIEN */}
-                    <Link
-                        href="/pasiens"
-                        className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
+                        {/* PASIEN */}
+                        <Link
+                            href="/pasiens"
+                            className={navBottom(isActive('/pasiens'))}
                         >
-                            <circle cx="12" cy="8" r="3.5" />
-                            <path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5" />
-                        </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                            >
+                                <circle cx="12" cy="8" r="3.5" />
+                                <path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5" />
+                            </svg>
 
-                        <span className="text-[9px] font-medium">Pasien</span>
-                    </Link>
+                            <span className="text-[9px] font-medium">
+                                Pasien
+                            </span>
+                        </Link>
 
-                    {/* POLI */}
-                    <Link
-                        href="/polis"
-                        className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
+                        {/* POLI */}
+                        <Link
+                            href="/polis"
+                            className={navBottom(isActive('/polis'))}
                         >
-                            <rect x="5" y="3" width="14" height="18" rx="2" />
-                            <path d="M9 7h6M9 11h6M9 15h4" />
-                        </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                            >
+                                <rect
+                                    x="5"
+                                    y="3"
+                                    width="14"
+                                    height="18"
+                                    rx="2"
+                                />
+                                <path d="M9 7h6M9 11h6M9 15h4" />
+                            </svg>
 
-                        <span className="text-[9px] font-medium">Poli</span>
-                    </Link>
+                            <span className="text-[9px] font-medium">Poli</span>
+                        </Link>
 
-                    {/* PENDAFTARAN */}
-                    <Link
-                        href="/pendaftarans"
-                        className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
+                        {/* PENDAFTARAN */}
+                        <Link
+                            href="/pendaftarans"
+                            className={navBottom(isActive('/pendaftarans'))}
                         >
-                            <rect x="4" y="3" width="16" height="18" rx="2" />
-                            <path d="M8 7h8M8 11h8M8 15h5" />
-                        </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                            >
+                                <rect
+                                    x="4"
+                                    y="3"
+                                    width="16"
+                                    height="18"
+                                    rx="2"
+                                />
+                                <path d="M8 7h8M8 11h8M8 15h5" />
+                            </svg>
 
-                        <span className="text-[9px] font-medium">
-                            Pendaftaran
-                        </span>
-                    </Link>
+                            <span className="text-[9px] font-medium">
+                                Pendaftaran
+                            </span>
+                        </Link>
 
-                    {/* ANTREAN */}
-                    <Link
-                        href="/antrians"
-                        className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
+                        {/* ANTREAN */}
+                        <Link
+                            href="/antrians"
+                            className={navBottom(isActive('/antrians'))}
                         >
-                            <circle cx="12" cy="12" r="8.5" />
-                            <path d="M12 7v5l3 2" />
-                        </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                            >
+                                <circle cx="12" cy="12" r="8.5" />
+                                <path d="M12 7v5l3 2" />
+                            </svg>
 
-                        <span className="text-[9px] font-medium">Antrean</span>
-                    </Link>
+                            <span className="text-[9px] font-medium">
+                                Antrean
+                            </span>
+                        </Link>
 
-                    {/* LAPORAN */}
-                    <button
-                        type="button"
-                        className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
+                        {/* LAPORAN */}
+                        <button
+                            type="button"
+                            className="flex h-full flex-1 flex-col items-center justify-center gap-1 px-1 text-white/55"
                         >
-                            <path d="M4 19V5M4 19h17" />
-                            <path d="m7 15 4-4 3 2 5-6" />
-                        </svg>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                            >
+                                <path d="M4 19V5M4 19h17" />
+                                <path d="m7 15 4-4 3 2 5-6" />
+                            </svg>
 
-                        <span className="text-[9px] font-medium">Laporan</span>
-                    </button>
+                            <span className="text-[9px] font-medium">
+                                Laporan
+                            </span>
+                        </button>
+                    </div>
                 </div>
             </nav>
         </div>

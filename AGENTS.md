@@ -10,6 +10,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 This application is a Laravel application running on PHP 8.3. You are an expert with the Laravel ecosystem. Always use the APIs that match the installed major version of each package — do not assume a version.
 
 Before relying on a package's API, confirm its installed version:
+
 - PHP packages: run `composer show --direct` to list direct dependencies with versions, or `composer show <vendor/package>` for a single package.
 - JS packages: check `package.json` for the installed versions.
 
@@ -58,7 +59,7 @@ Before relying on a package's API, confirm its installed version:
 
 - Execute PHP in app context for debugging and testing code. Do not create models without user approval, prefer tests with factories instead. Prefer existing Artisan commands over custom tinker code.
 - Always use single quotes to prevent shell expansion: `php artisan tinker --execute 'Your::code();'`
-  - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
+    - Double quotes for PHP strings inside: `php artisan tinker --execute 'User::where("active", true)->count();'`
 
 === php rules ===
 
@@ -166,3 +167,43 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
 </laravel-boost-guidelines>
+
+# Repository notes (RS Merdeka / HQMS)
+
+Stack: Laravel 13 (PHP 8.3) backend + Inertia v3 / React 19 SPA, session-based Sanctum auth, Spatie permissions. No README, no CI workflows, no `.ai/rules` directory, and no repo-local OpenCode config (the boost block's project-rules step is a no-op here). Viten wrapper is `vite-plus` (`vp`), configured in `vite.config.ts` (not `.js`).
+
+## Commands
+
+- Dev: `composer run dev` (runs `php artisan dev`, starting Laravel server + Vite together). Frontend: `npm run dev` / `npm run build` (`vp build`)
+- Verify after changes:
+    - PHP: `vendor/bin/pint` (or `composer run lint`), `composer run types:check` (= `phpstan analyse`, level 7 over `app/ config/ database/ routes/`), then `php artisan test --compact`.
+    - TS: `npm run types:check` (`tsc --noEmit`); `npm run check` (`vp check`, vite-plus formatter/lint gate, `denyWarnings: true`) — generated files under `resources/js/actions|routes|wayfinder` and `resources/js/components/ui/*` are ignore-listed in `vite.config.ts`.
+    - `composer run test` runs the full gate: config:clear → `pint --test` → phpstan → `php artisan test`. `composer run ci:check` = `npm run check` + `npm run types:check` + `composer run test`.
+    - `npm run check` may fail on formatting even when `npm run types:check` passes — run `npm run check --fix` (or `vp check --fix`) to apply formatter.
+- Tests are Pest; feature tests auto-apply `RefreshDatabase` on in-memory SQLite (`phpunit.xml`). Run one test with `php artisan test --compact --filter=...` or `vendor/bin/pest <file>`.
+
+## Known broken gate (verify before relying on it)
+
+- **PHPStan currently cannot run** (`composer run test` and `composer run types:check` fail at bootstrap) with: `Undefined constant "Larastan\Larastan\LARAVEL_VERSION"` in `LarastanStubFilesExtension.php:25`. This is a Larastan 3.10 / Laravel 13 environment incompatibility that fails before analyzing any code — it is NOT caused by app changes. If you see it, fall back to `vendor/bin/pint` + `vendor/bin/pest` for PHP verification, and treat said two composer scripts as un-actionable until dependencies are fixed.
+- `vendor/bin/pint --test` is repo-wide; run `vendor/bin/pint` to fix all files (or `--dirty` for just changes) to keep the gate green.
+
+## Architecture & conventions
+
+- API is versioned in `routes/api.php` under `Route::prefix('v1')`; every resource is behind `middleware('auth:sanctum')`.
+- Per-resource pattern: `Api/*Controller` (thin, calls `Gate::authorize`) → `Services/*Service` (owns DB transactions) → `Requests/*Request` → `Resources/*Resource`.
+- Every API JSON response uses the envelope `{ success, message, data }`; list endpoints return `data.items` + `data.pagination` (see `PoliController::index`).
+- `routes/api.php` explicitly adds `StartSession::class` to the group — this is what makes session auth work outside the web group; do not remove it.
+- Frontend: pages in `resources/js/pages`; `routes/web.php` holds Inertia closures for the SPA pages. It renders far more than auth pages — one closure per CRUD route for Pasien, Poli, Dokter, JadwalDokter, Pendaftaran, Antrian, and a query-string-driven `Pemeriksaan/Create` (`/pemeriksaans/create?antrian_id=N`). API wrappers in `resources/js/api/*.ts` share the axios instance in `resources/js/lib/axios.ts`.
+- User resource exposes roles via Spatie (see `UserResource`). Seeders: `RolePermissionSeeder` + `AdminSeeder` + per-resource seeders.
+
+## Domain rules (non-obvious)
+
+- **Queue number format** is `"{$poli->name} {$queue_prefix}-NNN"` (e.g. `Poli Umum A-002`), built in `PendaftaranService::create` from the poli's `queue_prefix` (A–Z, one letter per poli) + a 3-digit sequence per poli/date. `queue_prefix` lives on `polis` (added by migration `add_queue_prefix_to_polis_table`); `Antrian` copies `queue_number` from its `Pendaftaran`.
+- **Pendaftaran ↔ Antrian status are kept in sync** in `AntrianService`: `called`/`serving`/`completed` mirror directly; Antrian `skipped` resets Pendaftaran to `waiting`; deleting an Antrian reverts its Pendaftaran to `waiting`.
+
+## Auth gotchas (hard-won)
+
+- Auth is cookie/session-based (Sanctum "stateful" requests), NOT bearer tokens. `.env` `SANCTUM_STATEFUL_DOMAINS` must contain the exact host you open the app with (currently `127.0.0.1:8000,localhost:8000`). If a host is missing there: login succeeds, but the first authenticated API call after a page load returns 401 (web pages encrypt the session cookie via `EncryptCookies`; non-stateful API requests don't get matching handling) and the SPA bounces back to login.
+- Seeded login: `admin@hqms` / `password` (role `Super Admin`).
+- Never hardcode the API base URL; keep `axios` requests same-origin (`resources/js/lib/axios.ts` uses `import.meta.env.VITE_API_URL || ''`). Leave `VITE_API_URL` unset unless the API is deliberately hosted elsewhere.
+- Manual API testing (curl/PowerShell) must replay the browser flow: load a web page or `/sanctum/csrf-cookie` to obtain the `XSRF-TOKEN` cookie, send it as `X-XSRF-TOKEN` on stateful POSTs, and reuse the cookie jar. In PowerShell, call `curl.exe` (plain `curl` aliases to `Invoke-WebRequest`).

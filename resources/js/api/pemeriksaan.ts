@@ -1,14 +1,8 @@
 import api from '@/lib/axios';
-import type { AntrianStatus } from './antrian';
 import type { Pagination } from './dokter';
 
 export interface Pemeriksaan {
     id: number;
-    antrian: {
-        id: number;
-        queue_number: string;
-        status: AntrianStatus;
-    } | null;
     pasien: {
         id: number;
         medical_record_number: string;
@@ -21,6 +15,7 @@ export interface Pemeriksaan {
         name: string;
         specialization: string | null;
     } | null;
+    category: string | null;
     examined_at: string | null;
     complaint: string | null;
     diagnosis: string | null;
@@ -29,8 +24,10 @@ export interface Pemeriksaan {
 }
 
 export interface PemeriksaanPayload {
-    antrian_id: number;
-    dokter_id: number;
+    pasien_id: number;
+    poli_id: number;
+    dokter_id?: number;
+    category: string;
     examined_at: string;
     complaint?: string;
     diagnosis?: string;

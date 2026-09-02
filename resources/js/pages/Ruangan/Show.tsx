@@ -149,7 +149,7 @@ export default function RuanganShow() {
             />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Ruangan
@@ -239,7 +239,7 @@ export default function RuanganShow() {
                                     </span>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                     {detailItem('ID', String(ruangan.id), true)}
                                     {detailItem('Kode', ruangan.code, true)}
                                     {detailItem(
@@ -262,7 +262,7 @@ export default function RuanganShow() {
 
                             {/* PASIEN DI RUANGAN */}
                             <section className="mt-8">
-                                <div className="flex items-end justify-between gap-4">
+                                <div className="flex flex-wrap items-center justify-between gap-4">
                                     <div>
                                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                                             Pasien {ruangan.name}
@@ -432,7 +432,7 @@ export default function RuanganShow() {
                                                                                 item,
                                                                             )
                                                                         }
-                                                                        className="flex h-8 items-center gap-1.5 rounded-lg bg-red-50 px-3 text-[11px] font-semibold text-red-500 transition hover:bg-red-100"
+                                                                        className="flex h-10 items-center gap-1.5 rounded-lg bg-red-50 px-3 text-[11px] font-semibold text-red-500 transition hover:bg-red-100 sm:h-8"
                                                                     >
                                                                         Keluar
                                                                     </button>

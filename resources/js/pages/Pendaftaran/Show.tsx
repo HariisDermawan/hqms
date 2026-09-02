@@ -98,7 +98,7 @@ export default function PendaftaranShow() {
             <Head title="Detail Pendaftaran" />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Pendaftaran
@@ -174,7 +174,7 @@ export default function PendaftaranShow() {
                                     </div>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                     {detailItem(
                                         'No. Registrasi',
                                         pendaftaran.registration_number,

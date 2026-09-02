@@ -116,7 +116,7 @@ export default function PoliShow() {
             <Head title={poli ? `Detail ${poli.name}` : 'Detail Poli'} />
 
             <AppLayout wide>
-                <div className="flex items-end justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
                             Detail Poli
@@ -213,7 +213,7 @@ export default function PoliShow() {
                                     </span>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                     {detailItem('ID', String(poli.id), true)}
                                     {detailItem('Kode', poli.code, true)}
                                     {detailItem(
@@ -246,7 +246,7 @@ export default function PoliShow() {
                                     </p>
                                 </div>
 
-                                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+                                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
                                     {jadwalsLoading ? (
                                         <div className="col-span-2 rounded-xl bg-white px-4 py-8 text-center text-sm text-gray-400 shadow-sm sm:col-span-3 xl:col-span-4">
                                             Memuat dokter...
