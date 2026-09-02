@@ -169,7 +169,62 @@ export default function PoliIndex() {
                                         href={`/polis/${poli.id}`}
                                         className="block h-[140px]"
                                     >
-                                        {poli.image_url ? (
+                                        {(poli.dokters?.length ?? 0) > 0 ? (
+                                            <div className="relative flex h-full w-full bg-[#07577f]">
+                                                {poli.dokters
+                                                    ?.slice(0, 2)
+                                                    .map((dokter, index) =>
+                                                        dokter.image_url ? (
+                                                            <img
+                                                                key={dokter.id}
+                                                                src={
+                                                                    dokter.image_url
+                                                                }
+                                                                alt={
+                                                                    dokter.name
+                                                                }
+                                                                className={
+                                                                    'h-full object-cover ' +
+                                                                    ((poli
+                                                                        .dokters
+                                                                        ?.length ??
+                                                                        0) > 1
+                                                                        ? 'w-1/2'
+                                                                        : 'w-full')
+                                                                }
+                                                                style={{
+                                                                    objectPosition: `center ${index === 0 ? '20%' : '35%'}`,
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            <div
+                                                                key={dokter.id}
+                                                                className={
+                                                                    (poli
+                                                                        .dokters
+                                                                        ?.length ??
+                                                                        0) > 1
+                                                                        ? 'flex w-1/2 items-center justify-center text-lg font-bold text-white'
+                                                                        : 'flex h-full w-full items-center justify-center text-3xl font-bold text-white'
+                                                                }
+                                                            >
+                                                                {dokter.name
+                                                                    ?.charAt(0)
+                                                                    ?.toUpperCase()}
+                                                            </div>
+                                                        ),
+                                                    )}
+
+                                                {(poli.dokters?.length ?? 0) >
+                                                    2 && (
+                                                    <span className="absolute right-2 bottom-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-[11px] font-bold text-white">
+                                                        +
+                                                        {poli.dokters!.length -
+                                                            2}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ) : poli.image_url ? (
                                             <img
                                                 src={poli.image_url}
                                                 alt={poli.name}
@@ -203,6 +258,12 @@ export default function PoliIndex() {
                                             <h3 className="truncate text-[14px] font-bold text-gray-800">
                                                 {poli.name}
                                             </h3>
+
+                                            {poli.queue_prefix && (
+                                                <span className="ml-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[#07577f]/10 text-[11px] font-bold text-[#07577f]">
+                                                    {poli.queue_prefix}
+                                                </span>
+                                            )}
 
                                             <span
                                                 className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-bold ${

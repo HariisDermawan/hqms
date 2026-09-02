@@ -53,4 +53,3 @@ class StorePemeriksaanRequest extends FormRequest
         ];
     }
 }
-

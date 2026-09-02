@@ -1,7 +1,16 @@
 <?php
 
+use App\Models\Antrian;
+use App\Models\Dokter;
+use App\Models\Faq;
+use App\Models\JadwalDokter;
+use App\Models\Message;
 use App\Models\Pasien;
+use App\Models\Pemeriksaan;
+use App\Models\Pendaftaran;
 use App\Models\Poli;
+use App\Models\Testimonial;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -56,3 +65,170 @@ Route::get('/polis/{poli}', function (Poli $poli) {
 Route::get('/polis', function () {
     return Inertia::render('Poli/Index');
 })->name('polis.index');
+
+Route::get('/dokters/create', function () {
+    return Inertia::render('Dokter/Create');
+})->name('dokters.create');
+
+Route::get('/dokters/{dokter}/edit', function (Dokter $dokter) {
+    return Inertia::render('Dokter/Edit', [
+        'id' => $dokter->id,
+    ]);
+})->name('dokters.edit');
+
+Route::get('/dokters/{dokter}', function (Dokter $dokter) {
+    return Inertia::render('Dokter/Show', [
+        'id' => $dokter->id,
+    ]);
+})->name('dokters.show');
+
+Route::get('/dokters', function () {
+    return Inertia::render('Dokter/Index');
+})->name('dokters.index');
+
+Route::get('/jadwal-dokters/create', function () {
+    return Inertia::render('JadwalDokter/Create');
+})->name('jadwal-dokters.create');
+
+Route::get('/jadwal-dokters/{jadwal_dokter}/edit', function (JadwalDokter $jadwalDokter) {
+    return Inertia::render('JadwalDokter/Edit', [
+        'id' => $jadwalDokter->id,
+    ]);
+})->name('jadwal-dokters.edit');
+
+Route::get('/jadwal-dokters/{jadwal_dokter}', function (JadwalDokter $jadwalDokter) {
+    return Inertia::render('JadwalDokter/Show', [
+        'id' => $jadwalDokter->id,
+    ]);
+})->name('jadwal-dokters.show');
+
+Route::get('/jadwal-dokters', function () {
+    return Inertia::render('JadwalDokter/Index');
+})->name('jadwal-dokters.index');
+
+Route::get('/pendaftarans/create', function () {
+    return Inertia::render('Pendaftaran/Create');
+})->name('pendaftarans.create');
+
+Route::get('/pendaftarans/{pendaftaran}/edit', function (Pendaftaran $pendaftaran) {
+    return Inertia::render('Pendaftaran/Edit', [
+        'id' => $pendaftaran->id,
+    ]);
+})->name('pendaftarans.edit');
+
+Route::get('/pendaftarans/{pendaftaran}', function (Pendaftaran $pendaftaran) {
+    return Inertia::render('Pendaftaran/Show', [
+        'id' => $pendaftaran->id,
+    ]);
+})->name('pendaftarans.show');
+
+Route::get('/pendaftarans', function () {
+    return Inertia::render('Pendaftaran/Index');
+})->name('pendaftarans.index');
+
+Route::get('/pemeriksaans/create', function (Request $request) {
+    return Inertia::render('Pemeriksaan/Create', [
+        'antrian_id' => (int) $request->query('antrian_id', 0),
+    ]);
+})->name('pemeriksaans.create');
+
+Route::get('/pemeriksaans/{pemeriksaan}/edit', function (Pemeriksaan $pemeriksaan) {
+    return Inertia::render('Pemeriksaan/Edit', [
+        'id' => $pemeriksaan->id,
+    ]);
+})->name('pemeriksaans.edit');
+
+Route::get('/pemeriksaans/{pemeriksaan}', function (Pemeriksaan $pemeriksaan) {
+    return Inertia::render('Pemeriksaan/Show', [
+        'id' => $pemeriksaan->id,
+    ]);
+})->name('pemeriksaans.show');
+
+Route::get('/pemeriksaans', function () {
+    return Inertia::render('Pemeriksaan/Index');
+})->name('pemeriksaans.index');
+
+Route::get('/profile', function () {
+    return Inertia::render('Profile/Index');
+})->name('profile.index');
+
+Route::get('/faqs/create', function () {
+    return Inertia::render('Faq/Create');
+})->name('faqs.create');
+
+Route::get('/faqs/{faq}/edit', function (Faq $faq) {
+    return Inertia::render('Faq/Edit', [
+        'id' => $faq->id,
+    ]);
+})->name('faqs.edit');
+
+Route::get('/faqs/{faq}', function (Faq $faq) {
+    return Inertia::render('Faq/Show', [
+        'id' => $faq->id,
+    ]);
+})->name('faqs.show');
+
+Route::get('/faqs', function () {
+    return Inertia::render('Faq/Index');
+})->name('faqs.index');
+
+Route::get('/messages/create', function () {
+    return Inertia::render('Message/Create');
+})->name('messages.create');
+
+Route::get('/messages/{message}/edit', function (Message $message, Request $request) {
+    return Inertia::render('Message/Edit', [
+        'id' => $message->id,
+        'reply' => (bool) $request->query('reply', false),
+    ]);
+})->name('messages.edit');
+
+Route::get('/messages/{message}', function (Message $message) {
+    return Inertia::render('Message/Show', [
+        'id' => $message->id,
+    ]);
+})->name('messages.show');
+
+Route::get('/messages', function () {
+    return Inertia::render('Message/Index');
+})->name('messages.index');
+
+Route::get('/testimonials/create', function () {
+    return Inertia::render('Testimonial/Create');
+})->name('testimonials.create');
+
+Route::get('/testimonials/{testimonial}/edit', function (Testimonial $testimonial) {
+    return Inertia::render('Testimonial/Edit', [
+        'id' => $testimonial->id,
+    ]);
+})->name('testimonials.edit');
+
+Route::get('/testimonials/{testimonial}', function (Testimonial $testimonial) {
+    return Inertia::render('Testimonial/Show', [
+        'id' => $testimonial->id,
+    ]);
+})->name('testimonials.show');
+
+Route::get('/testimonials', function () {
+    return Inertia::render('Testimonial/Index');
+})->name('testimonials.index');
+
+Route::get('/antrians/create', function () {
+    return Inertia::render('Antrian/Create');
+})->name('antrians.create');
+
+Route::get('/antrians/{antrian}/edit', function (Antrian $antrian) {
+    return Inertia::render('Antrian/Edit', [
+        'id' => $antrian->id,
+    ]);
+})->name('antrians.edit');
+
+Route::get('/antrians/{antrian}', function (Antrian $antrian) {
+    return Inertia::render('Antrian/Show', [
+        'id' => $antrian->id,
+    ]);
+})->name('antrians.show');
+
+Route::get('/antrians', function () {
+    return Inertia::render('Antrian/Index');
+})->name('antrians.index');

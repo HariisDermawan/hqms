@@ -13,7 +13,7 @@ class PemeriksaanSeeder extends Seeder
     {
         $antrian = Antrian::first();
 
-        if (!$antrian) {
+        if (! $antrian) {
             $this->command->warn(
                 'Belum ada data antrian. Jalankan AntrianSeeder terlebih dahulu.'
             );
@@ -23,7 +23,7 @@ class PemeriksaanSeeder extends Seeder
 
         $dokter = Dokter::first();
 
-        if (!$dokter) {
+        if (! $dokter) {
             $this->command->warn(
                 'Belum ada data dokter. Jalankan DokterSeeder terlebih dahulu.'
             );
@@ -50,4 +50,3 @@ class PemeriksaanSeeder extends Seeder
         );
     }
 }
-

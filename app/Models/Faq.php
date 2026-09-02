@@ -24,4 +24,3 @@ class Faq extends Model
         'is_active' => 'boolean',
     ];
 }
-

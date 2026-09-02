@@ -9,6 +9,7 @@ use App\Http\Resources\PendaftaranResource;
 use App\Models\Pendaftaran;
 use App\Services\PendaftaranService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PendaftaranController extends Controller
@@ -20,11 +21,13 @@ class PendaftaranController extends Controller
     /**
      * Display a listing of registrations.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Pendaftaran::class);
 
-        $pendaftarans = $this->pendaftaranService->getAll();
+        $pendaftarans = $this->pendaftaranService->getAll(
+            min(100, $request->integer('per_page', 10))
+        );
 
         return response()->json([
             'success' => true,
@@ -133,4 +136,3 @@ class PendaftaranController extends Controller
         ]);
     }
 }
-

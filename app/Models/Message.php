@@ -27,4 +27,3 @@ class Message extends Model
         'replied_at' => 'datetime',
     ];
 }
-

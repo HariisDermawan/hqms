@@ -175,7 +175,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </Link>
 
                             {/* Dokter */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/dokters"
+                                className={linkNav(isActive('/dokters'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -190,7 +193,33 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Dokter</span>
-                            </button>
+                            </Link>
+
+                            {/* Jadwal Dokter */}
+                            <Link
+                                href="/jadwal-dokters"
+                                className={linkNav(isActive('/jadwal-dokters'))}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-[18px] w-[18px]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <rect
+                                        x="3"
+                                        y="5"
+                                        width="18"
+                                        height="16"
+                                        rx="2"
+                                    />
+                                    <path d="M8 3v4M16 3v4M3 10h18M9 14h.01M13 14h.01M17 14h.01M9 18h.01M13 18h.01" />
+                                </svg>
+
+                                <span>Jadwal Dokter</span>
+                            </Link>
 
                             {/* Perawat */}
                             <button type="button" className={staticNav}>
@@ -262,7 +291,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
 
                         <div className="space-y-1">
                             {/* Pendaftaran */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/pendaftarans"
+                                className={linkNav(isActive('/pendaftarans'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -282,10 +314,13 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Pendaftaran</span>
-                            </button>
+                            </Link>
 
                             {/* Antrean */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/antrians"
+                                className={linkNav(isActive('/antrians'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -299,10 +334,13 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Antrean</span>
-                            </button>
+                            </Link>
 
                             {/* Pemeriksaan */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/pemeriksaans"
+                                className={linkNav(isActive('/pemeriksaans'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -322,7 +360,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Pemeriksaan</span>
-                            </button>
+                            </Link>
 
                             {/* Pembayaran */}
                             <button type="button" className={staticNav}>
@@ -437,6 +475,97 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </button>
                         </div>
                     </div>
+
+                    {/* SISTEM */}
+                    <div className="mb-6">
+                        <p className="mb-2 px-3 text-[10px] font-semibold tracking-[0.16em] text-white/40 uppercase">
+                            Sistem
+                        </p>
+
+                        <div className="space-y-1">
+                            {/* Profile */}
+                            <Link
+                                href="/profile"
+                                className={linkNav(isActive('/profile'))}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-[18px] w-[18px]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <circle cx="12" cy="8" r="3.5" />
+                                    <path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5" />
+                                </svg>
+
+                                <span>Profile</span>
+                            </Link>
+
+                            {/* Message */}
+                            <Link
+                                href="/messages"
+                                className={linkNav(isActive('/messages'))}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-[18px] w-[18px]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5Z" />
+                                    <path d="M8 9h8M8 13h5" />
+                                </svg>
+
+                                <span>Message</span>
+                            </Link>
+
+                            {/* FAQ */}
+                            <Link
+                                href="/faqs"
+                                className={linkNav(isActive('/faqs'))}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-[18px] w-[18px]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <circle cx="12" cy="12" r="8.5" />
+                                    <path d="M9.5 9.2a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.1 1-1.1 1.9" />
+                                    <path d="M12 17h.01" />
+                                </svg>
+
+                                <span>FAQ</span>
+                            </Link>
+
+                            {/* Testimonial */}
+                            <Link
+                                href="/testimonials"
+                                className={linkNav(isActive('/testimonials'))}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-[18px] w-[18px]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <path d="M3 21h18" />
+                                    <path d="M5 21V8l7-5 7 5v13" />
+                                    <path d="M10 21v-4h4v4" />
+                                </svg>
+
+                                <span>Testimonial</span>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
 
                 {/* SYSTEM */}
@@ -446,23 +575,6 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                     </p>
 
                     <div className="space-y-1">
-                        {/* Profile */}
-                        <button type="button" className={staticNav}>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-[18px] w-[18px]"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                            >
-                                <circle cx="12" cy="8" r="3.5" />
-                                <path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5" />
-                            </svg>
-
-                            <span>Profile</span>
-                        </button>
-
                         {/* Logout */}
                         <button
                             type="button"
@@ -707,8 +819,8 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                     </Link>
 
                     {/* PENDAFTARAN */}
-                    <button
-                        type="button"
+                    <Link
+                        href="/pendaftarans"
                         className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
                     >
                         <svg
@@ -726,11 +838,11 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                         <span className="text-[9px] font-medium">
                             Pendaftaran
                         </span>
-                    </button>
+                    </Link>
 
                     {/* ANTREAN */}
-                    <button
-                        type="button"
+                    <Link
+                        href="/antrians"
                         className="flex h-full flex-1 flex-col items-center justify-center gap-1 text-white/55"
                     >
                         <svg
@@ -746,7 +858,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                         </svg>
 
                         <span className="text-[9px] font-medium">Antrean</span>
-                    </button>
+                    </Link>
 
                     {/* LAPORAN */}
                     <button

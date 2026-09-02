@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\UpdatePasswordRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
@@ -55,6 +57,38 @@ class AuthController extends Controller
                     request()->user()
                 ),
             ],
+        ]);
+    }
+
+    public function updateProfile(
+        UpdateProfileRequest $request
+    ): JsonResponse {
+        $user = $this->authService->updateProfile(
+            $request->user(),
+            $request->validated()
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Profile updated successfully.',
+            'data' => [
+                'user' => new UserResource($user),
+            ],
+        ]);
+    }
+
+    public function updatePassword(
+        UpdatePasswordRequest $request
+    ): JsonResponse {
+        $this->authService->updatePassword(
+            $request->user(),
+            $request->validated()
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password updated successfully.',
+            'data' => null,
         ]);
     }
 

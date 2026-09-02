@@ -9,12 +9,12 @@ use Illuminate\Support\Facades\DB;
 
 class PasienService
 {
-    public function getAll(): LengthAwarePaginator
+    public function getAll(int $perPage = 10): LengthAwarePaginator
     {
         return Pasien::query()
             ->with('poli')
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
     }
 
     public function create(array $data): Pasien
@@ -50,4 +50,3 @@ class PasienService
         });
     }
 }
-

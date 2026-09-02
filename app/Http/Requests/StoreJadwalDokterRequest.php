@@ -49,4 +49,3 @@ class StoreJadwalDokterRequest extends FormRequest
         ];
     }
 }
-

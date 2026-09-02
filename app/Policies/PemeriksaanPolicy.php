@@ -38,4 +38,3 @@ class PemeriksaanPolicy
         return true;
     }
 }
-

@@ -9,6 +9,7 @@ use App\Http\Resources\JadwalDokterResource;
 use App\Models\JadwalDokter;
 use App\Services\JadwalDokterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class JadwalDokterController extends Controller
@@ -17,11 +18,15 @@ class JadwalDokterController extends Controller
         private readonly JadwalDokterService $jadwalDokterService
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', JadwalDokter::class);
 
-        $jadwals = $this->jadwalDokterService->getAll();
+        $jadwals = $this->jadwalDokterService->getAll(
+            $request->integer('poli_id') ?: null,
+            $request->integer('dokter_id') ?: null,
+            min(100, $request->integer('per_page', 10)),
+        );
 
         return response()->json([
             'success' => true,
@@ -117,4 +122,3 @@ class JadwalDokterController extends Controller
         ]);
     }
 }
-

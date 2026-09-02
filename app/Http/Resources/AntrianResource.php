@@ -26,18 +26,14 @@ class AntrianResource extends JsonResource
 
             'pendaftaran' => [
                 'id' => $this->pendaftaran?->id,
-                'registration_number' =>
-                    $this->pendaftaran?->registration_number,
-                'registration_date' =>
-                    $this->pendaftaran?->registration_date?->format('Y-m-d'),
+                'registration_number' => $this->pendaftaran?->registration_number,
+                'registration_date' => $this->pendaftaran?->registration_date?->format('Y-m-d'),
             ],
 
             'pasien' => [
                 'id' => $this->pendaftaran?->pasien?->id,
-                'medical_record_number' =>
-                    $this->pendaftaran?->pasien?->medical_record_number,
-                'name' =>
-                    $this->pendaftaran?->pasien?->name,
+                'medical_record_number' => $this->pendaftaran?->pasien?->medical_record_number,
+                'name' => $this->pendaftaran?->pasien?->name,
             ],
 
             'poli' => [
@@ -48,4 +44,3 @@ class AntrianResource extends JsonResource
         ];
     }
 }
-

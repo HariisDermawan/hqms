@@ -9,6 +9,7 @@ use App\Http\Resources\PasienResource;
 use App\Models\Pasien;
 use App\Services\PasienService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PasienController extends Controller
@@ -20,11 +21,13 @@ class PasienController extends Controller
     /**
      * Display a listing of patients.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Pasien::class);
 
-        $pasiens = $this->pasienService->getAll();
+        $pasiens = $this->pasienService->getAll(
+            min(100, $request->integer('per_page', 10))
+        );
 
         return response()->json([
             'success' => true,

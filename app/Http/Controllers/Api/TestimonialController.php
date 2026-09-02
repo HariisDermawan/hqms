@@ -10,7 +10,6 @@ use App\Models\Testimonial;
 use App\Services\TestimonialService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Storage;
 
 class TestimonialController extends Controller
 {
@@ -48,15 +47,9 @@ class TestimonialController extends Controller
     ): JsonResponse {
         Gate::authorize('create', Testimonial::class);
 
-        $data = $request->validated();
-
-        if ($request->hasFile('photo')) {
-            $data['photo'] = $request
-                ->file('photo')
-                ->store('testimonials', 'public');
-        }
-
-        $testimonial = $this->testimonialService->create($data);
+        $testimonial = $this->testimonialService->create(
+            $request->validated()
+        );
 
         return response()->json([
             'success' => true,
@@ -88,23 +81,9 @@ class TestimonialController extends Controller
     ): JsonResponse {
         Gate::authorize('update', $testimonial);
 
-        $data = $request->validated();
-
-        if ($request->hasFile('photo')) {
-            if ($testimonial->photo) {
-                Storage::disk('public')->delete(
-                    $testimonial->photo
-                );
-            }
-
-            $data['photo'] = $request
-                ->file('photo')
-                ->store('testimonials', 'public');
-        }
-
         $testimonial = $this->testimonialService->update(
             $testimonial,
-            $data
+            $request->validated()
         );
 
         return response()->json([
@@ -121,12 +100,6 @@ class TestimonialController extends Controller
     public function destroy(Testimonial $testimonial): JsonResponse
     {
         Gate::authorize('delete', $testimonial);
-
-        if ($testimonial->photo) {
-            Storage::disk('public')->delete(
-                $testimonial->photo
-            );
-        }
 
         $this->testimonialService->delete($testimonial);
 

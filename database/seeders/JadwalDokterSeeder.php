@@ -100,4 +100,3 @@ class JadwalDokterSeeder extends Seeder
         );
     }
 }
-

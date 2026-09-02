@@ -73,7 +73,7 @@ class PasienSeeder extends Seeder
         foreach ($pasien as $item) {
             $poli = Poli::where('name', $item['poli_name'])->first();
 
-            if (!$poli) {
+            if (! $poli) {
                 $this->command->warn(
                     "Poli '{$item['poli_name']}' tidak ditemukan. Pasien {$item['name']} dilewati."
                 );

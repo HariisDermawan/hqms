@@ -32,4 +32,3 @@ class AntrianPolicy
         return true;
     }
 }
-

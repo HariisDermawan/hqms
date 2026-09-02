@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Pemeriksaan extends Model
 {
@@ -37,4 +37,3 @@ class Pemeriksaan extends Model
         return $this->belongsTo(Dokter::class);
     }
 }
-

@@ -26,4 +26,3 @@ class UpdateAntrianRequest extends FormRequest
         ];
     }
 }
-

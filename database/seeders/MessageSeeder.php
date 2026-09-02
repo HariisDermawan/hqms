@@ -57,4 +57,3 @@ class MessageSeeder extends Seeder
         );
     }
 }
-

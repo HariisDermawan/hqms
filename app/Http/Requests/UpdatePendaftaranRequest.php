@@ -43,4 +43,3 @@ class UpdatePendaftaranRequest extends FormRequest
         ];
     }
 }
-

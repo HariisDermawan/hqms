@@ -72,4 +72,3 @@ class UpdateMessageRequest extends FormRequest
         ];
     }
 }
-

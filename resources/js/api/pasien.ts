@@ -52,9 +52,19 @@ export interface PasienResponse {
     };
 }
 
-export const getPasiens = async (page = 1): Promise<PasienListResponse> => {
+export const getPasiens = async (
+    page = 1,
+    perPage?: number,
+): Promise<PasienListResponse> => {
+    const searchParams = new URLSearchParams();
+    searchParams.append('page', String(page));
+
+    if (perPage) {
+        searchParams.append('per_page', String(perPage));
+    }
+
     const response = await api.get<PasienListResponse>(
-        `/api/v1/pasiens?page=${page}`,
+        `/api/v1/pasiens?${searchParams.toString()}`,
     );
 
     return response.data;

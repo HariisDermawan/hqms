@@ -1,17 +1,26 @@
-import api from '@/lib/axios';
+﻿import api from '@/lib/axios';
 import type { Pagination } from './dokter';
+
+export interface PoliDokter {
+    id: number;
+    name: string;
+    image_url: string | null;
+}
 
 export interface Poli {
     id: number;
     code: string;
+    queue_prefix: string | null;
     name: string;
     description: string | null;
     image_url: string | null;
+    dokters?: PoliDokter[];
     is_active: boolean;
 }
 
 export interface PoliPayload {
     code: string;
+    queue_prefix?: string;
     name: string;
     description?: string;
     is_active?: boolean;
@@ -34,9 +43,18 @@ export interface PoliResponse {
     };
 }
 
-export const getPolis = async (page = 1): Promise<PoliListResponse> => {
+export const getPolis = async (
+    page = 1,
+    perPage?: number,
+): Promise<PoliListResponse> => {
+    const searchParams = new URLSearchParams({ page: String(page) });
+
+    if (perPage) {
+        searchParams.append('per_page', String(perPage));
+    }
+
     const response = await api.get<PoliListResponse>(
-        `/api/v1/polis?page=${page}`,
+        `/api/v1/polis?${searchParams.toString()}`,
     );
 
     return response.data;
@@ -55,6 +73,9 @@ export const storePoli = async (
     const formData = new FormData();
 
     formData.append('code', payload.code);
+    if (payload.queue_prefix) {
+        formData.append('queue_prefix', payload.queue_prefix);
+    }
     formData.append('name', payload.name);
     formData.append('description', payload.description ?? '');
 
@@ -78,6 +99,9 @@ export const updatePoli = async (
 
     formData.append('_method', 'PUT');
     formData.append('code', payload.code);
+    if (payload.queue_prefix) {
+        formData.append('queue_prefix', payload.queue_prefix);
+    }
     formData.append('name', payload.name);
     formData.append('description', payload.description ?? '');
 

@@ -65,4 +65,3 @@ class StoreMessageRequest extends FormRequest
         ];
     }
 }
-

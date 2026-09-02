@@ -9,6 +9,7 @@ use App\Http\Resources\AntrianResource;
 use App\Models\Antrian;
 use App\Services\AntrianService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class AntrianController extends Controller
@@ -20,11 +21,13 @@ class AntrianController extends Controller
     /**
      * Display a listing of queues.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Antrian::class);
 
-        $antrians = $this->antrianService->getAll();
+        $antrians = $this->antrianService->getAll(
+            min(100, $request->integer('per_page', 10))
+        );
 
         return response()->json([
             'success' => true,

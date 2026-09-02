@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\Storage;
 
 class DokterService
 {
-    public function getAll(): LengthAwarePaginator
+    public function getAll(int $perPage = 10): LengthAwarePaginator
     {
         return Dokter::query()
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
     }
 
     public function create(array $data): Dokter

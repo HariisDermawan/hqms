@@ -20,6 +20,13 @@ class StorePoliRequest extends FormRequest
                 'max:50',
                 'unique:polis,code',
             ],
+            'queue_prefix' => [
+                'nullable',
+                'string',
+                'size:1',
+                'regex:/^[A-Za-z]$/',
+                'unique:polis,queue_prefix',
+            ],
             'name' => [
                 'required',
                 'string',

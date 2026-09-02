@@ -32,4 +32,3 @@ class PendaftaranPolicy
         return true;
     }
 }
-

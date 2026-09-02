@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('subject')->nullable();
             $table->text('message');
-            $table->enum('status', ['unread', 'read', 'replied',])->default('unread');
+            $table->enum('status', ['unread', 'read', 'replied'])->default('unread');
             $table->text('admin_reply')->nullable();
             $table->timestamp('replied_at')->nullable();
             $table->timestamps();

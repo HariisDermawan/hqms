@@ -51,4 +51,3 @@ class UpdateJadwalDokterRequest extends FormRequest
         ];
     }
 }
-

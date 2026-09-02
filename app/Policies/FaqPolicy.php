@@ -32,4 +32,3 @@ class FaqPolicy
         return true;
     }
 }
-

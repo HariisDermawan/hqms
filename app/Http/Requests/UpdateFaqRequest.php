@@ -38,4 +38,3 @@ class UpdateFaqRequest extends FormRequest
         ];
     }
 }
-

@@ -43,4 +43,27 @@ class AuthService
 
         request()->session()->regenerateToken();
     }
+
+    public function updateProfile(User $user, array $data): User
+    {
+        return DB::transaction(function () use ($user, $data) {
+            $user->update([
+                'name' => $data['name'],
+                'email' => $data['email'],
+            ]);
+
+            return $user->fresh();
+        });
+    }
+
+    public function updatePassword(User $user, array $data): User
+    {
+        return DB::transaction(function () use ($user, $data) {
+            $user->update([
+                'password' => $data['password'],
+            ]);
+
+            return $user->fresh();
+        });
+    }
 }

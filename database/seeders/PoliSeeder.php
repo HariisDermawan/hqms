@@ -12,6 +12,7 @@ class PoliSeeder extends Seeder
         $polis = [
             [
                 'code' => 'PLUM',
+                'queue_prefix' => 'A',
                 'name' => 'Poli Umum',
                 'description' => 'Pelayanan kesehatan umum.',
                 'image' => 'polis/default.jpg',
@@ -19,6 +20,7 @@ class PoliSeeder extends Seeder
             ],
             [
                 'code' => 'PLMA',
+                'queue_prefix' => 'B',
                 'name' => 'Poli Mata',
                 'description' => 'Pelayanan kesehatan mata.',
                 'image' => 'polis/default.jpg',
@@ -26,6 +28,7 @@ class PoliSeeder extends Seeder
             ],
             [
                 'code' => 'PLJA',
+                'queue_prefix' => 'C',
                 'name' => 'Poli Jantung',
                 'description' => 'Pelayanan kesehatan jantung.',
                 'image' => 'polis/default.jpg',
@@ -33,6 +36,7 @@ class PoliSeeder extends Seeder
             ],
             [
                 'code' => 'PLAN',
+                'queue_prefix' => 'D',
                 'name' => 'Poli Anak',
                 'description' => 'Pelayanan kesehatan anak.',
                 'image' => 'polis/default.jpg',
@@ -40,6 +44,7 @@ class PoliSeeder extends Seeder
             ],
             [
                 'code' => 'PLGI',
+                'queue_prefix' => 'E',
                 'name' => 'Poli Gigi',
                 'description' => 'Pelayanan kesehatan gigi dan mulut.',
                 'image' => 'polis/default.jpg',

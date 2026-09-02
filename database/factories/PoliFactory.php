@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Poli;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<\App\Models\Poli>
+ * @extends Factory<Poli>
  */
 class PoliFactory extends Factory
 {

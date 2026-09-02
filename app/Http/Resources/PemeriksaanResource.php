@@ -20,10 +20,8 @@ class PemeriksaanResource extends JsonResource
 
             'pasien' => [
                 'id' => $this->antrian?->pendaftaran?->pasien?->id,
-                'medical_record_number' =>
-                    $this->antrian?->pendaftaran?->pasien?->medical_record_number,
-                'name' =>
-                    $this->antrian?->pendaftaran?->pasien?->name,
+                'medical_record_number' => $this->antrian?->pendaftaran?->pasien?->medical_record_number,
+                'name' => $this->antrian?->pendaftaran?->pasien?->name,
             ],
 
             'poli' => [
@@ -36,8 +34,7 @@ class PemeriksaanResource extends JsonResource
                 'id' => $this->dokter?->id,
                 'code' => $this->dokter?->code,
                 'name' => $this->dokter?->name,
-                'specialization' =>
-                    $this->dokter?->specialization,
+                'specialization' => $this->dokter?->specialization,
             ],
 
             'examined_at' => $this->examined_at?->toISOString(),
@@ -49,4 +46,3 @@ class PemeriksaanResource extends JsonResource
         ];
     }
 }
-

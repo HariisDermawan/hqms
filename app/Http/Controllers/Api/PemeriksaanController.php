@@ -120,4 +120,3 @@ class PemeriksaanController extends Controller
         ]);
     }
 }
-

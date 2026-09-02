@@ -23,6 +23,7 @@ export default function PoliForm({
     onSubmit,
 }: PoliFormProps) {
     const [code, setCode] = useState(initial?.code ?? '');
+    const [queuePrefix, setQueuePrefix] = useState(initial?.queue_prefix ?? '');
     const [name, setName] = useState(initial?.name ?? '');
     const [description, setDescription] = useState(initial?.description ?? '');
     const [isActive, setIsActive] = useState(initial?.is_active ?? true);
@@ -51,6 +52,7 @@ export default function PoliForm({
         onSubmit(
             {
                 code,
+                queue_prefix: queuePrefix.toUpperCase() || undefined,
                 name,
                 description: description || undefined,
                 is_active: isActive,
@@ -173,6 +175,36 @@ export default function PoliForm({
                     {errors.code && (
                         <p className="mt-1 text-[11px] text-red-500">
                             {errors.code}
+                        </p>
+                    )}
+                </div>
+
+                {/* KODE ANTREAN */}
+                <div>
+                    <label htmlFor="queue_prefix" className={labelClass}>
+                        Kode Antrean
+                    </label>
+
+                    <input
+                        id="queue_prefix"
+                        type="text"
+                        value={queuePrefix}
+                        onChange={(event) =>
+                            setQueuePrefix(event.target.value.toUpperCase())
+                        }
+                        placeholder="A"
+                        maxLength={1}
+                        className={inputClass}
+                    />
+
+                    <p className="mt-1 text-[11px] text-gray-400">
+                        Huruf prefix antrean (A–Z). Contoh: A untuk 'A-001'.
+                        {!initial && ' Kosongkan untuk otomatis.'}
+                    </p>
+
+                    {errors.queue_prefix && (
+                        <p className="mt-1 text-[11px] text-red-500">
+                            {errors.queue_prefix}
                         </p>
                     )}
                 </div>

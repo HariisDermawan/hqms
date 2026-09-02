@@ -23,6 +23,13 @@ class UpdatePoliRequest extends FormRequest
                 'max:50',
                 Rule::unique('polis', 'code')->ignore($poli->id),
             ],
+            'queue_prefix' => [
+                'nullable',
+                'string',
+                'size:1',
+                'regex:/^[A-Za-z]$/',
+                Rule::unique('polis', 'queue_prefix')->ignore($poli->id),
+            ],
             'name' => [
                 'required',
                 'string',

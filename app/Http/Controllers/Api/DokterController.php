@@ -9,6 +9,7 @@ use App\Http\Resources\DokterResource;
 use App\Models\Dokter;
 use App\Services\DokterService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class DokterController extends Controller
@@ -17,11 +18,13 @@ class DokterController extends Controller
         private readonly DokterService $dokterService
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Dokter::class);
 
-        $dokters = $this->dokterService->getAll();
+        $dokters = $this->dokterService->getAll(
+            min(100, $request->integer('per_page', 10))
+        );
 
         return response()->json([
             'success' => true,
@@ -106,4 +109,3 @@ class DokterController extends Controller
         ]);
     }
 }
-

@@ -9,6 +9,7 @@ use App\Http\Resources\PoliResource;
 use App\Models\Poli;
 use App\Services\PoliService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PoliController extends Controller
@@ -20,11 +21,13 @@ class PoliController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         Gate::authorize('viewAny', Poli::class);
 
-        $polis = $this->poliService->getAll();
+        $polis = $this->poliService->getAll(
+            min(100, $request->integer('per_page', 10))
+        );
 
         return response()->json([
             'success' => true,
@@ -52,6 +55,7 @@ class PoliController extends Controller
         $poli = $this->poliService->create(
             $request->validated()
         );
+
         return response()->json([
             'success' => true,
             'message' => 'Poli created successfully.',

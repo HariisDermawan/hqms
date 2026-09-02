@@ -20,11 +20,11 @@ class TestimonialService
     {
         return DB::transaction(function () use ($data) {
             return Testimonial::create([
+                'pasien_id' => $data['pasien_id'] ?? null,
                 'name' => $data['name'],
                 'role' => $data['role'] ?? null,
                 'message' => $data['message'],
                 'rating' => $data['rating'] ?? 5,
-                'photo' => $data['photo'] ?? null,
                 'sort_order' => $data['sort_order'] ?? 0,
                 'is_active' => $data['is_active'] ?? true,
             ]);
@@ -40,11 +40,11 @@ class TestimonialService
             $data
         ) {
             $testimonial->update([
+                'pasien_id' => $data['pasien_id'] ?? null,
                 'name' => $data['name'],
                 'role' => $data['role'] ?? null,
                 'message' => $data['message'],
                 'rating' => $data['rating'] ?? $testimonial->rating,
-                'photo' => $data['photo'] ?? $testimonial->photo,
                 'sort_order' => $data['sort_order']
                     ?? $testimonial->sort_order,
                 'is_active' => $data['is_active']
@@ -62,4 +62,3 @@ class TestimonialService
         });
     }
 }
-

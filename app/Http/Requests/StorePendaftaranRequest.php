@@ -38,4 +38,3 @@ class StorePendaftaranRequest extends FormRequest
         ];
     }
 }
-
