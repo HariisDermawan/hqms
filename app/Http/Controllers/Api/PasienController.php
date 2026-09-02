@@ -73,7 +73,10 @@ class PasienController extends Controller
     {
         Gate::authorize('view', $pasien);
 
-        $pasien->load('poli');
+        $pasien->load([
+            'poli',
+            'ruanganPasiens.ruangan',
+        ]);
 
         return response()->json([
             'success' => true,

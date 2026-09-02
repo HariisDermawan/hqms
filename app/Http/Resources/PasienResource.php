@@ -27,6 +27,30 @@ class PasienResource extends JsonResource
             'phone' => $this->phone,
             'address' => $this->address,
             'is_active' => (bool) $this->is_active,
+
+            'ruangans' => $this->whenLoaded(
+                'ruanganPasiens',
+                function () {
+                    return $this->ruanganPasiens
+                        ->filter(
+                            fn ($item) => $item->tanggal_keluar === null
+                        )
+                        ->filter(
+                            fn ($item) => $item->ruangan !== null
+                        )
+                        ->values()
+                        ->map(fn ($item) => [
+                            'id' => $item->ruangan->id,
+                            'code' => $item->ruangan->code,
+                            'name' => $item->ruangan->name,
+                            'category' => $item->ruangan->category,
+                            'tanggal_masuk' => $item->tanggal_masuk?->format(
+                                'Y-m-d'
+                            ),
+                        ])
+                        ->all();
+                },
+            ),
         ];
     }
 }

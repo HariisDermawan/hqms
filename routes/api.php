@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\PasienController;
 use App\Http\Controllers\Api\PemeriksaanController;
 use App\Http\Controllers\Api\PendaftaranController;
 use App\Http\Controllers\Api\PoliController;
+use App\Http\Controllers\Api\RuanganController;
 use App\Http\Controllers\Api\TestimonialController;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
@@ -28,6 +29,15 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         });
 
         Route::apiResource('polis', PoliController::class);
+        Route::apiResource('ruangans', RuanganController::class);
+        Route::post('ruangans/{ruangan}/pasiens', [
+            RuanganController::class,
+            'assignPasien',
+        ]);
+        Route::delete('ruangans/{ruangan}/pasiens/{ruanganPasien}', [
+            RuanganController::class,
+            'removePasien',
+        ]);
         Route::apiResource('pasiens', PasienController::class);
         Route::apiResource('pendaftarans', PendaftaranController::class);
         Route::apiResource('antrians', AntrianController::class);

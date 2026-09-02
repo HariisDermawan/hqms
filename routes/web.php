@@ -9,6 +9,7 @@ use App\Models\Pasien;
 use App\Models\Pemeriksaan;
 use App\Models\Pendaftaran;
 use App\Models\Poli;
+use App\Models\Ruangan;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +66,26 @@ Route::get('/polis/{poli}', function (Poli $poli) {
 Route::get('/polis', function () {
     return Inertia::render('Poli/Index');
 })->name('polis.index');
+
+Route::get('/ruangans/create', function () {
+    return Inertia::render('Ruangan/Create');
+})->name('ruangans.create');
+
+Route::get('/ruangans/{ruangan}/edit', function (Ruangan $ruangan) {
+    return Inertia::render('Ruangan/Edit', [
+        'id' => $ruangan->id,
+    ]);
+})->name('ruangans.edit');
+
+Route::get('/ruangans/{ruangan}', function (Ruangan $ruangan) {
+    return Inertia::render('Ruangan/Show', [
+        'id' => $ruangan->id,
+    ]);
+})->name('ruangans.show');
+
+Route::get('/ruangans', function () {
+    return Inertia::render('Ruangan/Index');
+})->name('ruangans.index');
 
 Route::get('/dokters/create', function () {
     return Inertia::render('Dokter/Create');

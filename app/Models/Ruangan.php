@@ -4,36 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Pasien extends Model
+class Ruangan extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'poli_id',
-        'medical_record_number',
+        'code',
         'name',
-        'nik',
-        'gender',
-        'birth_date',
-        'age',
-        'phone',
-        'address',
+        'category',
+        'description',
         'is_active',
     ];
 
-    protected $casts = [
-        'birth_date' => 'date',
-        'age' => 'integer',
-        'is_active' => 'boolean',
-    ];
-
-    public function poli(): BelongsTo
+    protected function casts(): array
     {
-        return $this->belongsTo(Poli::class);
+        return [
+            'is_active' => 'boolean',
+        ];
     }
 
     public function ruanganPasiens(): HasMany

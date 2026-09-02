@@ -53,6 +53,9 @@ export default function PasienShow() {
 
     const initial = pasien?.name?.[0]?.toUpperCase() ?? '?';
 
+    const rooms = pasien?.ruangans ?? [];
+    const currentRoom = rooms[0];
+
     return (
         <>
             <Head title={pasien ? `Detail ${pasien.name}` : 'Detail Pasien'} />
@@ -104,6 +107,25 @@ export default function PasienShow() {
                                     <p className="mt-0.5 text-[13px] text-gray-400">
                                         {pasien.poli?.name ?? '-'}
                                     </p>
+
+                                    {currentRoom && (
+                                        <p className="mt-1 inline-flex items-center gap-1.5 rounded-md bg-[#07577f]/10 px-2 py-0.5 text-[11px] font-semibold text-[#07577f]">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-3.5 w-3.5"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                            >
+                                                <path d="M4 21V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v17" />
+                                                <path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2" />
+                                                <path d="M10 21v-3h4v3" />
+                                            </svg>
+                                            {currentRoom.name} ·{' '}
+                                            {currentRoom.category}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <span
@@ -147,6 +169,88 @@ export default function PasienShow() {
                                 <div className="col-span-2 lg:col-span-3">
                                     {detailItem('Alamat', fullAddress)}
                                 </div>
+                            </div>
+
+                            {/* RUANGAN PASIEN */}
+                            <div className="mt-6 border-t border-gray-100 pt-5">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h4 className="text-sm font-bold text-gray-800">
+                                            Ruangan Pasien
+                                        </h4>
+
+                                        <p className="mt-0.5 text-[12px] text-gray-400">
+                                            Ruangan yang sedang ditempati
+                                        </p>
+                                    </div>
+
+                                    <Link
+                                        href="/ruangans"
+                                        className="text-[12px] font-semibold text-[#07577f] transition hover:text-[#063f62]"
+                                    >
+                                        Lihat Ruangan →
+                                    </Link>
+                                </div>
+
+                                {rooms.length === 0 ? (
+                                    <p className="mt-3 text-[13px] text-gray-400">
+                                        Pasien belum menempati ruangan manapun.
+                                    </p>
+                                ) : (
+                                    <div className="mt-3 overflow-x-auto">
+                                        <table className="w-full text-left text-[13px]">
+                                            <thead>
+                                                <tr className="bg-[#f7f9fb] text-[11px] tracking-wider text-gray-400 uppercase">
+                                                    <th className="px-4 py-3">
+                                                        No
+                                                    </th>
+                                                    <th className="px-4 py-3">
+                                                        Nama Ruangan
+                                                    </th>
+                                                    <th className="px-4 py-3">
+                                                        Kelas
+                                                    </th>
+                                                    <th className="px-4 py-3">
+                                                        Tanggal Masuk
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody className="divide-y divide-gray-50">
+                                                {rooms.map((room, index) => (
+                                                    <tr
+                                                        key={room.id}
+                                                        className="transition hover:bg-[#f7f9fb]"
+                                                    >
+                                                        <td className="px-4 py-3 text-gray-500">
+                                                            {index + 1}
+                                                        </td>
+
+                                                        <td className="px-4 py-3">
+                                                            <Link
+                                                                href={`/ruangans/${room.id}`}
+                                                                className="font-semibold text-[#07577f] transition hover:text-[#063f62]"
+                                                            >
+                                                                {room.name}
+                                                            </Link>
+                                                        </td>
+
+                                                        <td className="px-4 py-3">
+                                                            <span className="rounded-md bg-[#07577f]/10 px-2 py-0.5 text-[11px] font-semibold text-[#07577f]">
+                                                                {room.category}
+                                                            </span>
+                                                        </td>
+
+                                                        <td className="px-4 py-3 text-gray-600">
+                                                            {room.tanggal_masuk ??
+                                                                '-'}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="mt-6 text-right">

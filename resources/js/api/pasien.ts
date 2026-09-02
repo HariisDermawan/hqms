@@ -9,6 +9,14 @@ export interface PoliSummary {
 
 export type Gender = 'L' | 'P';
 
+export interface PasienRuangan {
+    id: number;
+    code: string;
+    name: string;
+    category: string;
+    tanggal_masuk: string | null;
+}
+
 export interface Pasien {
     id: number;
     poli: PoliSummary | null;
@@ -21,6 +29,7 @@ export interface Pasien {
     phone: string | null;
     address: string | null;
     is_active: boolean;
+    ruangans?: PasienRuangan[];
 }
 
 export interface PasienPayload {

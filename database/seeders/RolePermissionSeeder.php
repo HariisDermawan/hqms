@@ -26,6 +26,12 @@ class RolePermissionSeeder extends Seeder
             'poli.update',
             'poli.delete',
 
+            // Ruangan
+            'ruangan.view',
+            'ruangan.create',
+            'ruangan.update',
+            'ruangan.delete',
+
             // Dokter
             'doctor.view',
             'doctor.create',
@@ -116,6 +122,11 @@ class RolePermissionSeeder extends Seeder
                 'poli.create',
                 'poli.update',
                 'poli.delete',
+
+                'ruangan.view',
+                'ruangan.create',
+                'ruangan.update',
+                'ruangan.delete',
 
                 'doctor.view',
                 'doctor.create',

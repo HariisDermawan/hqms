@@ -264,7 +264,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </button>
 
                             {/* Ruangan */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/ruangans"
+                                className={linkNav(isActive('/ruangans'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -279,7 +282,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Ruangan</span>
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
