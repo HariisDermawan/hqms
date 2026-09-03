@@ -230,7 +230,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </Link>
 
                             {/* Perawat */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/perawats"
+                                className={linkNav(isActive('/perawats'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -245,7 +248,34 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Perawat</span>
-                            </button>
+                            </Link>
+
+                            {/* Presensi */}
+                            <Link
+                                href="/presensis"
+                                className={linkNav(isActive('/presensis'))}
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-[18px] w-[18px]"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <rect
+                                        x="3"
+                                        y="4"
+                                        width="18"
+                                        height="18"
+                                        rx="2"
+                                    />
+                                    <path d="M16 2v4M8 2v4M3 10h18" />
+                                    <path d="m9 16 2 2 4-4" />
+                                </svg>
+
+                                <span>Presensi</span>
+                            </Link>
 
                             {/* Obat */}
                             <button type="button" className={staticNav}>

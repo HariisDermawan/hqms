@@ -8,7 +8,9 @@ use App\Models\Message;
 use App\Models\Pasien;
 use App\Models\Pemeriksaan;
 use App\Models\Pendaftaran;
+use App\Models\Perawat;
 use App\Models\Poli;
+use App\Models\Presensi;
 use App\Models\Ruangan;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
@@ -30,6 +32,10 @@ Route::get('/ticket', function () {
 Route::get('/antrians-ticker', function () {
     return Inertia::render('Kiosk/Ticker');
 })->name('antrians-ticker');
+
+Route::get('/absen-karyawan', function () {
+    return Inertia::render('Kiosk/AbsenKaryawan');
+})->name('absen-karyawan');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
@@ -118,6 +124,46 @@ Route::get('/dokters/{dokter}', function (Dokter $dokter) {
 Route::get('/dokters', function () {
     return Inertia::render('Dokter/Index');
 })->name('dokters.index');
+
+Route::get('/perawats/create', function () {
+    return Inertia::render('Perawat/Create');
+})->name('perawats.create');
+
+Route::get('/perawats/{perawat}/edit', function (Perawat $perawat) {
+    return Inertia::render('Perawat/Edit', [
+        'id' => $perawat->id,
+    ]);
+})->name('perawats.edit');
+
+Route::get('/perawats/{perawat}', function (Perawat $perawat) {
+    return Inertia::render('Perawat/Show', [
+        'id' => $perawat->id,
+    ]);
+})->name('perawats.show');
+
+Route::get('/perawats', function () {
+    return Inertia::render('Perawat/Index');
+})->name('perawats.index');
+
+Route::get('/presensis/create', function () {
+    return Inertia::render('Presensi/Create');
+})->name('presensis.create');
+
+Route::get('/presensis/{presensi}/edit', function (Presensi $presensi) {
+    return Inertia::render('Presensi/Edit', [
+        'id' => $presensi->id,
+    ]);
+})->name('presensis.edit');
+
+Route::get('/presensis/{presensi}', function (Presensi $presensi) {
+    return Inertia::render('Presensi/Show', [
+        'id' => $presensi->id,
+    ]);
+})->name('presensis.show');
+
+Route::get('/presensis', function () {
+    return Inertia::render('Presensi/Index');
+})->name('presensis.index');
 
 Route::get('/jadwal-dokters/create', function () {
     return Inertia::render('JadwalDokter/Create');

@@ -218,55 +218,50 @@ export default function KioskTicker() {
         <>
             <Head title="Ambil Antrian" />
 
-            <div
-                className="relative flex min-h-screen flex-col overflow-hidden bg-cover bg-center text-white"
-                style={{
-                    backgroundImage:
-                        "url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1920&q=80')",
-                }}
-            >
-                <div className="absolute inset-0 bg-gradient-to-b from-[#07577f]/85 via-[#0a4d78]/70 to-[#0a4d78]/90" />
-
-                <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-                <div className="pointer-events-none absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-emerald-300/10 blur-3xl" />
-
-                <div className="relative z-10 flex items-center gap-3 px-8 py-6 sm:px-12">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
-                        <TickerTab />
-                    </div>
-
-                    <div>
-                        <h1 className="text-2xl font-black tracking-tight drop-shadow">
-                            Rs Merdeka
-                        </h1>
-
-                        <p className="mt-0.5 text-[12px] tracking-wide text-white/70 uppercase">
-                            Sistem Antrean Mandiri
-                        </p>
-                    </div>
+            <div className="relative flex min-h-screen flex-col overflow-hidden bg-slate-100 text-slate-900">
+                <div className="relative z-10 flex items-center px-8 py-6 sm:px-12">
+                    <img
+                        src="/assets/LG2.png"
+                        alt="Logo RS Merdeka"
+                        className="h-16 w-auto object-contain"
+                    />
                 </div>
 
                 <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-6 sm:px-8">
                     {view === 'ticket' ? (
-                        <div className="animate-fade-in-up flex flex-1 flex-col items-center justify-center text-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400/20 text-emerald-200 backdrop-blur">
-                                <CheckTab />
-                            </div>
+                        <div className="animate-fade-in-up -mt-20 flex flex-1 flex-col items-center justify-center text-center">
+                            <img
+                                src="/assets/LG2.png"
+                                alt="Logo RS Merdeka"
+                                className="-mt-8 h-36 w-auto object-contain sm:h-44"
+                            />
 
-                            <p className="mt-6 text-sm font-semibold tracking-[0.2em] text-white/80 uppercase">
+                            <p className="mt-6 text-sm font-bold tracking-[0.22em] text-[#07577f] uppercase">
                                 Nomor Antrean Anda
                             </p>
 
-                            <div className="mt-6 rounded-3xl border border-white/20 bg-white/95 px-10 py-6 shadow-2xl sm:px-16">
-                                <p className="text-[72px] leading-none font-black tracking-tight text-[#07577f] sm:text-[96px]">
+                            <div className="relative mt-6 w-full max-w-md overflow-hidden rounded-3xl bg-gradient-to-br from-[#07577f] to-[#0a8fd4] px-10 py-12 text-center text-white shadow-2xl sm:px-16">
+                                <p className="relative text-[13px] font-semibold tracking-[0.3em] text-white/70 uppercase">
+                                    Antrian Anda
+                                </p>
+
+                                <p className="relative mt-3 text-8xl leading-none font-black tracking-tight drop-shadow sm:text-[104px]">
+                                    {ticket?.split('-')[1] ?? ticket}
+                                </p>
+
+                                <p className="relative mt-4 text-sm font-semibold text-white/85">
                                     {ticket}
                                 </p>
                             </div>
 
-                            <p className="mt-6 text-sm text-white/80">
-                                Silakan menunggu untuk dipanggil di layar
-                                pemanggilan.
-                            </p>
+                            <div className="mt-7 inline-flex items-center gap-2.5 rounded-full bg-emerald-50 px-5 py-2.5 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                                <CheckTab />
+
+                                <span>
+                                    Silakan menunggu dipanggil di layar
+                                    pemanggilan
+                                </span>
+                            </div>
                         </div>
                     ) : view === 'polis' ? (
                         <div className="animate-fade-in-up flex flex-1 flex-col">
@@ -354,19 +349,13 @@ export default function KioskTicker() {
                     ) : (
                         <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
                             <div className="animate-fade-in-up flex flex-col items-center">
-                                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/15 shadow-2xl backdrop-blur">
-                                    <TickerTab />
-                                </div>
+                                <img
+                                    src="/assets/LG2.png"
+                                    alt="Logo RS Merdeka"
+                                    className="-mt-24 h-56 w-auto object-contain sm:-mt-28 sm:h-72"
+                                />
 
-                                <p className="mt-6 text-[13px] font-semibold tracking-[0.22em] text-white/80 uppercase">
-                                    Selamat Datang di
-                                </p>
-
-                                <h1 className="mt-2 text-4xl font-black tracking-tight text-white drop-shadow-lg sm:text-6xl">
-                                    Rs Merdeka
-                                </h1>
-
-                                <p className="mt-2 text-lg font-semibold tracking-[0.18em] text-white/70 uppercase">
+                                <p className="mt-6 text-lg font-semibold tracking-[0.18em] text-slate-500 uppercase">
                                     Ambil Nomor Antrian
                                 </p>
 

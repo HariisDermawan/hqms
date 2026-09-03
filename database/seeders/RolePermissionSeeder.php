@@ -38,6 +38,18 @@ class RolePermissionSeeder extends Seeder
             'doctor.update',
             'doctor.delete',
 
+            // Perawat
+            'nurse.view',
+            'nurse.create',
+            'nurse.update',
+            'nurse.delete',
+
+            // Presensi
+            'attendance.view',
+            'attendance.create',
+            'attendance.update',
+            'attendance.delete',
+
             // Jadwal Dokter
             'schedule.view',
             'schedule.create',
@@ -133,6 +145,16 @@ class RolePermissionSeeder extends Seeder
                 'doctor.update',
                 'doctor.delete',
 
+                'nurse.view',
+                'nurse.create',
+                'nurse.update',
+                'nurse.delete',
+
+                'attendance.view',
+                'attendance.create',
+                'attendance.update',
+                'attendance.delete',
+
                 'schedule.view',
                 'schedule.create',
                 'schedule.update',
@@ -211,6 +233,15 @@ class RolePermissionSeeder extends Seeder
                 'doctor.view',
                 'schedule.view',
                 'patient.view',
+
+                'nurse.view',
+                'nurse.create',
+                'nurse.update',
+                'nurse.delete',
+
+                'attendance.view',
+                'attendance.create',
+                'attendance.update',
 
                 'queue.view',
                 'queue.call',

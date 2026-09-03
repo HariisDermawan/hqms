@@ -304,34 +304,12 @@ export default function KioskTicketDisplay() {
             <div className="flex h-screen flex-col bg-slate-100 text-slate-900">
                 {/* TOP BAR: LOGO + CLOCK (blended, not a navbar bar) */}
                 <div className="flex shrink-0 items-center justify-between px-6 pt-5">
-                    <div className="flex items-center gap-2.5">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#07577f] text-white shadow-sm">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            >
-                                <path d="M3 21h18" />
-                                <path d="M5 21V7l7-4 7 4v14" />
-                                <path d="M9 21v-6h6v6" />
-                                <path d="M9 11h.01M15 11h.01" />
-                            </svg>
-                        </div>
-
-                        <div>
-                            <h1 className="text-xl font-black tracking-tight text-[#07577f]">
-                                Rs Merdeka
-                            </h1>
-
-                            <p className="mt-0.5 text-[11px] tracking-wide text-slate-500">
-                                Sistem Informasi Antrean
-                            </p>
-                        </div>
+                    <div className="flex items-center">
+                        <img
+                            src="/assets/LG1.png"
+                            alt="Logo RS Merdeka"
+                            className="h-14 w-auto object-contain"
+                        />
                     </div>
 
                     <div className="text-right">

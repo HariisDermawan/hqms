@@ -11,7 +11,9 @@ use App\Http\Controllers\Api\MonitoringController;
 use App\Http\Controllers\Api\PasienController;
 use App\Http\Controllers\Api\PemeriksaanController;
 use App\Http\Controllers\Api\PendaftaranController;
+use App\Http\Controllers\Api\PerawatController;
 use App\Http\Controllers\Api\PoliController;
+use App\Http\Controllers\Api\PresensiController;
 use App\Http\Controllers\Api\RuanganController;
 use App\Http\Controllers\Api\TestimonialController;
 use Illuminate\Session\Middleware\StartSession;
@@ -27,6 +29,10 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::get('/polis', [KioskController::class, 'polis']);
         Route::post('/tickets', [KioskController::class, 'store']);
         Route::get('/now-serving', [KioskController::class, 'nowServing']);
+        Route::post('/attendance/scan', [
+            KioskController::class,
+            'scanAttendance',
+        ]);
     });
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -51,6 +57,8 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::apiResource('pendaftarans', PendaftaranController::class);
         Route::apiResource('antrians', AntrianController::class);
         Route::apiResource('dokters', DokterController::class);
+        Route::apiResource('perawats', PerawatController::class);
+        Route::apiResource('presensis', PresensiController::class);
         Route::apiResource('jadwal-dokters', JadwalDokterController::class);
         Route::apiResource('pemeriksaans', PemeriksaanController::class);
         Route::apiResource('faqs', FaqController::class);

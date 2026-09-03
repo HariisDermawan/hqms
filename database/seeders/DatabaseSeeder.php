@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             PendaftaranSeeder::class,
             AntrianSeeder::class,
             DokterSeeder::class,
+            PerawatSeeder::class,
+            PresensiSeeder::class,
             JadwalDokterSeeder::class,
             PemeriksaanSeeder::class,
             FaqSeeder::class,
