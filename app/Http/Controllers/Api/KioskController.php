@@ -78,8 +78,17 @@ class KioskController extends Controller
     {
         $tickets = Antrian::query()
             ->with(['poli', 'pendaftaran.pasien'])
-            ->whereDate('created_at', now()->toDateString())
             ->whereIn('status', ['waiting', 'called', 'serving'])
+            ->where(function ($query) {
+                $query->whereDate('created_at', now()->toDateString())
+                    ->orWhereDoesntHave('pendaftaran')
+                    ->orWhereHas('pendaftaran', function ($pendaftaran) {
+                        $pendaftaran->whereDate(
+                            'registration_date',
+                            now()->toDateString()
+                        );
+                    });
+            })
             ->latest('id')
             ->get();
 
