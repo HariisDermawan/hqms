@@ -18,6 +18,7 @@ class Antrian extends Model
         'poli_id',
         'queue_number',
         'status',
+        'loket',
         'called_at',
         'started_at',
         'completed_at',
@@ -25,6 +26,7 @@ class Antrian extends Model
     ];
 
     protected $casts = [
+        'loket' => 'integer',
         'called_at' => 'datetime',
         'started_at' => 'datetime',
         'completed_at' => 'datetime',

@@ -72,6 +72,7 @@ class AntrianService
             $updateData = [
                 'status' => $status,
                 'notes' => $data['notes'] ?? $antrian->notes,
+                'loket' => $data['loket'] ?? $antrian->loket,
             ];
 
             /*

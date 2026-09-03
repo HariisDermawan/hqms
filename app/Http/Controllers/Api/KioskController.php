@@ -70,7 +70,7 @@ class KioskController extends Controller
     }
 
     /**
-     * Latest active ticket (waiting/called/serving) for each poli today.
+     * All called/serving tickets active today (per loket for the TV display).
      *
      * @return Collection<int, array<string, mixed>>
      */
@@ -78,7 +78,7 @@ class KioskController extends Controller
     {
         $tickets = Antrian::query()
             ->with(['poli', 'pendaftaran.pasien'])
-            ->whereIn('status', ['waiting', 'called', 'serving'])
+            ->whereIn('status', ['called', 'serving'])
             ->where(function ($query) {
                 $query->whereDate('created_at', now()->toDateString())
                     ->orWhereDoesntHave('pendaftaran')
@@ -93,16 +93,14 @@ class KioskController extends Controller
             ->get();
 
         return $tickets
-            ->groupBy('poli_id')
-            ->map(function (Collection $group) {
-                return $group->firstWhere('status', 'serving')
-                    ?? $group->firstWhere('status', 'called')
-                    ?? $group->first();
-            })
+            ->sortByDesc(fn (Antrian $antrian) => $antrian->called_at)
             ->values()
             ->map(fn (Antrian $antrian) => [
+                'id' => $antrian->id,
                 'queue_number' => $antrian->queue_number,
                 'status' => $antrian->status,
+                'loket' => $antrian->loket,
+                'called_at' => $antrian->called_at?->toISOString(),
                 'poli' => [
                     'id' => $antrian->poli?->id,
                     'name' => $antrian->poli?->name,

@@ -15,19 +15,101 @@ const ACCENTS = [
     'from-cyan-500 to-teal-600',
 ];
 
-const POLITab = () => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-7 w-7"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-    >
-        <rect x="5" y="3" width="14" height="18" rx="2" />
-        <path d="M9 7h6M9 11h6M9 15h4" />
-    </svg>
-);
+const PoliIcon = ({ name }: { name: string }) => {
+    const n = name.toLowerCase();
+
+    if (n.includes('anak')) {
+        return (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+            >
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M12 14c-4.2 0-7 2.5-7 5 0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2 0-2.5-2.8-5-7-5z" />
+                <path d="M5 8a7 7 0 0 1 14 0" />
+            </svg>
+        );
+    }
+
+    if (n.includes('gigi')) {
+        return (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+            >
+                <path d="M7 4c-1.5 0-3 1.5-3 3.5 0 3 1 5 2 7l1.2 4.8c.2.7 1.2.7 1.4 0l.6-2.3h1.6l.7 2.3c.2.7 1.2.7 1.4 0l1.2-4.8c1-2 2-4 2-7C17 5.5 15.5 4 14 4c-1.2 0-1.8.6-2 1.2-.3-.6-.9-1.2-2-1.2s-2 .6-3 0z" />
+            </svg>
+        );
+    }
+
+    if (n.includes('jantung')) {
+        return (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+            >
+                <path d="M12 20s-7-4.3-9-8.3C1.8 9 3 6 6 6c2 0 3 1 4 2l2 2 2-2c1-1 2-2 4-2 3 0 4.2 3 3 5.7-2 4-9 8.3-9 8.3z" />
+            </svg>
+        );
+    }
+
+    if (n.includes('mata')) {
+        return (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+            >
+                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" />
+                <circle cx="12" cy="12" r="3" />
+            </svg>
+        );
+    }
+
+    if (n.includes('umum')) {
+        return (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-7 w-7"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+            >
+                <path d="M3 10h3l2 7 3-13 2 9 1-3h4" />
+            </svg>
+        );
+    }
+
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-7 w-7"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+        >
+            <rect x="5" y="3" width="14" height="18" rx="2" />
+            <path d="M9 7h6M9 11h6M9 15h4" />
+        </svg>
+    );
+};
 
 const TickerTab = () => (
     <svg
@@ -136,74 +218,79 @@ export default function KioskTicker() {
         <>
             <Head title="Ambil Antrian" />
 
-            <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#eef4fb] to-[#f8fafc]">
-                {/* NAVBAR */}
-                <header className="flex items-center justify-between bg-[#07577f] px-8 py-5 text-white shadow-lg shadow-[#07577f]/20">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
-                            <TickerTab />
-                        </div>
+            <div
+                className="relative flex min-h-screen flex-col overflow-hidden bg-cover bg-center text-white"
+                style={{
+                    backgroundImage:
+                        "url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1920&q=80')",
+                }}
+            >
+                <div className="absolute inset-0 bg-gradient-to-b from-[#07577f]/85 via-[#0a4d78]/70 to-[#0a4d78]/90" />
 
-                        <div>
-                            <h1 className="text-2xl font-black tracking-tight">
-                                Rs Merdeka
-                            </h1>
+                <div className="pointer-events-none absolute -top-24 -left-24 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
+                <div className="pointer-events-none absolute -right-24 -bottom-24 h-96 w-96 rounded-full bg-emerald-300/10 blur-3xl" />
 
-                            <p className="mt-0.5 text-[12px] tracking-wide text-white/60">
-                                Sistem Antrean Mandiri
-                            </p>
-                        </div>
+                <div className="relative z-10 flex items-center gap-3 px-8 py-6 sm:px-12">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur">
+                        <TickerTab />
                     </div>
 
-                    {view === 'polis' && (
-                        <div className="text-right text-[12px] text-white/70">
-                            <p>
-                                Silakan pilih poliklinik untuk mengambil nomor
-                                antrean
-                            </p>
-                        </div>
-                    )}
-                </header>
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight drop-shadow">
+                            Rs Merdeka
+                        </h1>
 
-                <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-10">
+                        <p className="mt-0.5 text-[12px] tracking-wide text-white/70 uppercase">
+                            Sistem Antrean Mandiri
+                        </p>
+                    </div>
+                </div>
+
+                <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col px-6 py-6 sm:px-8">
                     {view === 'ticket' ? (
                         <div className="animate-fade-in-up flex flex-1 flex-col items-center justify-center text-center">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400/20 text-emerald-200 backdrop-blur">
                                 <CheckTab />
                             </div>
 
-                            <p className="mt-6 text-sm font-semibold tracking-[0.2em] text-gray-400 uppercase">
+                            <p className="mt-6 text-sm font-semibold tracking-[0.2em] text-white/80 uppercase">
                                 Nomor Antrean Anda
                             </p>
 
-                            <div className="mt-6 rounded-3xl border-4 border-[#07577f]/10 bg-white px-10 py-6 shadow-xl sm:px-16">
+                            <div className="mt-6 rounded-3xl border border-white/20 bg-white/95 px-10 py-6 shadow-2xl sm:px-16">
                                 <p className="text-[72px] leading-none font-black tracking-tight text-[#07577f] sm:text-[96px]">
                                     {ticket}
                                 </p>
                             </div>
 
-                            <p className="mt-6 text-sm text-gray-500">
+                            <p className="mt-6 text-sm text-white/80">
                                 Silakan menunggu untuk dipanggil di layar
                                 pemanggilan.
                             </p>
                         </div>
                     ) : view === 'polis' ? (
                         <div className="animate-fade-in-up flex flex-1 flex-col">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-[12px] font-semibold tracking-[0.18em] text-[#07577f] uppercase">
-                                        Poliklinik
-                                    </p>
+                            <div className="flex items-center justify-between gap-3 rounded-3xl bg-white/95 p-5 shadow-2xl">
+                                <div className="flex min-w-0 items-center gap-4">
+                                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#07577f] to-[#0a8fd4] text-white shadow-lg">
+                                        <PoliIcon name="Poliklinik" />
+                                    </div>
 
-                                    <h2 className="mt-1 text-2xl font-black text-gray-800">
-                                        Pilih Poliklinik
-                                    </h2>
+                                    <div className="min-w-0">
+                                        <p className="text-[12px] font-semibold tracking-[0.18em] text-[#07577f] uppercase">
+                                            Poliklinik
+                                        </p>
+
+                                        <h2 className="mt-0.5 truncate text-xl font-black text-gray-800 sm:text-2xl">
+                                            Pilih Poliklinik
+                                        </h2>
+                                    </div>
                                 </div>
 
                                 <button
                                     type="button"
                                     onClick={backHome}
-                                    className="inline-flex h-11 items-center gap-1.5 rounded-full bg-white px-5 text-[13px] font-semibold text-gray-600 shadow-md transition hover:bg-gray-50"
+                                    className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-gray-100 px-5 text-[13px] font-semibold text-gray-600 transition hover:bg-gray-200"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -227,7 +314,7 @@ export default function KioskTicker() {
 
                             <div className="mt-6">
                                 {loading ? (
-                                    <div className="rounded-3xl bg-white p-14 text-center text-sm text-gray-400 shadow-md">
+                                    <div className="rounded-3xl bg-white/90 p-14 text-center text-sm text-gray-500 shadow-xl">
                                         Memuat poliklinik...
                                     </div>
                                 ) : (
@@ -244,47 +331,19 @@ export default function KioskTicker() {
                                                     onClick={() =>
                                                         handlePick(poli)
                                                     }
-                                                    className="group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white text-left shadow-md transition hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                                                    className="group flex flex-col items-center overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 text-center shadow-md transition hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                                                 >
                                                     <div
-                                                        className={`flex h-16 items-center justify-center bg-gradient-to-r ${accent} text-white`}
+                                                        className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-lg transition group-hover:scale-105`}
                                                     >
-                                                        <POLITab />
+                                                        <PoliIcon
+                                                            name={poli.name}
+                                                        />
                                                     </div>
 
-                                                    <div className="flex flex-1 flex-col p-5">
-                                                        <div className="flex items-start justify-between">
-                                                            <span className="text-[12px] font-bold tracking-widest text-[#07577f]">
-                                                                {poli.queue_prefix ??
-                                                                    poli.code}
-                                                            </span>
-
-                                                            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-[#07577f] transition group-hover:bg-[#07577f] group-hover:text-white">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    className="h-4 w-4"
-                                                                    viewBox="0 0 24 24"
-                                                                    fill="none"
-                                                                    stroke="currentColor"
-                                                                    strokeWidth="2"
-                                                                >
-                                                                    <path d="M9 6l6 6-6 6" />
-                                                                </svg>
-                                                            </span>
-                                                        </div>
-
-                                                        <p className="mt-2 text-lg font-bold text-gray-800">
-                                                            {poli.name}
-                                                        </p>
-
-                                                        {poli.description && (
-                                                            <p className="mt-1 line-clamp-2 text-[12px] text-gray-400">
-                                                                {
-                                                                    poli.description
-                                                                }
-                                                            </p>
-                                                        )}
-                                                    </div>
+                                                    <p className="mt-4 text-lg font-bold text-gray-800">
+                                                        {poli.name}
+                                                    </p>
                                                 </button>
                                             );
                                         })}
@@ -293,43 +352,37 @@ export default function KioskTicker() {
                             </div>
                         </div>
                     ) : (
-                        <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden text-center">
-                            <div className="pointer-events-none absolute -top-10 -left-16 h-64 w-64 rounded-full bg-[#07577f]/10 blur-2xl" />
-                            <div className="pointer-events-none absolute -right-16 -bottom-10 h-64 w-64 rounded-full bg-emerald-500/10 blur-2xl" />
+                        <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
+                            <div className="animate-fade-in-up flex flex-col items-center">
+                                <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/15 shadow-2xl backdrop-blur">
+                                    <TickerTab />
+                                </div>
 
-                            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-[#07577f] text-white shadow-xl shadow-[#07577f]/30">
-                                <TickerTab />
+                                <p className="mt-6 text-[13px] font-semibold tracking-[0.22em] text-white/80 uppercase">
+                                    Selamat Datang di
+                                </p>
+
+                                <h1 className="mt-2 text-4xl font-black tracking-tight text-white drop-shadow-lg sm:text-6xl">
+                                    Rs Merdeka
+                                </h1>
+
+                                <p className="mt-2 text-lg font-semibold tracking-[0.18em] text-white/70 uppercase">
+                                    Ambil Nomor Antrian
+                                </p>
+
+                                <button
+                                    type="button"
+                                    onClick={goPolis}
+                                    className="mt-10 inline-flex h-16 items-center gap-3 rounded-full bg-gradient-to-r from-[#0a8fd4] to-[#07577f] px-12 text-lg font-bold text-white shadow-xl shadow-black/40 transition hover:-translate-y-0.5 hover:shadow-2xl active:scale-[0.98]"
+                                >
+                                    <TickerTab />
+
+                                    <span>Ambil Antrian</span>
+                                </button>
                             </div>
-
-                            <p className="mt-6 text-[13px] font-semibold tracking-[0.22em] text-[#07577f] uppercase">
-                                Selamat Datang di
-                            </p>
-
-                            <h1 className="mt-2 text-4xl font-black tracking-tight text-gray-800 sm:text-6xl">
-                                Rs Merdeka
-                            </h1>
-
-                            <p className="mt-2 text-lg font-semibold tracking-[0.18em] text-gray-400 uppercase">
-                                Ambil Nomor Antrian
-                            </p>
-
-                            <button
-                                type="button"
-                                onClick={goPolis}
-                                className="mt-10 inline-flex h-16 items-center gap-3 rounded-full bg-gradient-to-r from-[#07577f] to-[#0a8fd4] px-12 text-lg font-bold text-white shadow-xl shadow-[#07577f]/30 transition hover:-translate-y-0.5 hover:shadow-2xl active:scale-[0.98]"
-                            >
-                                <TickerTab />
-
-                                <span>Ambil Antrian</span>
-                            </button>
                         </div>
                     )}
                 </main>
-
-                <footer className="bg-gradient-to-r from-[#07577f] to-[#0a8fd4] px-8 py-4 text-center text-[12px] text-white/80">
-                    © {new Date().getFullYear()} Rs Merdeka — Management System
-                    · Jl. Merdeka No. 1
-                </footer>
             </div>
         </>
     );

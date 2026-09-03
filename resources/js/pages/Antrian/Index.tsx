@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     deleteAntrian,
     getAntrians,
@@ -24,6 +25,18 @@ const STATUS_ORDER: Record<AntrianStatus, number> = {
     skipped: 4,
 };
 
+interface LoketModalState {
+    antrian: Antrian;
+    status: AntrianStatus;
+    label: string;
+}
+
+interface ConfirmModalState {
+    antrian: Antrian;
+    status: AntrianStatus;
+    label: string;
+}
+
 const waktuLabel = (antrian: Antrian): string => {
     switch (antrian.status) {
         case 'called':
@@ -46,6 +59,10 @@ export default function AntrianIndex() {
     const [poliFilter, setPoliFilter] = useState('all');
     const [scope, setScope] = useState<'today' | 'all'>('today');
     const [busyId, setBusyId] = useState<number | null>(null);
+    const [loketModal, setLoketModal] = useState<LoketModalState | null>(null);
+    const [confirmModal, setConfirmModal] = useState<ConfirmModalState | null>(
+        null,
+    );
 
     const loadAntrians = useCallback(async (silent = false): Promise<void> => {
         try {
@@ -94,26 +111,27 @@ export default function AntrianIndex() {
     const changeStatus = async (
         antrian: Antrian,
         status: AntrianStatus,
-        label: string,
+        loket?: number,
     ) => {
-        const confirmed = window.confirm(
-            `Pindahkan antrean ${antrian.queue_number} ke status "${label}"?`,
-        );
-
-        if (!confirmed) {
-            return;
-        }
-
         try {
             setBusyId(antrian.id);
 
             setAntrians((current) =>
                 current.map((item) =>
-                    item.id === antrian.id ? { ...item, status } : item,
+                    item.id === antrian.id
+                        ? {
+                              ...item,
+                              status,
+                              loket: loket ?? item.loket,
+                          }
+                        : item,
                 ),
             );
 
-            await updateAntrian(antrian.id, { status });
+            await updateAntrian(antrian.id, {
+                status,
+                ...(loket !== undefined ? { loket } : {}),
+            });
 
             await loadAntrians();
         } catch (error: any) {
@@ -132,6 +150,46 @@ export default function AntrianIndex() {
         } finally {
             setBusyId(null);
         }
+    };
+
+    const openLoketModal = (
+        antrian: Antrian,
+        status: AntrianStatus,
+        label: string,
+    ) => {
+        setLoketModal({ antrian, status, label });
+    };
+
+    const assignLoket = async (loket: number) => {
+        if (!loketModal) {
+            return;
+        }
+
+        const { antrian, status } = loketModal;
+
+        setLoketModal(null);
+
+        await changeStatus(antrian, status, loket);
+    };
+
+    const openConfirmModal = (
+        antrian: Antrian,
+        status: AntrianStatus,
+        label: string,
+    ) => {
+        setConfirmModal({ antrian, status, label });
+    };
+
+    const confirmAction = async () => {
+        if (!confirmModal) {
+            return;
+        }
+
+        const { antrian, status } = confirmModal;
+
+        setConfirmModal(null);
+
+        await changeStatus(antrian, status);
     };
 
     const handleDelete = async (antrian: Antrian) => {
@@ -464,7 +522,7 @@ export default function AntrianIndex() {
                                                 type="button"
                                                 disabled={busyId === antrian.id}
                                                 onClick={() =>
-                                                    changeStatus(
+                                                    openLoketModal(
                                                         antrian,
                                                         'called',
                                                         'Dipanggil',
@@ -481,15 +539,15 @@ export default function AntrianIndex() {
                                                 type="button"
                                                 disabled={busyId === antrian.id}
                                                 onClick={() =>
-                                                    changeStatus(
+                                                    openConfirmModal(
                                                         antrian,
                                                         'serving',
-                                                        'Dilayani',
+                                                        'Layani',
                                                     )
                                                 }
                                                 className="flex h-10 w-full items-center justify-center gap-1 rounded-lg bg-indigo-600 text-[12px] font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                                             >
-                                                Mulai
+                                                Layani
                                             </button>
                                         )}
 
@@ -498,7 +556,7 @@ export default function AntrianIndex() {
                                                 type="button"
                                                 disabled={busyId === antrian.id}
                                                 onClick={() =>
-                                                    changeStatus(
+                                                    openConfirmModal(
                                                         antrian,
                                                         'completed',
                                                         'Selesai',
@@ -530,10 +588,10 @@ export default function AntrianIndex() {
                                                             antrian.id
                                                         }
                                                         onClick={() =>
-                                                            changeStatus(
+                                                            openConfirmModal(
                                                                 antrian,
                                                                 'skipped',
-                                                                'Dilewati',
+                                                                'Lewati',
                                                             )
                                                         }
                                                         className="flex h-8 items-center rounded-lg bg-gray-100 px-3 text-[11px] font-semibold text-gray-500 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
@@ -572,6 +630,140 @@ export default function AntrianIndex() {
                         </div>
                     )}
                 </div>
+
+                {loketModal &&
+                    createPortal(
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+                            <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-bold text-gray-800">
+                                        Pilih Loket
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setLoketModal(null)}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                        >
+                                            <path d="M18 6 6 18M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <p className="mt-2 text-sm text-gray-500">
+                                    {loketModal.antrian.queue_number} (
+                                    {loketModal.antrian.poli?.name ?? '-'}) •{' '}
+                                    {loketModal.label}
+                                </p>
+
+                                <div className="mt-5 grid grid-cols-3 gap-3">
+                                    {[1, 2, 3].map((loket) => (
+                                        <button
+                                            key={loket}
+                                            type="button"
+                                            onClick={() =>
+                                                void assignLoket(loket)
+                                            }
+                                            className="flex flex-col items-center gap-1 rounded-2xl border-2 border-gray-200 bg-white py-5 transition hover:border-[#07577f] hover:bg-[#07577f]/5 active:scale-[0.98]"
+                                        >
+                                            <span className="text-3xl font-black text-[#07577f]">
+                                                {loket}
+                                            </span>
+
+                                            <span className="text-[11px] font-semibold tracking-wide text-gray-400 uppercase">
+                                                Loket
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>,
+                        document.body,
+                    )}
+
+                {confirmModal &&
+                    createPortal(
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+                            <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-lg font-bold text-gray-800">
+                                        Konfirmasi
+                                    </h3>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setConfirmModal(null)}
+                                        className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-100 hover:text-gray-600"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-5 w-5"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                        >
+                                            <path d="M18 6 6 18M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <div className="mt-4 flex items-center gap-4 rounded-2xl bg-slate-50 p-4">
+                                    <span className="flex h-12 items-center justify-center rounded-xl bg-[#07577f]/10 px-3 text-lg font-black tracking-tight text-[#07577f]">
+                                        {confirmModal.antrian.queue_number}
+                                    </span>
+
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-800">
+                                            {confirmModal.antrian.poli?.name ??
+                                                '-'}
+                                        </p>
+
+                                        <p className="text-[12px] text-gray-400">
+                                            Lanjutkan ke "{confirmModal.label}"?
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setConfirmModal(null)}
+                                        className="flex h-11 flex-1 items-center justify-center rounded-xl bg-gray-100 text-[13px] font-semibold text-gray-500 transition hover:bg-gray-200"
+                                    >
+                                        Batal
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        disabled={
+                                            busyId === confirmModal.antrian.id
+                                        }
+                                        onClick={() => void confirmAction()}
+                                        className={`flex h-11 flex-1 items-center justify-center rounded-xl text-[13px] font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                                            confirmModal.status === 'skipped'
+                                                ? 'bg-gray-500 hover:bg-gray-600'
+                                                : confirmModal.status ===
+                                                    'completed'
+                                                  ? 'bg-green-600 hover:bg-green-700'
+                                                  : 'bg-indigo-600 hover:bg-indigo-700'
+                                        }`}
+                                    >
+                                        Ya, {confirmModal.label}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>,
+                        document.body,
+                    )}
             </AppLayout>
         </>
     );

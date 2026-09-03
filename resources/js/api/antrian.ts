@@ -12,6 +12,7 @@ export interface Antrian {
     id: number;
     queue_number: string;
     status: AntrianStatus;
+    loket: number | null;
     called_at: string | null;
     started_at: string | null;
     completed_at: string | null;
@@ -37,6 +38,7 @@ export interface AntrianPayload {
 
 export interface AntrianStatusPayload {
     status: AntrianStatus;
+    loket?: number;
     notes?: string;
 }
 

@@ -10,8 +10,11 @@ export interface KioskTicketPasien {
 }
 
 export interface NowServingItem {
+    id: number;
     queue_number: string;
     status: AntrianStatus;
+    loket: number | null;
+    called_at: string | null;
     poli: {
         id: number;
         name: string | null;
@@ -23,6 +26,7 @@ export interface CreatedTicket {
     id: number;
     queue_number: string;
     status: AntrianStatus;
+    loket: number | null;
     poli: { id: number; code: string; name: string } | null;
 }
 

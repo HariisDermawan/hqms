@@ -16,6 +16,8 @@ class AntrianResource extends JsonResource
 
             'status' => $this->status,
 
+            'loket' => $this->loket,
+
             'called_at' => $this->called_at?->toISOString(),
 
             'started_at' => $this->started_at?->toISOString(),

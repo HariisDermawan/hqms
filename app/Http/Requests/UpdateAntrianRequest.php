@@ -19,6 +19,13 @@ class UpdateAntrianRequest extends FormRequest
                 'in:waiting,called,serving,completed,skipped',
             ],
 
+            'loket' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:3',
+            ],
+
             'notes' => [
                 'nullable',
                 'string',
