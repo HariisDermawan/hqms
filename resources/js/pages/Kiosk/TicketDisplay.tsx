@@ -8,7 +8,82 @@ const STEPS: {
     description: string;
     icon: ReactNode;
 }[] = [
-    // ...
+    {
+        label: 'Ambil Nomor Antrean',
+        description: 'Ketik nomor antrean di layar kiosk',
+        icon: (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M8 17h.01M12 17h.01M16 17h.01" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Pilih Poliklinik',
+        description: 'Tentukan poli tujuan kunjungan',
+        icon: (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <path d="M12 22s8-4 8-10a8 8 0 1 0-16 0c0 6 8 10 8 10z" />
+                <path d="M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Menunggu Dipanggil',
+        description: 'Pantau monitor antrean',
+        icon: (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+        ),
+    },
+    {
+        label: 'Dilayani Petugas',
+        description: 'Kunjungan diproses oleh petugas',
+        icon: (
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            >
+                <path d="M20 6L9 17l-5-5" />
+            </svg>
+        ),
+    },
 ];
 
 export default function KioskTicketDisplay() {
@@ -133,11 +208,10 @@ export default function KioskTicketDisplay() {
                                 activeServing.map((item, index) => (
                                     <div
                                         key={`${item.queue_number}-${index}`}
-                                        className={`rounded-xl p-4 text-center ${
-                                            item.status === 'serving'
-                                                ? 'bg-emerald-700'
-                                                : 'bg-[#07577f]'
-                                        }`}
+                                        className={`rounded-xl p-4 text-center ${item.status === 'serving'
+                                            ? 'bg-emerald-700'
+                                            : 'bg-[#07577f]'
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <p className="text-[11px] font-semibold tracking-widest text-white/70 uppercase">
@@ -167,9 +241,71 @@ export default function KioskTicketDisplay() {
                     </div>
                 </div>
 
-                {/* FOOTER */}
                 <footer className="bg-[#07577f] px-8 py-5">
-                    {/* bagian footer kamu tetap */}
+
+                    <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+
+                        {STEPS.map((step) => (
+
+                            <div
+
+                                key={step.label}
+
+                                className="flex flex-1 items-center gap-3"
+
+                            >
+
+                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/15 text-white">
+
+                                    {step.icon}
+
+                                </div>
+
+                                <div className="min-w-0">
+
+                                    <p className="text-[13px] font-bold text-white">
+
+                                        {step.label}
+
+                                    </p>
+
+                                    <p className="mt-0.5 truncate text-[11px] text-white/60">
+
+                                        {step.description}
+
+                                    </p>
+
+                                </div>
+
+                                {step !== STEPS[STEPS.length - 1] && (
+
+                                    <svg
+
+                                        xmlns="http://www.w3.org/2000/svg"
+
+                                        className="ml-2 h-5 w-5 shrink-0 text-white/40"
+
+                                        viewBox="0 0 24 24"
+
+                                        fill="none"
+
+                                        stroke="currentColor"
+
+                                        strokeWidth="2"
+
+                                    >
+
+                                        <path d="M9 18l6-6-6-6" />
+
+                                    </svg>
+                                )}
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
                 </footer>
             </div>
         </>
