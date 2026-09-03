@@ -58,31 +58,13 @@ export default function Login() {
                     {/* HEADER */}
                     <div className="relative h-[222px] rounded-b-[50%] bg-[#084e7a] lg:h-[225px]">
                         <div className="absolute top-[34px] right-0 left-0 flex flex-col items-center">
-                            <div className="relative flex items-center justify-center">
-                                <div className="flex h-[60px] w-[70px] items-end justify-center rounded-t-lg rounded-b-sm bg-white pb-2">
-                                    <div className="grid grid-cols-2 gap-[8px]">
-                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
-                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
-                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
-                                        <div className="h-[13px] w-[11px] bg-[#084e7a]" />
-                                    </div>
-                                </div>
-
-                                <div className="absolute -top-[14px] flex h-[35px] w-[35px] items-center justify-center rounded-lg bg-white">
-                                    <div className="flex h-[27px] w-[27px] items-center justify-center rounded-md border-[3px] border-[#084e7a]">
-                                        <span className="text-[24px] leading-none font-bold text-[#084e7a]">
-                                            +
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h1 className="mt-[10px] text-[21px] font-bold text-white">
-                                Rs Merdeka
-                            </h1>
+                            <img
+                                src="/assets/rs.png"
+                                alt="Rs Merdeka"
+                                className="h-[130px] w-[130px] object-contain"
+                            />
                         </div>
                     </div>
-
                     {/* FORM */}
                     <div className="px-[36px] pt-[39px] pb-[40px]">
                         <form onSubmit={handleLogin}>
