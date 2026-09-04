@@ -30,6 +30,11 @@ class StoreRuanganRequest extends FormRequest
                 'string',
                 'max:100',
             ],
+            'poli_id' => [
+                'nullable',
+                'integer',
+                'exists:polis,id',
+            ],
             'description' => [
                 'nullable',
                 'string',

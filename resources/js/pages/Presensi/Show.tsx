@@ -6,6 +6,7 @@ import {
     type PresensiStatus,
 } from '@/api/presensi';
 import AppLayout from '@/Layouts/AppLayout';
+import { usePermissions } from '@/lib/permissions';
 
 const statusLabel: Record<PresensiStatus, string> = {
     hadir: 'Hadir',
@@ -54,6 +55,7 @@ const detailItem = (label: string, value: string, highlight = false) => (
 
 export default function PresensiShow() {
     const { id } = usePage<{ id: number }>().props;
+    const { viewOnly } = usePermissions();
 
     const [presensi, setPresensi] = useState<Presensi | null>(null);
     const [loading, setLoading] = useState(true);
@@ -95,16 +97,18 @@ export default function PresensiShow() {
                         </p>
                     </div>
 
-                    <Link
-                        href={
-                            presensi
-                                ? `/presensis/${presensi.id}/edit`
-                                : '/presensis'
-                        }
-                        className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
-                    >
-                        Edit Presensi
-                    </Link>
+                    {!viewOnly && (
+                        <Link
+                            href={
+                                presensi
+                                    ? `/presensis/${presensi.id}/edit`
+                                    : '/presensis'
+                            }
+                            className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
+                        >
+                            Edit Presensi
+                        </Link>
+                    )}
                 </div>
 
                 {loading ? (

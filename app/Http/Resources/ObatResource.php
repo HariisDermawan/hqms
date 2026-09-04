@@ -34,6 +34,11 @@ class ObatResource extends JsonResource
                         'id' => $this->pemeriksaan?->poli?->id,
                         'name' => $this->pemeriksaan?->poli?->name,
                     ],
+                    'dokter' => [
+                        'id' => $this->pemeriksaan?->dokter?->id,
+                        'name' => $this->pemeriksaan?->dokter?->name,
+                        'specialization' => $this->pemeriksaan?->dokter?->specialization,
+                    ],
                 ];
             }),
 

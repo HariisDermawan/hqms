@@ -15,6 +15,10 @@ class RuanganResource extends JsonResource
             'name' => $this->name,
             'category' => $this->category,
             'description' => $this->description,
+            'poli' => [
+                'id' => $this->poli?->id,
+                'name' => $this->poli?->name,
+            ],
             'is_active' => (bool) $this->is_active,
 
             'pasiens' => $this->whenLoaded(

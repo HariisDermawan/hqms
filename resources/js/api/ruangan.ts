@@ -23,6 +23,7 @@ export interface Ruangan {
     name: string;
     category: string;
     description: string | null;
+    poli: { id: number | null; name: string | null } | null;
     is_active: boolean;
     pasiens?: RuanganPasienItem[];
 }
@@ -31,6 +32,7 @@ export interface RuanganPayload {
     code: string;
     name: string;
     category: string;
+    poli_id?: number;
     description?: string;
     is_active?: boolean;
 }
@@ -71,6 +73,41 @@ export const getRuangans = async (
 
 export const getRuangan = async (id: number): Promise<RuanganResponse> => {
     const response = await api.get<RuanganResponse>(`/api/v1/ruangans/${id}`);
+
+    return response.data;
+};
+
+export interface RuanganAntrianItem {
+    id: number;
+    queue_number: string;
+    status: string;
+    poli: { id: number; code: string; name: string } | null;
+    pendaftaran: {
+        id: number;
+        registration_number: string | null;
+        status: string | null;
+        pasien: {
+            id: number;
+            medical_record_number: string;
+            name: string;
+        } | null;
+    } | null;
+}
+
+export interface RuanganAntrianResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        antrians?: RuanganAntrianItem[];
+    };
+}
+
+export const getRuanganAntrians = async (
+    id: number,
+): Promise<RuanganAntrianResponse> => {
+    const response = await api.get<RuanganAntrianResponse>(
+        `/api/v1/ruangans/${id}/antrians`,
+    );
 
     return response.data;
 };

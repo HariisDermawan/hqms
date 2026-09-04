@@ -15,6 +15,7 @@ class ObatService
                 'pemeriksaan.pasien',
                 'pemeriksaan.poli',
                 'pemeriksaan.antrian',
+                'pemeriksaan.dokter',
             ])
             ->latest()
             ->paginate(10);
@@ -37,6 +38,7 @@ class ObatService
                 'pemeriksaan.pasien',
                 'pemeriksaan.poli',
                 'pemeriksaan.antrian',
+                'pemeriksaan.dokter',
             ]);
         });
     }
@@ -58,6 +60,7 @@ class ObatService
                 'pemeriksaan.pasien',
                 'pemeriksaan.poli',
                 'pemeriksaan.antrian',
+                'pemeriksaan.dokter',
             ]);
         });
     }

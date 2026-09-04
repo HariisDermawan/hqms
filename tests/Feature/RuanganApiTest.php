@@ -3,6 +3,7 @@
 use App\Models\Antrian;
 use App\Models\Pasien;
 use App\Models\Pendaftaran;
+use App\Models\Poli;
 use App\Models\Ruangan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -119,7 +120,9 @@ it('can delete a ruangan', function () {
 });
 
 it('can assign a pasien to a ruangan', function () {
-    $ruangan = Ruangan::factory()->create();
+    $ruangan = Ruangan::factory()->create([
+        'category' => 'Kamar Kelas 1',
+    ]);
     $pasien = Pasien::factory()->create();
 
     $this->postJson(
@@ -141,7 +144,9 @@ it('can assign a pasien to a ruangan', function () {
 });
 
 it('carries antrian and pendaftaran ids when assigning a pasien', function () {
-    $ruangan = Ruangan::factory()->create();
+    $ruangan = Ruangan::factory()->create([
+        'category' => 'Kamar Kelas 1',
+    ]);
     $paket = Pendaftaran::factory()->create();
     $antrian = Antrian::factory()->for($paket->poli)->create();
 
@@ -240,4 +245,60 @@ it('exposes a pasien assigned room in pasien detail', function () {
         ->assertJsonCount(1, 'data.pasien.ruangans')
         ->assertJsonPath('data.pasien.ruangans.0.name', 'Ruang Mawar 01')
         ->assertJsonPath('data.pasien.ruangans.0.category', 'Kamar Kelas 1');
+});
+
+it('requires an antrian ticket when assigning to a poli room', function () {
+    $poli = Poli::factory()->create();
+    $ruangan = Ruangan::factory()->create([
+        'category' => 'Poli',
+        'poli_id' => $poli->id,
+    ]);
+    $pasien = Pasien::factory()->create();
+
+    $this->postJson(
+        "/api/v1/ruangans/{$ruangan->id}/pasiens",
+        ['pasien_id' => $pasien->id],
+    )
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['antrian_id']);
+});
+
+it('rejects an antrian from a different poli for a poli room', function () {
+    $ruanganPoli = Poli::factory()->create();
+    $otherPoli = Poli::factory()->create();
+    $ruangan = Ruangan::factory()->create([
+        'category' => 'Poli',
+        'poli_id' => $ruanganPoli->id,
+    ]);
+    $paket = Pendaftaran::factory()->create(['poli_id' => $otherPoli->id]);
+    $antrian = Antrian::factory()->for($otherPoli)->create();
+
+    $this->postJson(
+        "/api/v1/ruangans/{$ruangan->id}/pasiens",
+        [
+            'pasien_id' => $paket->pasien_id,
+            'antrian_id' => $antrian->id,
+            'pendaftaran_id' => $paket->id,
+        ],
+    )
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['antrian_id']);
+});
+
+it('lists assignable antrian tickets for a ruangan poli', function () {
+    $poli = Poli::factory()->create();
+    $ruangan = Ruangan::factory()->create([
+        'category' => 'Poli',
+        'poli_id' => $poli->id,
+    ]);
+    $matching = Pendaftaran::factory()->create(['poli_id' => $poli->id]);
+    $matchingAntrian = Antrian::factory()->for($poli)->create([
+        'status' => 'waiting',
+    ]);
+    $matchingAntrian->pendaftaran()->save($matching);
+
+    $this->getJson("/api/v1/ruangans/{$ruangan->id}/antrians")
+        ->assertOk()
+        ->assertJsonCount(1, 'data.antrians')
+        ->assertJsonPath('data.antrians.0.queue_number', $matchingAntrian->queue_number);
 });

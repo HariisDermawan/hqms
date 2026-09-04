@@ -117,15 +117,15 @@ export default function PemeriksaanIndex() {
             }
 
             const patientName = pemeriksaan.pasien?.name.toLowerCase() ?? '';
-            const mrNumber =
-                pemeriksaan.pasien?.medical_record_number.toLowerCase() ?? '';
+            const queueNumber =
+                pemeriksaan.antrian?.queue_number?.toLowerCase() ?? '';
             const category = (pemeriksaan.category ?? '').toLowerCase();
             const poliName = pemeriksaan.poli?.name.toLowerCase() ?? '';
             const dokterName = pemeriksaan.dokter?.name.toLowerCase() ?? '';
 
             return (
                 patientName.includes(keyword) ||
-                mrNumber.includes(keyword) ||
+                queueNumber.includes(keyword) ||
                 category.includes(keyword) ||
                 poliName.includes(keyword) ||
                 dokterName.includes(keyword)
@@ -153,25 +153,6 @@ export default function PemeriksaanIndex() {
                             Rekap hasil pemeriksaan pasien
                         </p>
                     </div>
-
-                    <Link
-                        href="/pemeriksaans/create"
-                        className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <path d="M12 5v14M5 12h14" />
-                        </svg>
-                        Tambah
-                    </Link>
                 </div>
 
                 <div className="mt-4">
@@ -196,7 +177,7 @@ export default function PemeriksaanIndex() {
                                 onChange={(event) =>
                                     setSearch(event.target.value)
                                 }
-                                placeholder="Cari nama pasien, No. RM, kategori, poli, atau dokter..."
+                                placeholder="Cari nama pasien, no. antrian, kategori, poli, atau dokter..."
                                 className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                             />
                         </div>
@@ -235,7 +216,7 @@ export default function PemeriksaanIndex() {
                     ) : (
                         <div className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm">
                             <div className="overflow-x-auto">
-                                <table className="w-full min-w-[880px] text-left">
+                                <table className="w-full min-w-[960px] text-left">
                                     <thead>
                                         <tr className="border-b border-gray-100 text-[11px] tracking-wide text-gray-400 uppercase">
                                             <th className="px-5 py-3.5 font-semibold">
@@ -246,6 +227,9 @@ export default function PemeriksaanIndex() {
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
                                                 Poli / Dokter
+                                            </th>
+                                            <th className="px-5 py-3.5 font-semibold">
+                                                Resep
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
                                                 Diagnosis
@@ -272,9 +256,9 @@ export default function PemeriksaanIndex() {
                                                     </p>
 
                                                     <p className="text-[11px] text-gray-400">
-                                                        No. RM{' '}
-                                                        {pemeriksaan.pasien
-                                                            ?.medical_record_number ??
+                                                        No. Antrian{' '}
+                                                        {pemeriksaan.antrian
+                                                            ?.queue_number ??
                                                             '-'}
                                                     </p>
                                                 </td>
@@ -296,6 +280,22 @@ export default function PemeriksaanIndex() {
                                                         {pemeriksaan.dokter
                                                             ?.name ?? '-'}
                                                     </p>
+                                                </td>
+
+                                                <td className="px-5 py-3.5">
+                                                    {pemeriksaan.obats &&
+                                                    pemeriksaan.obats.length >
+                                                        0 ? (
+                                                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-semibold text-green-600">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                                                            Sudah Resep
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-semibold text-orange-600">
+                                                            <span className="h-1.5 w-1.5 rounded-full bg-orange-500" />
+                                                            Belum Resep
+                                                        </span>
+                                                    )}
                                                 </td>
 
                                                 <td className="max-w-[260px] px-5 py-3.5">

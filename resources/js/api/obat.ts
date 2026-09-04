@@ -12,6 +12,11 @@ export interface ObatPemeriksaanInfo {
         name: string;
     } | null;
     poli: { id: number; name: string } | null;
+    dokter: {
+        id: number;
+        name: string;
+        specialization: string | null;
+    } | null;
 }
 
 export interface Obat {

@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Antrian;
 use App\Models\Pasien;
 use App\Models\Ruangan;
 use App\Models\RuanganPasien;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RuanganService
 {
@@ -14,6 +16,7 @@ class RuanganService
     {
         return Ruangan::query()
             ->with([
+                'poli',
                 'ruanganPasiens.antrian.poli',
                 'ruanganPasiens.pendaftaran',
             ])
@@ -53,10 +56,42 @@ class RuanganService
                 ->whereKey($pasienId)
                 ->firstOrFail();
 
+            $antrianId = $data['antrian_id'] ?? null;
+            $antrian = null;
+            $pendaftaranId = $data['pendaftaran_id'] ?? null;
+
+            if ($antrianId !== null) {
+                $antrian = Antrian::query()
+                    ->with(['pendaftaran'])
+                    ->whereKey($antrianId)
+                    ->firstOrFail();
+
+                if (
+                    $ruangan->poli_id !== null
+                    && $antrian->poli_id !== $ruangan->poli_id
+                ) {
+                    throw ValidationException::withMessages([
+                        'antrian_id' => 'Tiket antrian tidak sesuai dengan poli ruangan ini.',
+                    ]);
+                }
+
+                $pendaftaranId = $antrian->pendaftaran?->id
+                    ?? $pendaftaranId;
+            }
+
+            if (
+                strtolower($ruangan->category) === 'poli'
+                && $antrianId === null
+            ) {
+                throw ValidationException::withMessages([
+                    'antrian_id' => 'Ruang poli membutuhkan pilihan tiket antrian.',
+                ]);
+            }
+
             return $ruangan->ruanganPasiens()->create([
                 'pasien_id' => $pasien->id,
-                'antrian_id' => $data['antrian_id'] ?? null,
-                'pendaftaran_id' => $data['pendaftaran_id'] ?? null,
+                'antrian_id' => $antrianId,
+                'pendaftaran_id' => $pendaftaranId,
                 'pasien_name' => $pasien->name,
                 'pasien_mrn' => $pasien->medical_record_number,
                 'pasien_gender' => $pasien->gender,

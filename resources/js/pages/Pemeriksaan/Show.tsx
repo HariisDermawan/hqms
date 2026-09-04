@@ -233,6 +233,95 @@ export default function PemeriksaanShow() {
                                     </div>
                                 </div>
                             </div>
+
+                            {pemeriksaan.obats &&
+                            pemeriksaan.obats.length > 0 ? (
+                                <div className="mt-4 rounded-xl bg-white p-5 shadow-sm sm:p-6">
+                                    <h3 className="text-[14px] font-bold text-gray-800">
+                                        Daftar Obat / Resep
+                                    </h3>
+
+                                    <p className="mt-0.5 text-[11px] text-gray-400">
+                                        {pemeriksaan.obats.length} obat tercatat
+                                        untuk pemeriksaan ini
+                                    </p>
+
+                                    <div className="mt-4 overflow-x-auto">
+                                        <table className="w-full min-w-[600px] text-left">
+                                            <thead>
+                                                <tr className="border-b border-gray-100 text-[11px] tracking-wide text-gray-400 uppercase">
+                                                    <th className="pr-4 pb-2 font-semibold">
+                                                        Nama Obat
+                                                    </th>
+                                                    <th className="pr-4 pb-2 font-semibold">
+                                                        Dosis
+                                                    </th>
+                                                    <th className="pr-4 pb-2 font-semibold">
+                                                        Jumlah
+                                                    </th>
+                                                    <th className="pr-4 pb-2 font-semibold">
+                                                        Harga
+                                                    </th>
+                                                    <th className="pb-2 font-semibold">
+                                                        Keterangan
+                                                    </th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {pemeriksaan.obats.map(
+                                                    (obat) => (
+                                                        <tr
+                                                            key={obat.id}
+                                                            className="border-b border-gray-50 last:border-0"
+                                                        >
+                                                            <td className="py-2.5 pr-4 text-[13px] font-semibold text-gray-800">
+                                                                {obat.nama_obat}
+                                                            </td>
+
+                                                            <td className="py-2.5 pr-4 text-[12px] text-gray-600">
+                                                                {obat.dosis ||
+                                                                    '—'}
+                                                            </td>
+
+                                                            <td className="py-2.5 pr-4 text-[12px] text-gray-600">
+                                                                {obat.jumlah}{' '}
+                                                                {obat.satuan ||
+                                                                    ''}
+                                                            </td>
+
+                                                            <td className="py-2.5 pr-4 text-[12px] font-medium text-gray-700">
+                                                                Rp{' '}
+                                                                {Number(
+                                                                    obat.harga,
+                                                                ).toLocaleString(
+                                                                    'id-ID',
+                                                                )}
+                                                            </td>
+
+                                                            <td className="py-2.5 text-[12px] text-gray-500">
+                                                                {obat.keterangan ||
+                                                                    '—'}
+                                                            </td>
+                                                        </tr>
+                                                    ),
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mt-4 rounded-xl border border-dashed border-orange-200 bg-orange-50/50 p-5 text-center sm:p-6">
+                                    <p className="text-[13px] font-semibold text-orange-600">
+                                        Belum ada resep obat
+                                    </p>
+
+                                    <p className="mt-1 text-[11px] text-orange-400">
+                                        Klik &quot;Tambah Obat / Resep&quot;
+                                        untuk mengisi resep
+                                    </p>
+                                </div>
+                            )}
                         </>
                     )
                 )}

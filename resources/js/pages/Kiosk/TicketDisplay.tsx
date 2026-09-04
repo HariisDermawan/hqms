@@ -22,46 +22,144 @@ const readDigits = (value: string | number): string =>
         .map((char) => DIGIT_WORDS[char] ?? char)
         .join(' ');
 
-const announceCall = (item: NowServingItem) => {
-    const audio = new Audio('/audio/bel1.mp3');
+const pickFemaleIdVoice = (): SpeechSynthesisVoice | undefined => {
+    const voices = window.speechSynthesis.getVoices();
 
-    const speak = () => {
+    if (voices.length === 0) {
+        return undefined;
+    }
+
+    const isId = (voice: SpeechSynthesisVoice) =>
+        voice.lang.toLowerCase().replace('_', '-').startsWith('id');
+
+    const idVoices = voices.filter(isId);
+    const pool = idVoices.length > 0 ? idVoices : voices;
+
+    const looksFemale = (voice: SpeechSynthesisVoice) =>
+        /(female|wanita|perempuan|andini|gadis|damayanti|shinta|rara|gadis)/i.test(
+            `${voice.name} ${voice.localService}`,
+        );
+
+    return (
+        pool.find((voice) => looksFemale(voice)) ??
+        pool.find((voice) => voice.lang === 'id-ID') ??
+        pool[0]
+    );
+};
+
+const BEL1_MS = 2_760;
+const BEL2_MS = 2_230;
+const GAP_MS = 1_000;
+
+let audioUnlocked = false;
+let audioContext: AudioContext | null = null;
+
+const getAudioContext = (): AudioContext | null => {
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
+    const AudioContextCtor =
+        window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+            .webkitAudioContext;
+
+    if (!AudioContextCtor) {
+        return null;
+    }
+
+    if (!audioContext) {
+        audioContext = new AudioContextCtor();
+    }
+
+    return audioContext;
+};
+
+const unlockAudio = () => {
+    if (audioUnlocked) {
+        return;
+    }
+
+    audioUnlocked = true;
+
+    window.speechSynthesis.resume?.();
+
+    const context = getAudioContext();
+    if (context?.state === 'suspended') {
+        void context.resume();
+    }
+};
+
+const announceCall = (item: NowServingItem) => {
+    const bel1 = new Audio('/audio/bel1.mp3');
+    const bel2 = new Audio('/audio/bel2.mp3');
+
+    const delay = (ms: number): Promise<void> =>
+        new Promise((resolve) => window.setTimeout(resolve, ms));
+
+    const play = async (audio: HTMLAudioElement): Promise<void> => {
+        try {
+            await audio.play();
+        } catch {
+            // autoplay still rejected; ignore
+        }
+    };
+
+    const speak = async (): Promise<void> => {
         const match = /^([A-Za-z])-(\d+)$/.exec(item.queue_number);
         const prefix = match?.[1] ?? item.queue_number;
         const digits = match?.[2] ?? item.queue_number;
 
         const loket = item.loket ?? 1;
 
-        const text = `Nomor ${prefix} ${readDigits(
-            digits,
-        )}, silahkan ke loket ${readDigits(loket)}`;
+        const text =
+            'Nomor antrian, ' +
+            `${prefix}, ` +
+            `${readDigits(digits)}, ` +
+            `di loket, ${readDigits(loket)}.`;
 
-        window.speechSynthesis.cancel();
+        const femaleVoice = pickFemaleIdVoice();
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'id-ID';
-        utterance.rate = 0.95;
-        utterance.pitch = 1;
-        window.speechSynthesis.speak(utterance);
+        await new Promise<void>((resolve) => {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            utterance.rate = 0.6;
+            utterance.pitch = 1.2;
+
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+
+            let settled = false;
+            const finish = () => {
+                if (!settled) {
+                    settled = true;
+                    resolve();
+                }
+            };
+
+            utterance.onend = finish;
+            utterance.onerror = finish;
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+
+            window.setTimeout(finish, 15_000);
+        });
     };
 
-    audio.play().catch(() => {
-        speak();
-    });
+    (async () => {
+        await delay(500);
 
-    audio.onended = () => {
-        speak();
-    };
+        await play(bel1);
 
-    const fallback = window.setTimeout(() => {
-        speak();
-    }, 4500);
-    audio.addEventListener('ended', () => window.clearTimeout(fallback), {
-        once: true,
-    });
-    audio.addEventListener('error', () => window.clearTimeout(fallback), {
-        once: true,
-    });
+        await delay(BEL1_MS + GAP_MS);
+
+        await speak();
+
+        await delay(GAP_MS);
+
+        await play(bel2);
+    })();
 };
 
 const STEPS: {
@@ -225,22 +323,65 @@ const CONTACTS: { icon: ReactNode; label: string }[] = [
 export default function KioskTicketDisplay() {
     const [nowServing, setNowServing] = useState<NowServingItem[]>([]);
     const [clock, setClock] = useState(() => new Date());
-    const announcedIds = useRef<Set<number>>(new Set());
+    const seenStatus = useRef<Map<number, string>>(new Map());
+    const initialized = useRef(false);
+    const announceQueue = useRef<NowServingItem[]>([]);
+    const isAnnouncing = useRef(false);
+
+    const processQueue = () => {
+        if (isAnnouncing.current) {
+            return;
+        }
+
+        const next = announceQueue.current.shift();
+
+        if (!next) {
+            return;
+        }
+
+        isAnnouncing.current = true;
+
+        Promise.resolve()
+            .then(() => announceCall(next))
+            .catch(() => {})
+            .finally(() => {
+                isAnnouncing.current = false;
+                processQueue();
+            });
+    };
 
     const loadNowServing = async () => {
         try {
             const response = await getNowServing();
             const items = response.data?.items ?? [];
 
+            const firstLoad = !initialized.current;
+
             items.forEach((item) => {
-                if (
-                    item.status === 'called' &&
-                    !announcedIds.current.has(item.id)
-                ) {
-                    announcedIds.current.add(item.id);
-                    announceCall(item);
+                const previous = seenStatus.current.get(item.id);
+                const isNew = previous === undefined;
+
+                if (isNew) {
+                    seenStatus.current.set(item.id, item.status);
+                }
+
+                const becameCalled =
+                    item.status === 'called' && previous !== 'called';
+
+                if (!firstLoad && becameCalled) {
+                    announceQueue.current.push(item);
+                }
+
+                if (!isNew) {
+                    seenStatus.current.set(item.id, item.status);
                 }
             });
+
+            initialized.current = true;
+
+            if (announceQueue.current.length > 0) {
+                processQueue();
+            }
 
             setNowServing(items);
         } catch (error) {
@@ -259,9 +400,30 @@ export default function KioskTicketDisplay() {
             setClock(new Date());
         }, 1_000);
 
+        const handleUnlock = () => {
+            unlockAudio();
+        };
+
+        window.addEventListener('pointerdown', handleUnlock);
+        window.addEventListener('keydown', handleUnlock);
+
+        const warmVoices = () => {
+            window.speechSynthesis.getVoices();
+        };
+
+        window.speechSynthesis.addEventListener('voiceschanged', warmVoices);
+
+        warmVoices();
+
         return () => {
             window.clearInterval(interval);
             window.clearInterval(clockInterval);
+            window.removeEventListener('pointerdown', handleUnlock);
+            window.removeEventListener('keydown', handleUnlock);
+            window.speechSynthesis.removeEventListener(
+                'voiceschanged',
+                warmVoices,
+            );
         };
     }, []);
 

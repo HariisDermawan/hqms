@@ -16,6 +16,7 @@ class PemeriksaanService
                 'pasien',
                 'poli',
                 'dokter',
+                'obats',
             ])
             ->latest()
             ->paginate(10);

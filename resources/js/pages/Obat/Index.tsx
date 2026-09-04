@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { deleteObat, getObats, type Obat } from '@/api/obat';
+import { getPemeriksaans } from '@/api/pemeriksaan';
 import AppLayout from '@/Layouts/AppLayout';
 
 const formatRupiah = (value: string | number): string => {
@@ -19,15 +20,26 @@ export default function ObatIndex() {
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
     const [deletingId, setDeletingId] = useState<number | null>(null);
+    const [pendingResep, setPendingResep] = useState(0);
 
     const load = useCallback(async () => {
         try {
             setLoading(true);
 
-            const response = await getObats(1, 100);
+            const [response, pemeriksaanResponse] = await Promise.all([
+                getObats(1, 100),
+                getPemeriksaans(1, 100),
+            ]);
 
             setItems(response.data?.items ?? []);
             setError('');
+
+            const pemeriksaans = pemeriksaanResponse.data?.items ?? [];
+
+            setPendingResep(
+                pemeriksaans.filter((p) => !p.obats || p.obats.length === 0)
+                    .length,
+            );
         } catch (error: any) {
             console.error('Gagal memuat obat', error);
 
@@ -82,15 +94,12 @@ export default function ObatIndex() {
         }
 
         const medicineName = obat.nama_obat.toLowerCase();
-        const patientName = obat.pemeriksaan?.pasien?.name.toLowerCase() ?? '';
-        const mrNumber =
-            obat.pemeriksaan?.pasien?.medical_record_number.toLowerCase() ?? '';
+        const dokterName = obat.pemeriksaan?.dokter?.name.toLowerCase() ?? '';
         const queueNumber = obat.pemeriksaan?.queue_number?.toLowerCase() ?? '';
 
         return (
             medicineName.includes(keyword) ||
-            patientName.includes(keyword) ||
-            mrNumber.includes(keyword) ||
+            dokterName.includes(keyword) ||
             queueNumber.includes(keyword)
         );
     });
@@ -112,6 +121,32 @@ export default function ObatIndex() {
                     </div>
                 </div>
 
+                {pendingResep > 0 && (
+                    <div className="mt-4 flex items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-500 text-[13px] font-bold text-white">
+                            {pendingResep}
+                        </span>
+
+                        <div>
+                            <p className="text-[13px] font-semibold text-orange-800">
+                                Pemeriksaan belum ada resep
+                            </p>
+
+                            <p className="text-[11px] text-orange-500">
+                                Ada {pendingResep} pemeriksaan yang belum diisi
+                                obat/resepnya
+                            </p>
+                        </div>
+
+                        <Link
+                            href="/pemeriksaans"
+                            className="ml-auto rounded-lg bg-orange-500 px-3 py-1.5 text-[11px] font-bold text-white transition hover:bg-orange-600"
+                        >
+                            Lihat
+                        </Link>
+                    </div>
+                )}
+
                 <div className="mt-4">
                     <div className="flex h-12 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
                         <svg
@@ -130,7 +165,7 @@ export default function ObatIndex() {
                             type="text"
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Cari nama obat, pasien, No. RM, atau no. antrian..."
+                            placeholder="Cari nama obat, dokter, atau no. antrian..."
                             className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                         />
                     </div>
@@ -159,7 +194,7 @@ export default function ObatIndex() {
                                                 Obat
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Pasien
+                                                Dokter
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
                                                 No. Antrian
@@ -217,16 +252,15 @@ export default function ObatIndex() {
                                                 <td className="px-5 py-3.5">
                                                     <p className="text-[13px] font-semibold text-gray-800">
                                                         {obat.pemeriksaan
-                                                            ?.pasien?.name ??
+                                                            ?.dokter?.name ??
                                                             '-'}
                                                     </p>
 
                                                     <p className="text-[11px] text-gray-400">
-                                                        No. RM{' '}
                                                         {obat.pemeriksaan
-                                                            ?.pasien
-                                                            ?.medical_record_number ??
-                                                            '-'}
+                                                            ?.dokter
+                                                            ?.specialization ??
+                                                            ''}
                                                     </p>
                                                 </td>
 

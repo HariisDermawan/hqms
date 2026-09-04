@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState, type ReactNode } from 'react';
 import { logout } from '@/api/auth';
+import { usePermissions } from '@/lib/permissions';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -22,6 +23,7 @@ const navBottom = (active: boolean): string =>
 
 export default function AppLayout({ children, wide = false }: AppLayoutProps) {
     const { url } = usePage();
+    const { canAccess } = usePermissions();
     const [loggingOut, setLoggingOut] = useState(false);
 
     const isActive = (href: string): boolean =>
@@ -63,69 +65,75 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             Main
                         </p>
                         <div className="space-y-1">
-                            <Link
-                                href="/dashboard"
-                                className={linkNav(isActive('/dashboard'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/dashboard') && (
+                                <Link
+                                    href="/dashboard"
+                                    className={linkNav(isActive('/dashboard'))}
                                 >
-                                    <rect
-                                        x="3"
-                                        y="3"
-                                        width="7"
-                                        height="7"
-                                        rx="1"
-                                    />
-                                    <rect
-                                        x="14"
-                                        y="3"
-                                        width="7"
-                                        height="7"
-                                        rx="1"
-                                    />
-                                    <rect
-                                        x="3"
-                                        y="14"
-                                        width="7"
-                                        height="7"
-                                        rx="1"
-                                    />
-                                    <rect
-                                        x="14"
-                                        y="14"
-                                        width="7"
-                                        height="7"
-                                        rx="1"
-                                    />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="3"
+                                            width="7"
+                                            height="7"
+                                            rx="1"
+                                        />
+                                        <rect
+                                            x="14"
+                                            y="3"
+                                            width="7"
+                                            height="7"
+                                            rx="1"
+                                        />
+                                        <rect
+                                            x="3"
+                                            y="14"
+                                            width="7"
+                                            height="7"
+                                            rx="1"
+                                        />
+                                        <rect
+                                            x="14"
+                                            y="14"
+                                            width="7"
+                                            height="7"
+                                            rx="1"
+                                        />
+                                    </svg>
 
-                                <span>Dashboard</span>
-                            </Link>
+                                    <span>Dashboard</span>
+                                </Link>
+                            )}
 
                             {/* Monitoring */}
-                            <Link
-                                href="/monitorings"
-                                className={linkNav(isActive('/monitorings'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/monitorings') && (
+                                <Link
+                                    href="/monitorings"
+                                    className={linkNav(
+                                        isActive('/monitorings'),
+                                    )}
                                 >
-                                    <path d="M3 12h4l2.2-6 4.2 12 2.2-6H21" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <path d="M3 12h4l2.2-6 4.2 12 2.2-6H21" />
+                                    </svg>
 
-                                <span>Monitoring</span>
-                            </Link>
+                                    <span>Monitoring</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -137,193 +145,211 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
 
                         <div className="space-y-1">
                             {/* Pasien */}
-                            <Link
-                                href="/pasiens"
-                                className={linkNav(isActive('/pasiens'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/pasiens') && (
+                                <Link
+                                    href="/pasiens"
+                                    className={linkNav(isActive('/pasiens'))}
                                 >
-                                    <circle cx="12" cy="8" r="3.5" />
-                                    <path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <circle cx="12" cy="8" r="3.5" />
+                                        <path d="M5 20c.8-3.3 3.2-5 7-5s6.2 1.7 7 5" />
+                                    </svg>
 
-                                <span>Pasien</span>
-                            </Link>
+                                    <span>Pasien</span>
+                                </Link>
+                            )}
 
                             {/* Poli */}
-                            <Link
-                                href="/polis"
-                                className={linkNav(isActive('/polis'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/polis') && (
+                                <Link
+                                    href="/polis"
+                                    className={linkNav(isActive('/polis'))}
                                 >
-                                    <rect
-                                        x="5"
-                                        y="3"
-                                        width="14"
-                                        height="18"
-                                        rx="2"
-                                    />
-                                    <path d="M9 7h6M9 11h6M9 15h4" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="5"
+                                            y="3"
+                                            width="14"
+                                            height="18"
+                                            rx="2"
+                                        />
+                                        <path d="M9 7h6M9 11h6M9 15h4" />
+                                    </svg>
 
-                                <span>Poli</span>
-                            </Link>
+                                    <span>Poli</span>
+                                </Link>
+                            )}
 
                             {/* Dokter */}
-                            <Link
-                                href="/dokters"
-                                className={linkNav(isActive('/dokters'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/dokters') && (
+                                <Link
+                                    href="/dokters"
+                                    className={linkNav(isActive('/dokters'))}
                                 >
-                                    <circle cx="12" cy="7" r="3" />
-                                    <path d="M6 20c.7-3.2 2.7-5 6-5s5.3 1.8 6 5" />
-                                    <path d="M18 4v4M16 6h4" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <circle cx="12" cy="7" r="3" />
+                                        <path d="M6 20c.7-3.2 2.7-5 6-5s5.3 1.8 6 5" />
+                                        <path d="M18 4v4M16 6h4" />
+                                    </svg>
 
-                                <span>Dokter</span>
-                            </Link>
+                                    <span>Dokter</span>
+                                </Link>
+                            )}
 
                             {/* Jadwal Dokter */}
-                            <Link
-                                href="/jadwal-dokters"
-                                className={linkNav(isActive('/jadwal-dokters'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/jadwal-dokters') && (
+                                <Link
+                                    href="/jadwal-dokters"
+                                    className={linkNav(
+                                        isActive('/jadwal-dokters'),
+                                    )}
                                 >
-                                    <rect
-                                        x="3"
-                                        y="5"
-                                        width="18"
-                                        height="16"
-                                        rx="2"
-                                    />
-                                    <path d="M8 3v4M16 3v4M3 10h18M9 14h.01M13 14h.01M17 14h.01M9 18h.01M13 18h.01" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="5"
+                                            width="18"
+                                            height="16"
+                                            rx="2"
+                                        />
+                                        <path d="M8 3v4M16 3v4M3 10h18M9 14h.01M13 14h.01M17 14h.01M9 18h.01M13 18h.01" />
+                                    </svg>
 
-                                <span>Jadwal Dokter</span>
-                            </Link>
+                                    <span>Jadwal Dokter</span>
+                                </Link>
+                            )}
 
                             {/* Perawat */}
-                            <Link
-                                href="/perawats"
-                                className={linkNav(isActive('/perawats'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/perawats') && (
+                                <Link
+                                    href="/perawats"
+                                    className={linkNav(isActive('/perawats'))}
                                 >
-                                    <circle cx="9" cy="8" r="3" />
-                                    <path d="M3 20c.7-3.2 2.7-5 6-5s5.3 1.8 6 5" />
-                                    <circle cx="17" cy="9" r="2.5" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <circle cx="9" cy="8" r="3" />
+                                        <path d="M3 20c.7-3.2 2.7-5 6-5s5.3 1.8 6 5" />
+                                        <circle cx="17" cy="9" r="2.5" />
+                                    </svg>
 
-                                <span>Perawat</span>
-                            </Link>
+                                    <span>Perawat</span>
+                                </Link>
+                            )}
 
                             {/* Presensi */}
-                            <Link
-                                href="/presensis"
-                                className={linkNav(isActive('/presensis'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/presensis') && (
+                                <Link
+                                    href="/presensis"
+                                    className={linkNav(isActive('/presensis'))}
                                 >
-                                    <rect
-                                        x="3"
-                                        y="4"
-                                        width="18"
-                                        height="18"
-                                        rx="2"
-                                    />
-                                    <path d="M16 2v4M8 2v4M3 10h18" />
-                                    <path d="m9 16 2 2 4-4" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="4"
+                                            width="18"
+                                            height="18"
+                                            rx="2"
+                                        />
+                                        <path d="M16 2v4M8 2v4M3 10h18" />
+                                        <path d="m9 16 2 2 4-4" />
+                                    </svg>
 
-                                <span>Presensi</span>
-                            </Link>
+                                    <span>Presensi</span>
+                                </Link>
+                            )}
 
                             {/* Obat */}
-                            <Link
-                                href="/obats"
-                                className={linkNav(isActive('/obats'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/obats') && (
+                                <Link
+                                    href="/obats"
+                                    className={linkNav(isActive('/obats'))}
                                 >
-                                    <rect
-                                        x="4"
-                                        y="6"
-                                        width="16"
-                                        height="12"
-                                        rx="6"
-                                        transform="rotate(-45 12 12)"
-                                    />
-                                    <path d="m8.5 8.5 7 7" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="4"
+                                            y="6"
+                                            width="16"
+                                            height="12"
+                                            rx="6"
+                                            transform="rotate(-45 12 12)"
+                                        />
+                                        <path d="m8.5 8.5 7 7" />
+                                    </svg>
 
-                                <span>Obat</span>
-                            </Link>
+                                    <span>Obat</span>
+                                </Link>
+                            )}
 
                             {/* Ruangan */}
-                            <Link
-                                href="/ruangans"
-                                className={linkNav(isActive('/ruangans'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/ruangans') && (
+                                <Link
+                                    href="/ruangans"
+                                    className={linkNav(isActive('/ruangans'))}
                                 >
-                                    <path d="M4 21V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v17" />
-                                    <path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2" />
-                                    <path d="M10 21v-3h4v3" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <path d="M4 21V4a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v17" />
+                                        <path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2" />
+                                        <path d="M10 21v-3h4v3" />
+                                    </svg>
 
-                                <span>Ruangan</span>
-                            </Link>
+                                    <span>Ruangan</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -335,102 +361,116 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
 
                         <div className="space-y-1">
                             {/* Pendaftaran */}
-                            <Link
-                                href="/pendaftarans"
-                                className={linkNav(isActive('/pendaftarans'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/pendaftarans') && (
+                                <Link
+                                    href="/pendaftarans"
+                                    className={linkNav(
+                                        isActive('/pendaftarans'),
+                                    )}
                                 >
-                                    <rect
-                                        x="4"
-                                        y="3"
-                                        width="16"
-                                        height="18"
-                                        rx="2"
-                                    />
-                                    <path d="M8 7h8M8 11h8M8 15h5" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="4"
+                                            y="3"
+                                            width="16"
+                                            height="18"
+                                            rx="2"
+                                        />
+                                        <path d="M8 7h8M8 11h8M8 15h5" />
+                                    </svg>
 
-                                <span>Pendaftaran</span>
-                            </Link>
+                                    <span>Pendaftaran</span>
+                                </Link>
+                            )}
 
                             {/* Antrean */}
-                            <Link
-                                href="/antrians"
-                                className={linkNav(isActive('/antrians'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/antrians') && (
+                                <Link
+                                    href="/antrians"
+                                    className={linkNav(isActive('/antrians'))}
                                 >
-                                    <circle cx="12" cy="12" r="8.5" />
-                                    <path d="M12 7v5l3 2" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <circle cx="12" cy="12" r="8.5" />
+                                        <path d="M12 7v5l3 2" />
+                                    </svg>
 
-                                <span>Antrean</span>
-                            </Link>
+                                    <span>Antrean</span>
+                                </Link>
+                            )}
 
                             {/* Pemeriksaan */}
-                            <Link
-                                href="/pemeriksaans"
-                                className={linkNav(isActive('/pemeriksaans'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/pemeriksaans') && (
+                                <Link
+                                    href="/pemeriksaans"
+                                    className={linkNav(
+                                        isActive('/pemeriksaans'),
+                                    )}
                                 >
-                                    <rect
-                                        x="4"
-                                        y="4"
-                                        width="16"
-                                        height="16"
-                                        rx="2"
-                                    />
-                                    <path d="M12 8v8M8 12h8" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="4"
+                                            y="4"
+                                            width="16"
+                                            height="16"
+                                            rx="2"
+                                        />
+                                        <path d="M12 8v8M8 12h8" />
+                                    </svg>
 
-                                <span>Pemeriksaan</span>
-                            </Link>
+                                    <span>Pemeriksaan</span>
+                                </Link>
+                            )}
 
                             {/* Pembayaran */}
-                            <Link
-                                href="/pembayarans"
-                                className={linkNav(isActive('/pembayarans'))}
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-[18px] w-[18px]"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="1.8"
+                            {canAccess('/pembayarans') && (
+                                <Link
+                                    href="/pembayarans"
+                                    className={linkNav(
+                                        isActive('/pembayarans'),
+                                    )}
                                 >
-                                    <rect
-                                        x="3"
-                                        y="6"
-                                        width="18"
-                                        height="13"
-                                        rx="2"
-                                    />
-                                    <path d="M3 10h18M16 15h2" />
-                                </svg>
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <rect
+                                            x="3"
+                                            y="6"
+                                            width="18"
+                                            height="13"
+                                            rx="2"
+                                        />
+                                        <path d="M3 10h18M16 15h2" />
+                                    </svg>
 
-                                <span>Pembayaran</span>
-                            </Link>
+                                    <span>Pembayaran</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
 

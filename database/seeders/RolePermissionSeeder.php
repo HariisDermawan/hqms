@@ -118,12 +118,10 @@ class RolePermissionSeeder extends Seeder
         $roles = [
             'Super Admin',
             'Admin',
-            'Petugas',
             'Dokter',
+            'Staf Loket',
+            'Staf Obat',
             'Perawat',
-            'Apotek',
-            'Kasir',
-            'Pasien',
         ];
 
         foreach ($roles as $role) {
@@ -214,27 +212,6 @@ class RolePermissionSeeder extends Seeder
                 'dashboard.view',
             ]);
 
-        Role::findByName('Petugas', 'web')
-            ->syncPermissions([
-                'poli.view',
-                'doctor.view',
-                'schedule.view',
-                'patient.view',
-                'patient.create',
-                'patient.update',
-
-                'queue.view',
-                'queue.create',
-                'queue.call',
-                'queue.recall',
-                'queue.skip',
-                'queue.complete',
-                'queue.cancel',
-                'queue.monitor',
-
-                'dashboard.view',
-            ]);
-
         Role::findByName('Dokter', 'web')
             ->syncPermissions([
                 'poli.view',
@@ -252,17 +229,50 @@ class RolePermissionSeeder extends Seeder
                 'queue.complete',
             ]);
 
+        Role::findByName('Staf Loket', 'web')
+            ->syncPermissions([
+                'poli.view',
+                'schedule.view',
+                'ruangan.view',
+                'patient.view',
+                'patient.create',
+                'patient.update',
+
+                'queue.view',
+                'queue.create',
+                'queue.call',
+                'queue.recall',
+                'queue.skip',
+                'queue.complete',
+                'queue.cancel',
+                'queue.monitor',
+
+                'dashboard.view',
+            ]);
+
+        Role::findByName('Staf Obat', 'web')
+            ->syncPermissions([
+                'patient.view',
+                'queue.view',
+                'medicine.view',
+                'medicine.create',
+                'medicine.update',
+                'payment.view',
+
+                'dashboard.view',
+            ]);
+
         Role::findByName('Perawat', 'web')
             ->syncPermissions([
                 'poli.view',
                 'doctor.view',
                 'schedule.view',
                 'patient.view',
+                'ruangan.view',
 
                 'nurse.view',
                 'nurse.create',
                 'nurse.update',
-                'nurse.delete',
 
                 'attendance.view',
                 'attendance.create',
@@ -273,36 +283,21 @@ class RolePermissionSeeder extends Seeder
                 'queue.recall',
                 'queue.skip',
                 'queue.complete',
-            ]);
 
-        Role::findByName('Apotek', 'web')
-            ->syncPermissions([
-                'patient.view',
-                'queue.view',
-                'medicine.view',
-                'medicine.update',
-                'payment.view',
                 'dashboard.view',
             ]);
 
-        Role::findByName('Kasir', 'web')
-            ->syncPermissions([
-                'patient.view',
-                'queue.view',
-                'medicine.view',
-                'payment.view',
-                'payment.create',
-                'payment.update',
-                'dashboard.view',
-            ]);
+        foreach (['Petugas', 'Apotek', 'Kasir', 'Pasien'] as $obsolete) {
+            $role = Role::where('name', $obsolete)
+                ->where('guard_name', 'web')
+                ->first();
 
-        Role::findByName('Pasien', 'web')
-            ->syncPermissions([
-                'poli.view',
-                'doctor.view',
-                'schedule.view',
-                'queue.view',
-            ]);
+            if ($role !== null) {
+                $role->users()->detach();
+                $role->permissions()->detach();
+                $role->delete();
+            }
+        }
 
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }

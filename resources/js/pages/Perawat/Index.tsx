@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { deletePerawat, getPerawats, type Perawat } from '@/api/perawat';
+import { usePermissions } from '@/lib/permissions';
 import AppLayout from '@/Layouts/AppLayout';
 
 const getInitials = (name: string): string =>
@@ -13,6 +14,7 @@ const getInitials = (name: string): string =>
         .join('');
 
 export default function PerawatIndex() {
+    const { viewOnly } = usePermissions();
     const [perawats, setPerawats] = useState<Perawat[]>([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
@@ -110,22 +112,24 @@ export default function PerawatIndex() {
                         </p>
                     </div>
 
-                    <Link
-                        href="/perawats/create"
-                        className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
+                    {!viewOnly && (
+                        <Link
+                            href="/perawats/create"
+                            className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
                         >
-                            <path d="M12 5v14M5 12h14" />
-                        </svg>
-                        Tambah Perawat
-                    </Link>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            Tambah Perawat
+                        </Link>
+                    )}
                 </div>
 
                 <div className="mt-4">
@@ -247,45 +251,52 @@ export default function PerawatIndex() {
                                                 Detail
                                             </Link>
 
-                                            <Link
-                                                href={`/perawats/${perawat.id}/edit`}
-                                                className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100 sm:h-8 sm:w-8"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-[15px] w-[15px]"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="1.8"
-                                                >
-                                                    <path d="M12 20h9" />
-                                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                                                </svg>
-                                            </Link>
+                                            {!viewOnly && (
+                                                <>
+                                                    <Link
+                                                        href={`/perawats/${perawat.id}/edit`}
+                                                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100 sm:h-8 sm:w-8"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="h-[15px] w-[15px]"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="1.8"
+                                                        >
+                                                            <path d="M12 20h9" />
+                                                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                                                        </svg>
+                                                    </Link>
 
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    handleDelete(perawat)
-                                                }
-                                                disabled={
-                                                    deletingId === perawat.id
-                                                }
-                                                className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-8 sm:w-8"
-                                            >
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-[15px] w-[15px]"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="1.8"
-                                                >
-                                                    <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                                    <path d="M10 11v6M14 11v6" />
-                                                </svg>
-                                            </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                perawat,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            deletingId ===
+                                                            perawat.id
+                                                        }
+                                                        className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-8 sm:w-8"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="h-[15px] w-[15px]"
+                                                            viewBox="0 0 24 24"
+                                                            fill="none"
+                                                            stroke="currentColor"
+                                                            strokeWidth="1.8"
+                                                        >
+                                                            <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                                            <path d="M10 11v6M14 11v6" />
+                                                        </svg>
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

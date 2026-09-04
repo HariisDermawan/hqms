@@ -71,6 +71,7 @@ class PemeriksaanController extends Controller
             'pasien',
             'poli',
             'dokter',
+            'obats',
         ]);
 
         return response()->json([

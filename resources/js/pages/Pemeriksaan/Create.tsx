@@ -23,9 +23,11 @@ export default function PemeriksaanCreate() {
         setErrors({});
 
         try {
-            await storePemeriksaan(payload);
+            const response = await storePemeriksaan(payload);
 
-            router.visit('/pemeriksaans');
+            const newId = response.data?.pemeriksaan?.id;
+
+            router.visit(newId ? `/pemeriksaans/${newId}` : '/pemeriksaans');
         } catch (error: any) {
             console.error('Gagal menyimpan pemeriksaan', error);
 

@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
+import { getPolis, type Poli } from '@/api/poli';
 import type { Ruangan, RuanganPayload } from '@/api/ruangan';
 
 interface RuanganFormProps {
@@ -42,8 +43,22 @@ export default function RuanganForm({
     const [code, setCode] = useState(initial?.code ?? '');
     const [name, setName] = useState(initial?.name ?? '');
     const [category, setCategory] = useState(initial?.category ?? '');
+    const [poliId, setPoliId] = useState(
+        initial?.poli?.id ? String(initial.poli.id) : '',
+    );
     const [description, setDescription] = useState(initial?.description ?? '');
     const [isActive, setIsActive] = useState(initial?.is_active ?? true);
+    const [polis, setPolis] = useState<Poli[]>([]);
+
+    useEffect(() => {
+        getPolis(1, 100)
+            .then((response) => {
+                setPolis(response.data?.items ?? []);
+            })
+            .catch((error: any) => {
+                console.error('Gagal memuat opsi poli', error);
+            });
+    }, []);
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -52,6 +67,7 @@ export default function RuanganForm({
             code,
             name,
             category,
+            poli_id: category === 'Poli' && poliId ? Number(poliId) : undefined,
             description: description || undefined,
             is_active: isActive,
         });
@@ -143,6 +159,37 @@ export default function RuanganForm({
                         </p>
                     )}
                 </div>
+
+                {category === 'Poli' && (
+                    <div>
+                        <label htmlFor="poli_id" className={labelClass}>
+                            Poli
+                        </label>
+
+                        <select
+                            id="poli_id"
+                            value={poliId}
+                            onChange={(event) => setPoliId(event.target.value)}
+                            className={inputClass}
+                        >
+                            <option value="">
+                                Pilih poli untuk ruangan ini...
+                            </option>
+
+                            {polis.map((poli) => (
+                                <option key={poli.id} value={poli.id}>
+                                    {poli.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {errors.poli_id && (
+                            <p className="mt-1 text-[11px] text-red-500">
+                                {errors.poli_id}
+                            </p>
+                        )}
+                    </div>
+                )}
 
                 {/* STATUS AKTIF */}
                 <div>

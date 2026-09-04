@@ -47,6 +47,10 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
 
         Route::apiResource('polis', PoliController::class);
         Route::apiResource('ruangans', RuanganController::class);
+        Route::get('ruangans/{ruangan}/antrians', [
+            RuanganController::class,
+            'antrians',
+        ]);
         Route::post('ruangans/{ruangan}/pasiens', [
             RuanganController::class,
             'assignPasien',

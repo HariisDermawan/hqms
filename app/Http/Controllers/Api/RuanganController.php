@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AssignRuanganPasienRequest;
 use App\Http\Requests\StoreRuanganRequest;
 use App\Http\Requests\UpdateRuanganRequest;
+use App\Http\Resources\AntrianResource;
 use App\Http\Resources\RuanganResource;
+use App\Models\Antrian;
 use App\Models\Ruangan;
 use App\Models\RuanganPasien;
 use App\Services\RuanganService;
@@ -75,6 +77,8 @@ class RuanganController extends Controller
         Gate::authorize('view', $ruangan);
 
         $ruangan->load([
+            'poli',
+            'poli',
             'ruanganPasiens.antrian.poli',
             'ruanganPasiens.pendaftaran',
         ]);
@@ -84,6 +88,42 @@ class RuanganController extends Controller
             'message' => 'Ruangan retrieved successfully.',
             'data' => [
                 'ruangan' => new RuanganResource($ruangan),
+            ],
+        ]);
+    }
+
+    /**
+     * List available antrian tickets assignable to this ruangan.
+     */
+    public function antrians(Ruangan $ruangan): JsonResponse
+    {
+        Gate::authorize('view', $ruangan);
+
+        $assignedAntrianIds = RuanganPasien::query()
+            ->whereNull('tanggal_keluar')
+            ->whereNotNull('antrian_id')
+            ->pluck('antrian_id');
+
+        $antrians = Antrian::query()
+            ->with(['poli', 'pendaftaran.pasien'])
+            ->whereIn('status', ['waiting', 'called', 'serving'])
+            ->whereHas('pendaftaran.pasien')
+            ->when(
+                $ruangan->poli_id !== null,
+                fn ($query) => $query->where('poli_id', $ruangan->poli_id)
+            )
+            ->when(
+                $assignedAntrianIds->isNotEmpty(),
+                fn ($query) => $query->whereNotIn('id', $assignedAntrianIds)
+            )
+            ->orderBy('queue_number')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Antrians retrieved successfully.',
+            'data' => [
+                'antrians' => AntrianResource::collection($antrians),
             ],
         ]);
     }
@@ -142,6 +182,7 @@ class RuanganController extends Controller
         );
 
         $ruangan->load([
+            'poli',
             'ruanganPasiens.antrian.poli',
             'ruanganPasiens.pendaftaran',
         ]);
@@ -184,6 +225,7 @@ class RuanganController extends Controller
         );
 
         $ruangan->load([
+            'poli',
             'ruanganPasiens.antrian.poli',
             'ruanganPasiens.pendaftaran',
         ]);

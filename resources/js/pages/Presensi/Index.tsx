@@ -8,6 +8,7 @@ import {
     type Presensi,
     type PresensiStatus,
 } from '@/api/presensi';
+import { usePermissions } from '@/lib/permissions';
 import AppLayout from '@/Layouts/AppLayout';
 
 const statusLabel: Record<PresensiStatus, string> = {
@@ -60,6 +61,7 @@ const inputClass =
     'h-[42px] rounded-[12px] bg-[#d9d9d9] px-[12px] text-[13px] text-gray-700 outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 transition';
 
 export default function PresensiIndex() {
+    const { viewOnly } = usePermissions();
     const [presensis, setPresensis] = useState<Presensi[]>([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
@@ -225,104 +227,113 @@ export default function PresensiIndex() {
                         </p>
                     </div>
 
-                    <Link
-                        href="/presensis/create"
-                        className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
+                    {!viewOnly && (
+                        <Link
+                            href="/presensis/create"
+                            className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
                         >
-                            <path d="M12 5v14M5 12h14" />
-                        </svg>
-                        Tambah Presensi
-                    </Link>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                            >
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            Tambah Presensi
+                        </Link>
+                    )}
                 </div>
 
                 {/* QUICK CHECK-IN / CHECK-OUT */}
-                <div className="mt-4 rounded-xl bg-gradient-to-r from-[#084e7a] to-[#07577f] p-5 shadow-sm sm:p-6">
-                    <h3 className="text-sm font-bold text-white">
-                        Presensi Cepat (Check-in / Check-out)
-                    </h3>
+                {!viewOnly && (
+                    <div className="mt-4 rounded-xl bg-gradient-to-r from-[#084e7a] to-[#07577f] p-5 shadow-sm sm:p-6">
+                        <h3 className="text-sm font-bold text-white">
+                            Presensi Cepat (Check-in / Check-out)
+                        </h3>
 
-                    <p className="mt-0.5 text-[12px] text-white/70">
-                        Pilih perawat dan catat jam masuk / keluar hari ini
-                    </p>
+                        <p className="mt-0.5 text-[12px] text-white/70">
+                            Pilih perawat dan catat jam masuk / keluar hari ini
+                        </p>
 
-                    <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
-                        <div className="lg:col-span-2">
-                            <select
-                                value={quickPerawat}
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
+                            <div className="lg:col-span-2">
+                                <select
+                                    value={quickPerawat}
+                                    onChange={(event) =>
+                                        setQuickPerawat(event.target.value)
+                                    }
+                                    className={`${inputClass} w-full bg-white/95`}
+                                >
+                                    <option value="">
+                                        -- Pilih Perawat --
+                                    </option>
+
+                                    {perawats.map((perawat) => (
+                                        <option
+                                            key={perawat.id}
+                                            value={perawat.id}
+                                        >
+                                            {perawat.name} ({perawat.code})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <input
+                                type="date"
+                                value={quickDate}
                                 onChange={(event) =>
-                                    setQuickPerawat(event.target.value)
+                                    setQuickDate(event.target.value)
                                 }
                                 className={`${inputClass} w-full bg-white/95`}
+                            />
+
+                            <button
+                                type="button"
+                                onClick={quickCheckIn}
+                                className="flex h-[42px] items-center justify-center gap-2 rounded-[12px] bg-white text-[12px] font-bold text-[#084e7a] transition hover:bg-gray-100"
                             >
-                                <option value="">-- Pilih Perawat --</option>
+                                Check-in
+                                {quickTimeIn && (
+                                    <span className="rounded bg-[#084e7a] px-1.5 py-0.5 text-[11px] font-bold text-white">
+                                        {quickTimeIn}
+                                    </span>
+                                )}
+                            </button>
 
-                                {perawats.map((perawat) => (
-                                    <option key={perawat.id} value={perawat.id}>
-                                        {perawat.name} ({perawat.code})
-                                    </option>
-                                ))}
-                            </select>
+                            <button
+                                type="button"
+                                onClick={quickCheckOut}
+                                className="flex h-[42px] items-center justify-center gap-2 rounded-[12px] bg-white text-[12px] font-bold text-[#084e7a] transition hover:bg-gray-100"
+                            >
+                                Check-out
+                                {quickTimeOut && (
+                                    <span className="rounded bg-[#084e7a] px-1.5 py-0.5 text-[11px] font-bold text-white">
+                                        {quickTimeOut}
+                                    </span>
+                                )}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => void handleQuickSave()}
+                                disabled={saving}
+                                className="flex h-[42px] items-center justify-center rounded-[12px] bg-white text-[12px] font-bold text-[#064470] ring-2 ring-white/40 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                {saving ? 'Menyimpan...' : 'Simpan'}
+                            </button>
                         </div>
 
-                        <input
-                            type="date"
-                            value={quickDate}
-                            onChange={(event) =>
-                                setQuickDate(event.target.value)
-                            }
-                            className={`${inputClass} w-full bg-white/95`}
-                        />
-
-                        <button
-                            type="button"
-                            onClick={quickCheckIn}
-                            className="flex h-[42px] items-center justify-center gap-2 rounded-[12px] bg-white text-[12px] font-bold text-[#084e7a] transition hover:bg-gray-100"
-                        >
-                            Check-in
-                            {quickTimeIn && (
-                                <span className="rounded bg-[#084e7a] px-1.5 py-0.5 text-[11px] font-bold text-white">
-                                    {quickTimeIn}
-                                </span>
-                            )}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={quickCheckOut}
-                            className="flex h-[42px] items-center justify-center gap-2 rounded-[12px] bg-white text-[12px] font-bold text-[#084e7a] transition hover:bg-gray-100"
-                        >
-                            Check-out
-                            {quickTimeOut && (
-                                <span className="rounded bg-[#084e7a] px-1.5 py-0.5 text-[11px] font-bold text-white">
-                                    {quickTimeOut}
-                                </span>
-                            )}
-                        </button>
-
-                        <button
-                            type="button"
-                            onClick={() => void handleQuickSave()}
-                            disabled={saving}
-                            className="flex h-[42px] items-center justify-center rounded-[12px] bg-white text-[12px] font-bold text-[#064470] ring-2 ring-white/40 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            {saving ? 'Menyimpan...' : 'Simpan'}
-                        </button>
+                        {quickError && (
+                            <div className="mt-3 rounded-[10px] bg-red-50 px-3 py-2 text-[12px] text-red-500">
+                                {quickError}
+                            </div>
+                        )}
                     </div>
-
-                    {quickError && (
-                        <div className="mt-3 rounded-[10px] bg-red-50 px-3 py-2 text-[12px] text-red-500">
-                            {quickError}
-                        </div>
-                    )}
-                </div>
+                )}
 
                 {/* FILTERS */}
                 <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -540,48 +551,52 @@ export default function PresensiIndex() {
                                                         </svg>
                                                     </Link>
 
-                                                    <Link
-                                                        href={`/presensis/${presensi.id}/edit`}
-                                                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100"
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-[14px] w-[14px]"
-                                                            viewBox="0 0 24 24"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            strokeWidth="1.8"
-                                                        >
-                                                            <path d="M12 20h9" />
-                                                            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                                                        </svg>
-                                                    </Link>
+                                                    {!viewOnly && (
+                                                        <>
+                                                            <Link
+                                                                href={`/presensis/${presensi.id}/edit`}
+                                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100"
+                                                            >
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    className="h-[14px] w-[14px]"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="1.8"
+                                                                >
+                                                                    <path d="M12 20h9" />
+                                                                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                                                                </svg>
+                                                            </Link>
 
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            void handleDelete(
-                                                                presensi,
-                                                            )
-                                                        }
-                                                        disabled={
-                                                            deletingId ===
-                                                            presensi.id
-                                                        }
-                                                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-[14px] w-[14px]"
-                                                            viewBox="0 0 24 24"
-                                                            fill="none"
-                                                            stroke="currentColor"
-                                                            strokeWidth="1.8"
-                                                        >
-                                                            <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                                                            <path d="M10 11v6M14 11v6" />
-                                                        </svg>
-                                                    </button>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    void handleDelete(
+                                                                        presensi,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    deletingId ===
+                                                                    presensi.id
+                                                                }
+                                                                className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                                                            >
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    className="h-[14px] w-[14px]"
+                                                                    viewBox="0 0 24 24"
+                                                                    fill="none"
+                                                                    stroke="currentColor"
+                                                                    strokeWidth="1.8"
+                                                                >
+                                                                    <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                                                    <path d="M10 11v6M14 11v6" />
+                                                                </svg>
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </td>
                                         </tr>

@@ -4,8 +4,10 @@ import { getPasiens, type Pasien } from '@/api/pasien';
 import {
     assignRuanganPasien,
     getRuangan,
+    getRuanganAntrians,
     removeRuanganPasien,
     type Ruangan,
+    type RuanganAntrianItem,
     type RuanganPasienItem,
 } from '@/api/ruangan';
 import AppLayout from '@/Layouts/AppLayout';
@@ -45,9 +47,15 @@ export default function RuanganShow() {
 
     const [pasiens, setPasiens] = useState<RuanganPasienItem[]>([]);
     const [pasienOptions, setPasienOptions] = useState<Pasien[]>([]);
+    const [antrianOptions, setAntrianOptions] = useState<RuanganAntrianItem[]>(
+        [],
+    );
+    const [selectedAntrian, setSelectedAntrian] = useState('');
     const [selectedPasien, setSelectedPasien] = useState('');
     const [adding, setAdding] = useState(false);
     const [showForm, setShowForm] = useState(false);
+
+    const isPoliRoom = ruangan?.category?.toLowerCase() === 'poli';
 
     const loadPasienOptions = async () => {
         try {
@@ -56,6 +64,20 @@ export default function RuanganShow() {
             setPasienOptions(response.data?.items ?? []);
         } catch (error: any) {
             console.error('Gagal memuat daftar pasien', error);
+        }
+    };
+
+    const loadAntrianOptions = async () => {
+        if (!ruangan) {
+            return;
+        }
+
+        try {
+            const response = await getRuanganAntrians(ruangan.id);
+
+            setAntrianOptions(response.data?.antrians ?? []);
+        } catch (error: any) {
+            console.error('Gagal memuat tiket antrian', error);
         }
     };
 
@@ -86,8 +108,19 @@ export default function RuanganShow() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
+    useEffect(() => {
+        if (isPoliRoom) {
+            void loadAntrianOptions();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isPoliRoom, ruangan?.id]);
+
     const handleAddPasien = async () => {
-        const pasienId = Number(selectedPasien);
+        const pasienId = isPoliRoom
+            ? (antrianOptions.find(
+                  (item) => String(item.id) === selectedAntrian,
+              )?.pendaftaran?.pasien?.id ?? 0)
+            : Number(selectedPasien);
 
         if (!pasienId) {
             return;
@@ -98,12 +131,15 @@ export default function RuanganShow() {
         try {
             const response = await assignRuanganPasien(id, {
                 pasien_id: pasienId,
+                antrian_id: isPoliRoom ? Number(selectedAntrian) : undefined,
             });
 
             setRuangan(response.data?.ruangan ?? ruangan);
             setPasiens(response.data?.ruangan?.pasiens ?? []);
             setSelectedPasien('');
+            setSelectedAntrian('');
             setShowForm(false);
+            void loadAntrianOptions();
         } catch (error: any) {
             console.error('Gagal menambahkan pasien', error);
 
@@ -300,37 +336,87 @@ export default function RuanganShow() {
                                 {showForm && (
                                     <div className="mt-4 rounded-xl bg-white p-4 shadow-sm">
                                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                                            <select
-                                                value={selectedPasien}
-                                                onChange={(event) =>
-                                                    setSelectedPasien(
-                                                        event.target.value,
-                                                    )
-                                                }
-                                                className="h-[42px] w-full rounded-[12px] bg-[#d9d9d9] px-[12px] text-[13px] text-gray-700 outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 sm:max-w-[380px]"
-                                            >
-                                                <option value="">
-                                                    Pilih pasien...
-                                                </option>
-
-                                                {pasienOptions.map((pasien) => (
-                                                    <option
-                                                        key={pasien.id}
-                                                        value={pasien.id}
-                                                    >
-                                                        {pasien.name} — RM{' '}
-                                                        {
-                                                            pasien.medical_record_number
-                                                        }
+                                            {isPoliRoom ? (
+                                                <select
+                                                    value={selectedAntrian}
+                                                    onChange={(event) =>
+                                                        setSelectedAntrian(
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    className="h-[42px] w-full rounded-[12px] bg-[#d9d9d9] px-[12px] text-[13px] text-gray-700 outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 sm:max-w-[420px]"
+                                                >
+                                                    <option value="">
+                                                        Pilih tiket antrian...
                                                     </option>
-                                                ))}
-                                            </select>
+
+                                                    {antrianOptions.map(
+                                                        (antrian) => (
+                                                            <option
+                                                                key={antrian.id}
+                                                                value={
+                                                                    antrian.id
+                                                                }
+                                                            >
+                                                                {
+                                                                    antrian.queue_number
+                                                                }{' '}
+                                                                —{' '}
+                                                                {antrian
+                                                                    .pendaftaran
+                                                                    ?.pasien
+                                                                    ?.name ??
+                                                                    'Tanpa nama'}{' '}
+                                                                (
+                                                                {antrian.poli
+                                                                    ?.name ??
+                                                                    '-'}
+                                                                )
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                            ) : (
+                                                <select
+                                                    value={selectedPasien}
+                                                    onChange={(event) =>
+                                                        setSelectedPasien(
+                                                            event.target.value,
+                                                        )
+                                                    }
+                                                    className="h-[42px] w-full rounded-[12px] bg-[#d9d9d9] px-[12px] text-[13px] text-gray-700 outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 sm:max-w-[380px]"
+                                                >
+                                                    <option value="">
+                                                        Pilih pasien...
+                                                    </option>
+
+                                                    {pasienOptions.map(
+                                                        (pasien) => (
+                                                            <option
+                                                                key={pasien.id}
+                                                                value={
+                                                                    pasien.id
+                                                                }
+                                                            >
+                                                                {pasien.name} —
+                                                                RM{' '}
+                                                                {
+                                                                    pasien.medical_record_number
+                                                                }
+                                                            </option>
+                                                        ),
+                                                    )}
+                                                </select>
+                                            )}
 
                                             <button
                                                 type="button"
                                                 onClick={handleAddPasien}
                                                 disabled={
-                                                    adding || !selectedPasien
+                                                    adding ||
+                                                    (isPoliRoom
+                                                        ? !selectedAntrian
+                                                        : !selectedPasien)
                                                 }
                                                 className="h-[42px] rounded-[12px] bg-[#07577f] px-5 text-[13px] font-bold text-white transition hover:bg-[#063f62] disabled:cursor-not-allowed disabled:opacity-60"
                                             >

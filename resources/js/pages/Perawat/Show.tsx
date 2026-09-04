@@ -1,6 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { getPerawat, type Perawat } from '@/api/perawat';
+import { usePermissions } from '@/lib/permissions';
 import AppLayout from '@/Layouts/AppLayout';
 
 const getInitials = (name: string): string =>
@@ -28,6 +29,7 @@ const detailItem = (label: string, value: string, highlight = false) => (
 
 export default function PerawatShow() {
     const { id } = usePage<{ id: number }>().props;
+    const { viewOnly } = usePermissions();
 
     const [perawat, setPerawat] = useState<Perawat | null>(null);
     const [loading, setLoading] = useState(true);
@@ -71,16 +73,18 @@ export default function PerawatShow() {
                         </p>
                     </div>
 
-                    <Link
-                        href={
-                            perawat
-                                ? `/perawats/${perawat.id}/edit`
-                                : '/perawats'
-                        }
-                        className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
-                    >
-                        Edit Perawat
-                    </Link>
+                    {!viewOnly && (
+                        <Link
+                            href={
+                                perawat
+                                    ? `/perawats/${perawat.id}/edit`
+                                    : '/perawats'
+                            }
+                            className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
+                        >
+                            Edit Perawat
+                        </Link>
+                    )}
                 </div>
 
                 {loading ? (

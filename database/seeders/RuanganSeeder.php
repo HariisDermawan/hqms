@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Poli;
 use App\Models\Ruangan;
 use Illuminate\Database\Seeder;
 
@@ -9,13 +10,17 @@ class RuanganSeeder extends Seeder
 {
     public function run(): void
     {
+        $poliByCode = Poli::query()
+            ->get()
+            ->keyBy(fn ($poli) => strtolower($poli->code));
+
         $ruangans = [
             // Ruang Pelayanan Pasien
             ['code' => 'IGD', 'name' => 'IGD', 'category' => 'IGD', 'description' => 'Unit Gawat Darurat — penanganan pasien darurat.', 'is_active' => true],
-            ['code' => 'PLU', 'name' => 'Ruang Poli Umum', 'category' => 'Poli', 'description' => 'Pelayanan pemeriksaan umum.', 'is_active' => true],
-            ['code' => 'PLG', 'name' => 'Ruang Poli Gigi', 'category' => 'Poli', 'description' => 'Pelayanan kesehatan gigi dan mulut.', 'is_active' => true],
-            ['code' => 'PLA', 'name' => 'Ruang Poli Anak', 'category' => 'Poli', 'description' => 'Pelayanan kesehatan anak.', 'is_active' => true],
-            ['code' => 'PLM', 'name' => 'Ruang Poli Mata', 'category' => 'Poli', 'description' => 'Pelayanan kesehatan mata.', 'is_active' => true],
+            ['code' => 'PLU', 'name' => 'Ruang Poli Umum', 'category' => 'Poli', 'poli_code' => 'PLUM', 'description' => 'Pelayanan pemeriksaan umum.', 'is_active' => true],
+            ['code' => 'PLG', 'name' => 'Ruang Poli Gigi', 'category' => 'Poli', 'poli_code' => 'PLGI', 'description' => 'Pelayanan kesehatan gigi dan mulut.', 'is_active' => true],
+            ['code' => 'PLA', 'name' => 'Ruang Poli Anak', 'category' => 'Poli', 'poli_code' => 'PLAN', 'description' => 'Pelayanan kesehatan anak.', 'is_active' => true],
+            ['code' => 'PLM', 'name' => 'Ruang Poli Mata', 'category' => 'Poli', 'poli_code' => 'PLMA', 'description' => 'Pelayanan kesehatan mata.', 'is_active' => true],
             ['code' => 'PLT', 'name' => 'Ruang Poli THT', 'category' => 'Poli', 'description' => 'Pelayanan kesehatan telinga, hidung, dan tenggorokan.', 'is_active' => true],
             ['code' => 'PLPD', 'name' => 'Ruang Poli Penyakit Dalam', 'category' => 'Poli', 'description' => 'Pelayanan kesehatan penyakit dalam.', 'is_active' => true],
             ['code' => 'PLK', 'name' => 'Ruang Poli Kandungan', 'category' => 'Poli', 'description' => 'Pelayanan kesehatan kandungan.', 'is_active' => true],
@@ -58,6 +63,12 @@ class RuanganSeeder extends Seeder
         ];
 
         foreach ($ruangans as $ruangan) {
+            $poliCode = $ruangan['poli_code'] ?? null;
+            unset($ruangan['poli_code']);
+            $ruangan['poli_id'] = $poliCode
+                ? $poliByCode->get(strtolower($poliCode))?->id
+                : null;
+
             Ruangan::updateOrCreate(
                 ['code' => $ruangan['code']],
                 $ruangan
