@@ -278,7 +278,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </Link>
 
                             {/* Obat */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/obats"
+                                className={linkNav(isActive('/obats'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -299,7 +302,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Obat</span>
-                            </button>
+                            </Link>
 
                             {/* Ruangan */}
                             <Link
@@ -404,7 +407,10 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                             </Link>
 
                             {/* Pembayaran */}
-                            <button type="button" className={staticNav}>
+                            <Link
+                                href="/pembayarans"
+                                className={linkNav(isActive('/pembayarans'))}
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     className="h-[18px] w-[18px]"
@@ -424,7 +430,7 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </svg>
 
                                 <span>Pembayaran</span>
-                            </button>
+                            </Link>
                         </div>
                     </div>
 

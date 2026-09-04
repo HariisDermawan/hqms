@@ -74,7 +74,10 @@ class RuanganController extends Controller
     {
         Gate::authorize('view', $ruangan);
 
-        $ruangan->load('ruanganPasiens');
+        $ruangan->load([
+            'ruanganPasiens.antrian.poli',
+            'ruanganPasiens.pendaftaran',
+        ]);
 
         return response()->json([
             'success' => true,
@@ -138,7 +141,10 @@ class RuanganController extends Controller
             $request->validated()
         );
 
-        $ruangan->load('ruanganPasiens');
+        $ruangan->load([
+            'ruanganPasiens.antrian.poli',
+            'ruanganPasiens.pendaftaran',
+        ]);
 
         return response()->json([
             'success' => true,
@@ -148,6 +154,8 @@ class RuanganController extends Controller
                 'item' => [
                     'id' => $item->id,
                     'pasien_id' => $item->pasien_id,
+                    'antrian_id' => $item->antrian_id,
+                    'pendaftaran_id' => $item->pendaftaran_id,
                     'name' => $item->pasien_name,
                     'mrn' => $item->pasien_mrn,
                     'gender' => $item->pasien_gender,
@@ -175,7 +183,10 @@ class RuanganController extends Controller
             $ruanganPasien
         );
 
-        $ruangan->load('ruanganPasiens');
+        $ruangan->load([
+            'ruanganPasiens.antrian.poli',
+            'ruanganPasiens.pendaftaran',
+        ]);
 
         return response()->json([
             'success' => true,
@@ -185,6 +196,8 @@ class RuanganController extends Controller
                 'item' => [
                     'id' => $item->id,
                     'pasien_id' => $item->pasien_id,
+                    'antrian_id' => $item->antrian_id,
+                    'pendaftaran_id' => $item->pendaftaran_id,
                     'name' => $item->pasien_name,
                     'mrn' => $item->pasien_mrn,
                     'gender' => $item->pasien_gender,

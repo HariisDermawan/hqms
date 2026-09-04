@@ -62,6 +62,18 @@ class RolePermissionSeeder extends Seeder
             'patient.update',
             'patient.delete',
 
+            // Obat
+            'medicine.view',
+            'medicine.create',
+            'medicine.update',
+            'medicine.delete',
+
+            // Pembayaran
+            'payment.view',
+            'payment.create',
+            'payment.update',
+            'payment.delete',
+
             // Antrean
             'queue.view',
             'queue.create',
@@ -165,6 +177,16 @@ class RolePermissionSeeder extends Seeder
                 'patient.update',
                 'patient.delete',
 
+                'medicine.view',
+                'medicine.create',
+                'medicine.update',
+                'medicine.delete',
+
+                'payment.view',
+                'payment.create',
+                'payment.update',
+                'payment.delete',
+
                 'queue.view',
                 'queue.create',
                 'queue.call',
@@ -220,6 +242,9 @@ class RolePermissionSeeder extends Seeder
                 'schedule.view',
                 'patient.view',
 
+                'medicine.view',
+                'medicine.create',
+
                 'queue.view',
                 'queue.call',
                 'queue.recall',
@@ -254,6 +279,9 @@ class RolePermissionSeeder extends Seeder
             ->syncPermissions([
                 'patient.view',
                 'queue.view',
+                'medicine.view',
+                'medicine.update',
+                'payment.view',
                 'dashboard.view',
             ]);
 
@@ -261,6 +289,10 @@ class RolePermissionSeeder extends Seeder
             ->syncPermissions([
                 'patient.view',
                 'queue.view',
+                'medicine.view',
+                'payment.view',
+                'payment.create',
+                'payment.update',
                 'dashboard.view',
             ]);
 

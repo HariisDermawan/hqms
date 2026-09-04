@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             PresensiSeeder::class,
             JadwalDokterSeeder::class,
             PemeriksaanSeeder::class,
+            ObatSeeder::class,
+            PembayaranSeeder::class,
             FaqSeeder::class,
             TestimonialSeeder::class,
             MessageSeeder::class,

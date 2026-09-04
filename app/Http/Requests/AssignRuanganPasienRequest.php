@@ -20,6 +20,16 @@ class AssignRuanganPasienRequest extends FormRequest
                 'integer',
                 Rule::exists('pasiens', 'id'),
             ],
+            'antrian_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('antrians', 'id'),
+            ],
+            'pendaftaran_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('pendaftarans', 'id'),
+            ],
             'tanggal_masuk' => [
                 'nullable',
                 'date',

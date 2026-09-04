@@ -96,7 +96,9 @@ export default function RuanganShow() {
         setAdding(true);
 
         try {
-            const response = await assignRuanganPasien(id, pasienId);
+            const response = await assignRuanganPasien(id, {
+                pasien_id: pasienId,
+            });
 
             setRuangan(response.data?.ruangan ?? ruangan);
             setPasiens(response.data?.ruangan?.pasiens ?? []);
@@ -372,6 +374,12 @@ export default function RuanganShow() {
                                                             No. RM
                                                         </th>
                                                         <th className="px-4 py-3">
+                                                            No. Antrian
+                                                        </th>
+                                                        <th className="px-4 py-3">
+                                                            Poli
+                                                        </th>
+                                                        <th className="px-4 py-3">
                                                             Jenis Kelamin
                                                         </th>
                                                         <th className="px-4 py-3">
@@ -406,6 +414,24 @@ export default function RuanganShow() {
                                                                         '-'}
                                                                 </td>
 
+                                                                <td className="px-4 py-3">
+                                                                    {item.queue_number ? (
+                                                                        <span className="flex h-8 w-10 items-center justify-center rounded-lg bg-[#07577f]/10 text-[13px] font-bold text-[#07577f]">
+                                                                            {
+                                                                                item.queue_number
+                                                                            }
+                                                                        </span>
+                                                                    ) : (
+                                                                        '-'
+                                                                    )}
+                                                                </td>
+
+                                                                <td className="px-4 py-3 text-gray-600">
+                                                                    {item.poli
+                                                                        ?.name ??
+                                                                        '-'}
+                                                                </td>
+
                                                                 <td className="px-4 py-3 text-gray-600">
                                                                     {genderLabel(
                                                                         item.gender,
@@ -425,17 +451,27 @@ export default function RuanganShow() {
                                                                 </td>
 
                                                                 <td className="px-4 py-3 text-right">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() =>
-                                                                            handleRemovePasien(
-                                                                                item,
-                                                                            )
-                                                                        }
-                                                                        className="flex h-10 items-center gap-1.5 rounded-lg bg-red-50 px-3 text-[11px] font-semibold text-red-500 transition hover:bg-red-100 sm:h-8"
-                                                                    >
-                                                                        Keluar
-                                                                    </button>
+                                                                    <div className="flex items-center justify-end gap-2">
+                                                                        <Link
+                                                                            href={`/pemeriksaans/create?antrian_id=${item.antrian_id ?? ''}&pasien_id=${item.pasien_id ?? ''}&poli_id=${item.poli?.id ?? ''}`}
+                                                                            title="Lanjut ke Pemeriksaan"
+                                                                            className="flex h-10 items-center gap-1.5 rounded-lg bg-emerald-600 px-3 text-[11px] font-semibold text-white transition hover:bg-emerald-700 sm:h-8"
+                                                                        >
+                                                                            Pemeriksaan
+                                                                        </Link>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                handleRemovePasien(
+                                                                                    item,
+                                                                                )
+                                                                            }
+                                                                            className="flex h-10 items-center gap-1.5 rounded-lg bg-red-50 px-3 text-[11px] font-semibold text-red-500 transition hover:bg-red-100 sm:h-8"
+                                                                        >
+                                                                            Keluar
+                                                                        </button>
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         ),

@@ -3,6 +3,12 @@ import type { Pagination } from './dokter';
 
 export interface Pemeriksaan {
     id: number;
+    antrian: {
+        id: number;
+        queue_number: string | null;
+        status: string | null;
+        loket: number | null;
+    } | null;
     pasien: {
         id: number;
         medical_record_number: string;
@@ -21,9 +27,19 @@ export interface Pemeriksaan {
     diagnosis: string | null;
     treatment: string | null;
     notes: string | null;
+    obats?: Array<{
+        id: number;
+        nama_obat: string;
+        dosis: string | null;
+        jumlah: number;
+        satuan: string | null;
+        harga: string | number;
+        keterangan: string | null;
+    }>;
 }
 
 export interface PemeriksaanPayload {
+    antrian_id?: number;
     pasien_id: number;
     poli_id: number;
     dokter_id?: number;

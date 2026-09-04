@@ -1,11 +1,13 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState, type FormEvent } from 'react';
+import { getAntrian, type Antrian } from '@/api/antrian';
 import { getPasiens, type Pasien } from '@/api/pasien';
 import { getPolis, type Poli } from '@/api/poli';
 import { type Pemeriksaan, type PemeriksaanPayload } from '@/api/pemeriksaan';
 
 interface PemeriksaanFormProps {
     initial?: Pemeriksaan | null;
+    initialAntrianId?: number;
     initialPasienId?: number;
     initialPoliId?: number;
     processing: boolean;
@@ -57,6 +59,7 @@ const toLocalInput = (value: string | null): string => {
 
 export default function PemeriksaanForm({
     initial,
+    initialAntrianId,
     initialPasienId,
     initialPoliId,
     processing,
@@ -65,6 +68,7 @@ export default function PemeriksaanForm({
 }: PemeriksaanFormProps) {
     const [pasiens, setPasiens] = useState<Pasien[]>([]);
     const [polis, setPolis] = useState<Poli[]>([]);
+    const [antrian, setAntrian] = useState<Antrian | null>(null);
     const [optionsLoaded, setOptionsLoaded] = useState(false);
 
     const [pasienId, setPasienId] = useState('');
@@ -96,6 +100,26 @@ export default function PemeriksaanForm({
     }, []);
 
     useEffect(() => {
+        if (!initialAntrianId) {
+            setAntrian(null);
+
+            return;
+        }
+
+        getAntrian(initialAntrianId)
+            .then((response) => {
+                setAntrian(response.data?.antrian ?? null);
+            })
+            .catch((error: any) => {
+                console.error('Gagal memuat tiket antrean', error);
+
+                if (error.response?.status === 401) {
+                    window.location.href = '/login';
+                }
+            });
+    }, [initialAntrianId]);
+
+    useEffect(() => {
         if (!optionsLoaded) {
             return;
         }
@@ -105,14 +129,18 @@ export default function PemeriksaanForm({
                 ? String(initial.pasien.id)
                 : initialPasienId
                   ? String(initialPasienId)
-                  : '',
+                  : antrian?.pendaftaran?.pasien?.id
+                    ? String(antrian.pendaftaran.pasien.id)
+                    : '',
         );
         setPoliId(
             initial?.poli?.id
                 ? String(initial.poli.id)
-                : initialPoliId
-                  ? String(initialPoliId)
-                  : '',
+                : antrian?.poli?.id
+                  ? String(antrian.poli.id)
+                  : initialPoliId
+                    ? String(initialPoliId)
+                    : '',
         );
         setDokterId(initial?.dokter?.id ? String(initial.dokter.id) : '');
         setCategory(initial?.category ?? '');
@@ -125,12 +153,20 @@ export default function PemeriksaanForm({
         setDiagnosis(initial?.diagnosis ?? '');
         setTreatment(initial?.treatment ?? '');
         setNotes(initial?.notes ?? '');
-    }, [initial, initialPasienId, initialPoliId, optionsLoaded]);
+    }, [
+        initial,
+        initialAntrianId,
+        initialPasienId,
+        initialPoliId,
+        optionsLoaded,
+        antrian,
+    ]);
 
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         onSubmit({
+            antrian_id: antrian ? antrian.id : undefined,
             pasien_id: Number(pasienId),
             poli_id: Number(poliId),
             dokter_id: dokterId ? Number(dokterId) : undefined,
@@ -154,6 +190,28 @@ export default function PemeriksaanForm({
                 </div>
             )}
 
+            {antrian && (
+                <div className="mb-4 flex flex-wrap items-center gap-3 rounded-[10px] bg-[#07577f]/5 p-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#07577f] text-[14px] font-bold text-white">
+                        {antrian.queue_number}
+                    </span>
+
+                    <div>
+                        <p className="text-[12px] text-gray-400">
+                            Nomor antrian yang sedang diproses
+                        </p>
+
+                        <p className="text-[13px] font-semibold text-gray-700">
+                            {antrian.pendaftaran?.pasien?.name ??
+                                'Pasien terdaftar'}{' '}
+                            <span className="font-normal text-gray-400">
+                                · {antrian.poli?.name ?? '-'}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* PASIEN */}
                 <div className="sm:col-span-2">
@@ -164,7 +222,20 @@ export default function PemeriksaanForm({
                     <select
                         id="pasien_id"
                         value={pasienId}
-                        onChange={(event) => setPasienId(event.target.value)}
+                        onChange={(event) => {
+                            const value = event.target.value;
+
+                            setPasienId(value);
+
+                            const selected = pasiens.find(
+                                (pasien) => String(pasien.id) === value,
+                            );
+
+                            if (selected?.poli) {
+                                setPoliId(String(selected.poli.id));
+                                setDokterId('');
+                            }
+                        }}
                         className={inputClass}
                     >
                         <option value="">Pilih pasien...</option>

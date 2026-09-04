@@ -208,13 +208,29 @@ export default function PemeriksaanShow() {
                                         ),
                                 )}
 
-                                <div className="mt-4">
+                                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                                     <Link
                                         href="/pemeriksaans"
                                         className="inline-flex h-[43px] items-center rounded-[12px] bg-[#d9d9d9] px-5 text-[13px] font-bold text-gray-600 transition hover:bg-[#c9c9c9]"
                                     >
                                         Kembali
                                     </Link>
+
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <Link
+                                            href={`/obats/create?pemeriksaan_id=${pemeriksaan.id}`}
+                                            className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#07577f]/10 px-4 text-[13px] font-bold text-[#07577f] transition hover:bg-[#07577f]/20"
+                                        >
+                                            Tambah Obat / Resep
+                                        </Link>
+
+                                        <Link
+                                            href={`/pembayarans/create?pemeriksaan_id=${pemeriksaan.id}`}
+                                            className="flex h-[43px] items-center gap-2 rounded-[12px] bg-emerald-600 px-4 text-[13px] font-bold text-white transition hover:bg-emerald-700 hover:shadow-md active:scale-[0.99]"
+                                        >
+                                            Buat Pembayaran
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </>

@@ -13,7 +13,10 @@ class RuanganService
     public function getAll(int $perPage = 10): LengthAwarePaginator
     {
         return Ruangan::query()
-            ->with('ruanganPasiens')
+            ->with([
+                'ruanganPasiens.antrian.poli',
+                'ruanganPasiens.pendaftaran',
+            ])
             ->latest()
             ->paginate($perPage);
     }
@@ -52,6 +55,8 @@ class RuanganService
 
             return $ruangan->ruanganPasiens()->create([
                 'pasien_id' => $pasien->id,
+                'antrian_id' => $data['antrian_id'] ?? null,
+                'pendaftaran_id' => $data['pendaftaran_id'] ?? null,
                 'pasien_name' => $pasien->name,
                 'pasien_mrn' => $pasien->medical_record_number,
                 'pasien_gender' => $pasien->gender,

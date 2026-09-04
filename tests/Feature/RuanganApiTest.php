@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\Antrian;
 use App\Models\Pasien;
+use App\Models\Pendaftaran;
 use App\Models\Ruangan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -135,6 +137,31 @@ it('can assign a pasien to a ruangan', function () {
         'ruangan_id' => $ruangan->id,
         'pasien_id' => $pasien->id,
         'pasien_name' => $pasien->name,
+    ]);
+});
+
+it('carries antrian and pendaftaran ids when assigning a pasien', function () {
+    $ruangan = Ruangan::factory()->create();
+    $paket = Pendaftaran::factory()->create();
+    $antrian = Antrian::factory()->for($paket->poli)->create();
+
+    $this->postJson(
+        "/api/v1/ruangans/{$ruangan->id}/pasiens",
+        [
+            'pasien_id' => $paket->pasien_id,
+            'antrian_id' => $antrian->id,
+            'pendaftaran_id' => $paket->id,
+        ],
+    )
+        ->assertCreated()
+        ->assertJsonPath('data.item.antrian_id', $antrian->id)
+        ->assertJsonPath('data.item.pendaftaran_id', $paket->id);
+
+    $this->assertDatabaseHas('ruangan_pasien', [
+        'ruangan_id' => $ruangan->id,
+        'pasien_id' => $paket->pasien_id,
+        'antrian_id' => $antrian->id,
+        'pendaftaran_id' => $paket->id,
     ]);
 });
 

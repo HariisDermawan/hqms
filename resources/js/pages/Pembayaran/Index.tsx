@@ -1,61 +1,85 @@
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import {
-    deletePemeriksaan,
-    getPemeriksaans,
-    type Pemeriksaan,
-} from '@/api/pemeriksaan';
-import { getPolis, type Poli } from '@/api/poli';
+    deletePembayaran,
+    getPembayarans,
+    type Pembayaran,
+    type StatusPembayaran,
+} from '@/api/pembayaran';
 import AppLayout from '@/Layouts/AppLayout';
 
-const formatDate = (value: string | null): string => {
-    if (!value) {
-        return '—';
-    }
+const formatRupiah = (value: string | number): string => {
+    const number = Number(value ?? 0);
 
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-        return '—';
-    }
-
-    return date.toLocaleString('id-ID', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(number);
 };
 
-export default function PemeriksaanIndex() {
-    const [items, setItems] = useState<Pemeriksaan[]>([]);
-    const [polis, setPolis] = useState<Poli[]>([]);
+const formatDate = (date: string | null): string => {
+    if (!date) {
+        return '-';
+    }
+
+    const [year, month, day] = date.split('-');
+
+    return `${day}/${month}/${year}`;
+};
+
+const metodeLabel = (metode: Pembayaran['metode']): string => {
+    const map: Record<Pembayaran['metode'], string> = {
+        cash: 'Tunai',
+        transfer: 'Transfer',
+        debit: 'Debit',
+        credit: 'Kredit',
+        qris: 'QRIS',
+    };
+
+    return map[metode] ?? metode;
+};
+
+const statusBadgeClass = (status: StatusPembayaran): string => {
+    const map: Record<StatusPembayaran, string> = {
+        unpaid: 'bg-amber-50 text-amber-600',
+        paid: 'bg-green-50 text-green-600',
+        refunded: 'bg-blue-50 text-blue-600',
+        cancelled: 'bg-gray-100 text-gray-500',
+    };
+
+    return map[status] ?? 'bg-gray-100 text-gray-500';
+};
+
+const statusLabel = (status: StatusPembayaran): string => {
+    const map: Record<StatusPembayaran, string> = {
+        unpaid: 'Belum Bayar',
+        paid: 'Lunas',
+        refunded: 'Refund',
+        cancelled: 'Dibatalkan',
+    };
+
+    return map[status] ?? status;
+};
+
+export default function PembayaranIndex() {
+    const [items, setItems] = useState<Pembayaran[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [search, setSearch] = useState('');
-    const [poliFilter, setPoliFilter] = useState('all');
-    const [page, setPage] = useState(1);
-    const [lastPage, setLastPage] = useState(1);
-    const [total, setTotal] = useState(0);
-    const [busyId, setBusyId] = useState<number | null>(null);
+    const [statusFilter, setStatusFilter] = useState('');
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
-    const load = useCallback(async (): Promise<void> => {
+    const load = useCallback(async () => {
         try {
             setLoading(true);
 
-            const [response, polisResponse] = await Promise.all([
-                getPemeriksaans(1, 100),
-                getPolis(1, 100),
-            ]);
+            const response = await getPembayarans(1, 100);
 
             setItems(response.data?.items ?? []);
-            setLastPage(response.data?.pagination?.last_page ?? 1);
-            setTotal(response.data?.pagination?.total ?? 0);
-            setPolis(polisResponse.data?.items ?? []);
             setError('');
         } catch (error: any) {
-            console.error('Gagal memuat pemeriksaan', error);
+            console.error('Gagal memuat pembayaran', error);
 
             if (error.response?.status === 401) {
                 window.location.href = '/login';
@@ -64,7 +88,7 @@ export default function PemeriksaanIndex() {
 
             setError(
                 error.response?.data?.message ||
-                    'Gagal mengambil data pemeriksaan.',
+                    'Gagal mengambil data pembayaran.',
             );
         } finally {
             setLoading(false);
@@ -75,9 +99,9 @@ export default function PemeriksaanIndex() {
         void load();
     }, [load]);
 
-    const handleDelete = async (pemeriksaan: Pemeriksaan) => {
+    const handleDelete = async (pembayaran: Pembayaran) => {
         const confirmed = window.confirm(
-            `Hapus pemeriksaan ${pemeriksaan.pasien?.name ?? ''}? Tindakan ini tidak bisa dibatalkan.`,
+            `Hapus ${pembayaran.invoice_number}? Tindakan ini tidak bisa dibatalkan.`,
         );
 
         if (!confirmed) {
@@ -85,28 +109,25 @@ export default function PemeriksaanIndex() {
         }
 
         try {
-            setBusyId(pemeriksaan.id);
+            setDeletingId(pembayaran.id);
 
-            await deletePemeriksaan(pemeriksaan.id);
+            await deletePembayaran(pembayaran.id);
 
             await load();
         } catch (error: any) {
-            console.error('Gagal menghapus pemeriksaan', error);
+            console.error('Gagal menghapus pembayaran', error);
 
             window.alert(
-                error.response?.data?.message || 'Gagal menghapus pemeriksaan.',
+                error.response?.data?.message || 'Gagal menghapus pembayaran.',
             );
         } finally {
-            setBusyId(null);
+            setDeletingId(null);
         }
     };
 
     const filtered = items
-        .filter((pemeriksaan) => {
-            if (
-                poliFilter !== 'all' &&
-                pemeriksaan.poli?.id !== Number(poliFilter)
-            ) {
+        .filter((pembayaran) => {
+            if (statusFilter && pembayaran.status !== statusFilter) {
                 return false;
             }
 
@@ -116,46 +137,46 @@ export default function PemeriksaanIndex() {
                 return true;
             }
 
-            const patientName = pemeriksaan.pasien?.name.toLowerCase() ?? '';
+            const invoice = pembayaran.invoice_number.toLowerCase();
+            const patientName =
+                pembayaran.pemeriksaan?.pasien?.name.toLowerCase() ?? '';
             const mrNumber =
-                pemeriksaan.pasien?.medical_record_number.toLowerCase() ?? '';
-            const category = (pemeriksaan.category ?? '').toLowerCase();
-            const poliName = pemeriksaan.poli?.name.toLowerCase() ?? '';
-            const dokterName = pemeriksaan.dokter?.name.toLowerCase() ?? '';
+                pembayaran.pemeriksaan?.pasien?.medical_record_number.toLowerCase() ??
+                '';
+            const queueNumber =
+                pembayaran.pemeriksaan?.queue_number?.toLowerCase() ?? '';
 
             return (
+                invoice.includes(keyword) ||
                 patientName.includes(keyword) ||
                 mrNumber.includes(keyword) ||
-                category.includes(keyword) ||
-                poliName.includes(keyword) ||
-                dokterName.includes(keyword)
+                queueNumber.includes(keyword)
             );
         })
-        .sort((a, b) => {
-            const ta = a.examined_at ? new Date(a.examined_at).getTime() : 0;
-            const tb = b.examined_at ? new Date(b.examined_at).getTime() : 0;
-
-            return tb - ta;
-        });
+        .sort(
+            (a, b) =>
+                (b.tanggal ?? '').localeCompare(a.tanggal ?? '') ||
+                b.invoice_number.localeCompare(a.invoice_number),
+        );
 
     return (
         <>
-            <Head title="Pemeriksaan" />
+            <Head title="Pembayaran" />
 
             <AppLayout wide>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
-                            Pemeriksaan
+                            Pembayaran
                         </h2>
 
                         <p className="mt-1 text-xs text-gray-400 sm:text-sm">
-                            Rekap hasil pemeriksaan pasien
+                            Tagihan pembayaran pasien
                         </p>
                     </div>
 
                     <Link
-                        href="/pemeriksaans/create"
+                        href="/pembayarans/create"
                         className="flex h-[43px] items-center gap-2 rounded-[12px] bg-[#084e7a] px-4 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99]"
                     >
                         <svg
@@ -164,18 +185,15 @@ export default function PemeriksaanIndex() {
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                            strokeWidth="2"
                         >
                             <path d="M12 5v14M5 12h14" />
                         </svg>
-                        Tambah
+                        Buat Pembayaran
                     </Link>
                 </div>
 
                 <div className="mt-4">
-                    {/* SEARCH + FILTERS */}
                     <div className="flex flex-col gap-2 sm:flex-row">
                         <div className="flex h-12 w-full flex-1 items-center rounded-full border border-gray-200 bg-white px-4 shadow-sm">
                             <svg
@@ -196,24 +214,23 @@ export default function PemeriksaanIndex() {
                                 onChange={(event) =>
                                     setSearch(event.target.value)
                                 }
-                                placeholder="Cari nama pasien, No. RM, kategori, poli, atau dokter..."
+                                placeholder="Cari No. invoice, nama pasien, No. RM, atau no. antrian..."
                                 className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                             />
                         </div>
 
                         <select
-                            value={poliFilter}
+                            value={statusFilter}
                             onChange={(event) =>
-                                setPoliFilter(event.target.value)
+                                setStatusFilter(event.target.value)
                             }
-                            className="h-11 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[190px]"
+                            className="h-11 w-full rounded-full border border-gray-200 bg-white px-4 text-xs text-gray-600 shadow-sm outline-none sm:w-[180px]"
                         >
-                            <option value="all">Semua Poli</option>
-                            {polis.map((poli) => (
-                                <option key={poli.id} value={poli.id}>
-                                    {poli.name}
-                                </option>
-                            ))}
+                            <option value="">Semua Status</option>
+                            <option value="unpaid">Belum Bayar</option>
+                            <option value="paid">Lunas</option>
+                            <option value="refunded">Refund</option>
+                            <option value="cancelled">Dibatalkan</option>
                         </select>
                     </div>
 
@@ -223,14 +240,13 @@ export default function PemeriksaanIndex() {
                         </div>
                     )}
 
-                    {/* TABLE */}
                     {loading ? (
                         <div className="mt-4 rounded-xl bg-white p-10 text-center text-sm text-gray-400 shadow-sm">
                             Memuat data...
                         </div>
                     ) : filtered.length === 0 ? (
                         <div className="mt-4 rounded-xl bg-white p-10 text-center text-sm text-gray-400 shadow-sm">
-                            Tidak ada pemeriksaan yang cocok.
+                            Tidak ada pembayaran yang cocok.
                         </div>
                     ) : (
                         <div className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm">
@@ -239,19 +255,25 @@ export default function PemeriksaanIndex() {
                                     <thead>
                                         <tr className="border-b border-gray-100 text-[11px] tracking-wide text-gray-400 uppercase">
                                             <th className="px-5 py-3.5 font-semibold">
+                                                No. Invoice
+                                            </th>
+                                            <th className="px-5 py-3.5 font-semibold">
                                                 Pasien
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Kategori
+                                                Antrian
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Poli / Dokter
+                                                Tanggal
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Diagnosis
+                                                Metode
                                             </th>
                                             <th className="px-5 py-3.5 font-semibold">
-                                                Waktu
+                                                Total
+                                            </th>
+                                            <th className="px-5 py-3.5 font-semibold">
+                                                Status
                                             </th>
                                             <th className="px-5 py-3.5 text-right font-semibold">
                                                 Aksi
@@ -260,93 +282,92 @@ export default function PemeriksaanIndex() {
                                     </thead>
 
                                     <tbody>
-                                        {filtered.map((pemeriksaan) => (
+                                        {filtered.map((pembayaran) => (
                                             <tr
-                                                key={pemeriksaan.id}
+                                                key={pembayaran.id}
                                                 className="border-b border-gray-50 last:border-0 hover:bg-[#f7f9fb]/60"
                                             >
                                                 <td className="px-5 py-3.5">
+                                                    <p className="text-[13px] font-bold text-[#07577f]">
+                                                        {
+                                                            pembayaran.invoice_number
+                                                        }
+                                                    </p>
+                                                </td>
+
+                                                <td className="px-5 py-3.5">
                                                     <p className="text-[13px] font-semibold text-gray-800">
-                                                        {pemeriksaan.pasien
-                                                            ?.name ?? '-'}
+                                                        {pembayaran.pemeriksaan
+                                                            ?.pasien?.name ??
+                                                            '-'}
                                                     </p>
 
                                                     <p className="text-[11px] text-gray-400">
                                                         No. RM{' '}
-                                                        {pemeriksaan.pasien
+                                                        {pembayaran.pemeriksaan
+                                                            ?.pasien
                                                             ?.medical_record_number ??
                                                             '-'}
                                                     </p>
                                                 </td>
 
                                                 <td className="px-5 py-3.5">
-                                                    <span className="inline-flex rounded-md bg-[#07577f]/10 px-2 py-1 text-[11px] font-bold text-[#07577f]">
-                                                        {pemeriksaan.category ??
+                                                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#07577f]/10 text-[13px] font-bold text-[#07577f]">
+                                                        {pembayaran.pemeriksaan
+                                                            ?.queue_number ??
                                                             '-'}
                                                     </span>
                                                 </td>
 
-                                                <td className="px-5 py-3.5">
-                                                    <p className="text-[12px] font-semibold text-gray-700">
-                                                        {pemeriksaan.poli
-                                                            ?.name ?? '-'}
-                                                    </p>
-
-                                                    <p className="text-[11px] text-gray-400">
-                                                        {pemeriksaan.dokter
-                                                            ?.name ?? '-'}
-                                                    </p>
-                                                </td>
-
-                                                <td className="max-w-[260px] px-5 py-3.5">
-                                                    <p className="truncate text-[12px] text-gray-600">
-                                                        {pemeriksaan.diagnosis ||
-                                                            '—'}
-                                                    </p>
-                                                </td>
-
-                                                <td className="px-5 py-3.5 text-[12px] text-gray-500">
+                                                <td className="px-5 py-3.5 text-[13px] text-gray-600">
                                                     {formatDate(
-                                                        pemeriksaan.examined_at,
+                                                        pembayaran.tanggal,
                                                     )}
+                                                </td>
+
+                                                <td className="px-5 py-3.5 text-[13px] text-gray-600">
+                                                    {metodeLabel(
+                                                        pembayaran.metode,
+                                                    )}
+                                                </td>
+
+                                                <td className="px-5 py-3.5 text-[13px] font-bold text-gray-800">
+                                                    {formatRupiah(
+                                                        pembayaran.total,
+                                                    )}
+                                                </td>
+
+                                                <td className="px-5 py-3.5">
+                                                    <span
+                                                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${statusBadgeClass(
+                                                            pembayaran.status,
+                                                        )}`}
+                                                    >
+                                                        {statusLabel(
+                                                            pembayaran.status,
+                                                        )}
+                                                    </span>
                                                 </td>
 
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Link
-                                                            href={`/pemeriksaans/${pemeriksaan.id}`}
+                                                            href={`/pembayarans/${pembayaran.id}`}
                                                             className="flex h-10 items-center gap-1.5 rounded-lg bg-[#07577f]/10 px-3 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20 sm:h-8"
                                                         >
                                                             Detail
                                                         </Link>
 
-                                                        <Link
-                                                            href={`/pemeriksaans/${pemeriksaan.id}/edit`}
-                                                            className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition hover:bg-blue-100 sm:h-8 sm:w-8"
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                className="h-[15px] w-[15px]"
-                                                                viewBox="0 0 24 24"
-                                                                fill="none"
-                                                                stroke="currentColor"
-                                                                strokeWidth="1.8"
-                                                            >
-                                                                <path d="M12 20h9" />
-                                                                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                                                            </svg>
-                                                        </Link>
-
                                                         <button
                                                             type="button"
-                                                            disabled={
-                                                                busyId ===
-                                                                pemeriksaan.id
-                                                            }
                                                             onClick={() =>
                                                                 handleDelete(
-                                                                    pemeriksaan,
+                                                                    pembayaran,
                                                                 )
+                                                            }
+                                                            disabled={
+                                                                deletingId ===
+                                                                pembayaran.id
                                                             }
                                                             className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 sm:h-8 sm:w-8"
                                                         >
@@ -368,39 +389,6 @@ export default function PemeriksaanIndex() {
                                         ))}
                                     </tbody>
                                 </table>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* PAGINATION */}
-                    {!loading && total > 0 && (
-                        <div className="mt-4 flex items-center justify-between rounded-xl bg-white px-5 py-3 shadow-sm">
-                            <p className="text-xs text-gray-400">
-                                Menampilkan {filtered.length} dari {total} data
-                            </p>
-
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    disabled={page <= 1}
-                                    onClick={() => setPage(page - 1)}
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
-                                >
-                                    ‹
-                                </button>
-
-                                <span className="min-w-[70px] text-center text-xs font-medium text-gray-500">
-                                    Hal {page} / {lastPage}
-                                </span>
-
-                                <button
-                                    type="button"
-                                    disabled={page >= lastPage}
-                                    onClick={() => setPage(page + 1)}
-                                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 transition hover:bg-[#f7f9fb] disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9"
-                                >
-                                    ›
-                                </button>
                             </div>
                         </div>
                     )}

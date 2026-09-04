@@ -1,33 +1,27 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-import { storePemeriksaan, type PemeriksaanPayload } from '@/api/pemeriksaan';
+import { storeObat, type ObatPayload } from '@/api/obat';
 import AppLayout from '@/Layouts/AppLayout';
-import PemeriksaanForm from './Form';
+import ObatForm from './Form';
 
-export default function PemeriksaanCreate() {
-    const {
-        antrian_id: antrianId,
-        pasien_id: pasienId,
-        poli_id: poliId,
-    } = usePage<{
-        antrian_id?: number;
-        pasien_id?: number;
-        poli_id?: number;
+export default function ObatCreate() {
+    const { pemeriksaan_id: pemeriksaanId } = usePage<{
+        pemeriksaan_id?: number;
     }>().props;
 
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
 
-    const handleSubmit = async (payload: PemeriksaanPayload) => {
+    const handleSubmit = async (payload: ObatPayload) => {
         setProcessing(true);
         setErrors({});
 
         try {
-            await storePemeriksaan(payload);
+            await storeObat(payload);
 
-            router.visit('/pemeriksaans');
+            router.visit('/obats');
         } catch (error: any) {
-            console.error('Gagal menyimpan pemeriksaan', error);
+            console.error('Gagal menyimpan obat', error);
 
             if (error.response?.status === 422) {
                 setErrors({
@@ -46,7 +40,7 @@ export default function PemeriksaanCreate() {
             setErrors({
                 general:
                     error.response?.data?.message ||
-                    'Gagal menyimpan data pemeriksaan.',
+                    'Gagal menyimpan data obat.',
             });
         } finally {
             setProcessing(false);
@@ -55,23 +49,21 @@ export default function PemeriksaanCreate() {
 
     return (
         <>
-            <Head title="Lanjut ke Pemeriksaan" />
+            <Head title="Tambah Obat" />
 
             <AppLayout wide>
                 <div>
                     <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
-                        Lanjut ke Pemeriksaan
+                        Tambah Obat
                     </h2>
 
                     <p className="mt-1 text-xs text-gray-400 sm:text-sm">
-                        Catat hasil pemeriksaan pasien
+                        Catat resep obat dari hasil pemeriksaan
                     </p>
                 </div>
 
-                <PemeriksaanForm
-                    initialAntrianId={antrianId}
-                    initialPasienId={pasienId}
-                    initialPoliId={poliId}
+                <ObatForm
+                    initialPemeriksaanId={pemeriksaanId}
                     processing={processing}
                     errors={errors}
                     onSubmit={handleSubmit}

@@ -14,6 +14,12 @@ class StorePemeriksaanRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'antrian_id' => [
+                'nullable',
+                'integer',
+                'exists:antrians,id',
+            ],
+
             'pasien_id' => [
                 'required',
                 'integer',

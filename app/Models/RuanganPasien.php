@@ -16,6 +16,8 @@ class RuanganPasien extends Model
     protected $fillable = [
         'ruangan_id',
         'pasien_id',
+        'antrian_id',
+        'pendaftaran_id',
         'pasien_name',
         'pasien_mrn',
         'pasien_gender',
@@ -41,5 +43,15 @@ class RuanganPasien extends Model
     public function pasien(): BelongsTo
     {
         return $this->belongsTo(Pasien::class);
+    }
+
+    public function antrian(): BelongsTo
+    {
+        return $this->belongsTo(Antrian::class);
+    }
+
+    public function pendaftaran(): BelongsTo
+    {
+        return $this->belongsTo(Pendaftaran::class);
     }
 }

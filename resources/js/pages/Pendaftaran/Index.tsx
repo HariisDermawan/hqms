@@ -328,6 +328,14 @@ export default function PendaftaranIndex() {
                                                 <td className="px-5 py-3.5">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Link
+                                                            href={`/pemeriksaans/create?antrian_id=${pendaftaran.antrian?.id ?? 0}&pasien_id=${pendaftaran.pasien?.id ?? 0}&poli_id=${pendaftaran.poli?.id ?? 0}`}
+                                                            title="Lanjut ke Pemeriksaan"
+                                                            className="flex h-8 items-center gap-1.5 rounded-lg bg-emerald-600 px-3 text-[11px] font-semibold text-white transition hover:bg-emerald-700"
+                                                        >
+                                                            Pemeriksaan
+                                                        </Link>
+
+                                                        <Link
                                                             href={`/pendaftarans/${pendaftaran.id}`}
                                                             className="flex h-10 items-center gap-1.5 rounded-lg bg-[#07577f]/10 px-3 text-[11px] font-semibold text-[#07577f] transition hover:bg-[#07577f]/20 sm:h-8"
                                                         >

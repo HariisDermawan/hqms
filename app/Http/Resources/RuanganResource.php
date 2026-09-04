@@ -28,10 +28,17 @@ class RuanganResource extends JsonResource
                         ->map(fn ($item) => [
                             'id' => $item->id,
                             'pasien_id' => $item->pasien_id,
+                            'antrian_id' => $item->antrian_id,
+                            'pendaftaran_id' => $item->pendaftaran_id,
                             'name' => $item->pasien_name,
                             'mrn' => $item->pasien_mrn,
                             'gender' => $item->pasien_gender,
                             'age' => $item->pasien_age,
+                            'queue_number' => $item->antrian?->queue_number,
+                            'poli' => [
+                                'id' => $item->antrian?->poli?->id,
+                                'name' => $item->antrian?->poli?->name,
+                            ],
                             'tanggal_masuk' => $item->tanggal_masuk?->format(
                                 'Y-m-d'
                             ),

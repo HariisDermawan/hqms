@@ -376,7 +376,7 @@ export default function AntrianShow({ id }: { id: number }) {
 
                                 {antrian.status === 'serving' && (
                                     <Link
-                                        href={`/pemeriksaans/create?pasien_id=${antrian.pendaftaran?.pasien?.id ?? ''}&poli_id=${antrian.poli?.id ?? ''}`}
+                                        href={`/pemeriksaans/create?antrian_id=${antrian.id}&pasien_id=${antrian.pendaftaran?.pasien?.id ?? ''}&poli_id=${antrian.poli?.id ?? ''}`}
                                         className="flex h-[43px] items-center justify-center gap-2 rounded-[12px] bg-green-600 text-[13px] font-bold text-white transition hover:bg-green-700 hover:shadow-md active:scale-[0.99]"
                                     >
                                         Lanjut ke Pemeriksaan

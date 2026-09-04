@@ -12,6 +12,13 @@ class PemeriksaanResource extends JsonResource
         return [
             'id' => $this->id,
 
+            'antrian' => [
+                'id' => $this->antrian?->id,
+                'queue_number' => $this->antrian?->queue_number,
+                'status' => $this->antrian?->status,
+                'loket' => $this->antrian?->loket,
+            ],
+
             'pasien' => [
                 'id' => $this->pasien?->id,
                 'medical_record_number' => $this->pasien?->medical_record_number,
@@ -37,6 +44,10 @@ class PemeriksaanResource extends JsonResource
             'diagnosis' => $this->diagnosis,
             'treatment' => $this->treatment,
             'notes' => $this->notes,
+
+            'obats' => ObatResource::collection(
+                $this->whenLoaded('obats')
+            ),
 
         ];
     }

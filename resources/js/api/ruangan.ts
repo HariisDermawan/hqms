@@ -5,10 +5,14 @@ import type { Pagination } from './dokter';
 export interface RuanganPasienItem {
     id: number;
     pasien_id: number;
+    antrian_id: number | null;
+    pendaftaran_id: number | null;
     name: string;
     mrn: string | null;
     gender: Gender | null;
     age: number | null;
+    queue_number: string | null;
+    poli: { id: number | null; name: string | null } | null;
     tanggal_masuk: string | null;
     tanggal_keluar: string | null;
 }
@@ -111,13 +115,19 @@ export interface AssignRuanganPasienResponse {
     };
 }
 
+export interface AssignRuanganPasienPayload {
+    pasien_id: number;
+    antrian_id?: number;
+    pendaftaran_id?: number;
+}
+
 export const assignRuanganPasien = async (
     ruanganId: number,
-    pasienId: number,
+    payload: AssignRuanganPasienPayload,
 ): Promise<AssignRuanganPasienResponse> => {
     const response = await api.post<AssignRuanganPasienResponse>(
         `/api/v1/ruangans/${ruanganId}/pasiens`,
-        { pasien_id: pasienId },
+        payload,
     );
 
     return response.data;

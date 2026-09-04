@@ -8,7 +8,9 @@ use App\Http\Controllers\Api\JadwalDokterController;
 use App\Http\Controllers\Api\KioskController;
 use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\MonitoringController;
+use App\Http\Controllers\Api\ObatController;
 use App\Http\Controllers\Api\PasienController;
+use App\Http\Controllers\Api\PembayaranController;
 use App\Http\Controllers\Api\PemeriksaanController;
 use App\Http\Controllers\Api\PendaftaranController;
 use App\Http\Controllers\Api\PerawatController;
@@ -61,6 +63,8 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::apiResource('presensis', PresensiController::class);
         Route::apiResource('jadwal-dokters', JadwalDokterController::class);
         Route::apiResource('pemeriksaans', PemeriksaanController::class);
+        Route::apiResource('obats', ObatController::class);
+        Route::apiResource('pembayarans', PembayaranController::class);
         Route::apiResource('faqs', FaqController::class);
         Route::apiResource('testimonials', TestimonialController::class);
         Route::apiResource('messages', MessageController::class);

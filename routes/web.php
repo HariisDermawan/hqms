@@ -5,7 +5,9 @@ use App\Models\Dokter;
 use App\Models\Faq;
 use App\Models\JadwalDokter;
 use App\Models\Message;
+use App\Models\Obat;
 use App\Models\Pasien;
+use App\Models\Pembayaran;
 use App\Models\Pemeriksaan;
 use App\Models\Pendaftaran;
 use App\Models\Perawat;
@@ -209,6 +211,7 @@ Route::get('/pendaftarans', function () {
 
 Route::get('/pemeriksaans/create', function (Request $request) {
     return Inertia::render('Pemeriksaan/Create', [
+        'antrian_id' => (int) $request->query('antrian_id', 0),
         'pasien_id' => (int) $request->query('pasien_id', 0),
         'poli_id' => (int) $request->query('poli_id', 0),
     ]);
@@ -229,6 +232,50 @@ Route::get('/pemeriksaans/{pemeriksaan}', function (Pemeriksaan $pemeriksaan) {
 Route::get('/pemeriksaans', function () {
     return Inertia::render('Pemeriksaan/Index');
 })->name('pemeriksaans.index');
+
+Route::get('/obats/create', function (Request $request) {
+    return Inertia::render('Obat/Create', [
+        'pemeriksaan_id' => (int) $request->query('pemeriksaan_id', 0),
+    ]);
+})->name('obats.create');
+
+Route::get('/obats/{obat}/edit', function (Obat $obat) {
+    return Inertia::render('Obat/Edit', [
+        'id' => $obat->id,
+    ]);
+})->name('obats.edit');
+
+Route::get('/obats/{obat}', function (Obat $obat) {
+    return Inertia::render('Obat/Show', [
+        'id' => $obat->id,
+    ]);
+})->name('obats.show');
+
+Route::get('/obats', function () {
+    return Inertia::render('Obat/Index');
+})->name('obats.index');
+
+Route::get('/pembayarans/create', function (Request $request) {
+    return Inertia::render('Pembayaran/Create', [
+        'pemeriksaan_id' => (int) $request->query('pemeriksaan_id', 0),
+    ]);
+})->name('pembayarans.create');
+
+Route::get('/pembayarans/{pembayaran}/edit', function (Pembayaran $pembayaran) {
+    return Inertia::render('Pembayaran/Edit', [
+        'id' => $pembayaran->id,
+    ]);
+})->name('pembayarans.edit');
+
+Route::get('/pembayarans/{pembayaran}', function (Pembayaran $pembayaran) {
+    return Inertia::render('Pembayaran/Show', [
+        'id' => $pembayaran->id,
+    ]);
+})->name('pembayarans.show');
+
+Route::get('/pembayarans', function () {
+    return Inertia::render('Pembayaran/Index');
+})->name('pembayarans.index');
 
 Route::get('/profile', function () {
     return Inertia::render('Profile/Index');
