@@ -6,108 +6,36 @@ type View = 'home' | 'polis' | 'ticket';
 
 const TICKET_DISMISS_MS = 5_000;
 
-const ACCENTS = [
-    'from-sky-500 to-blue-600',
-    'from-emerald-500 to-green-600',
-    'from-amber-500 to-orange-600',
-    'from-rose-500 to-pink-600',
-    'from-violet-500 to-purple-600',
-    'from-cyan-500 to-teal-600',
+const POLI_ICON_MAP: { keywords: string[]; src: string }[] = [
+    { keywords: ['gigi', 'mulut'], src: '/icons/Gigi.svg' },
+    { keywords: ['mata'], src: '/icons/iconDok2.svg' },
+    { keywords: ['jantung'], src: '/icons/iconDok3.svg' },
+    { keywords: ['umum'], src: '/icons/iconDok1.svg' },
+    { keywords: ['anak'], src: '/icons/iconDok1.svg' },
 ];
 
-const PoliIcon = ({ name }: { name: string }) => {
+const PoliIcon = ({ name, imageUrl }: { name: string; imageUrl?: string | null }) => {
     const n = name.toLowerCase();
+    const match = POLI_ICON_MAP.find((entry) =>
+        entry.keywords.some((keyword) => n.includes(keyword)),
+    );
 
-    if (n.includes('anak')) {
+    if (imageUrl) {
         return (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-            >
-                <circle cx="12" cy="8" r="3.5" />
-                <path d="M12 14c-4.2 0-7 2.5-7 5 0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2 0-2.5-2.8-5-7-5z" />
-                <path d="M5 8a7 7 0 0 1 14 0" />
-            </svg>
-        );
-    }
-
-    if (n.includes('gigi')) {
-        return (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-            >
-                <path d="M7 4c-1.5 0-3 1.5-3 3.5 0 3 1 5 2 7l1.2 4.8c.2.7 1.2.7 1.4 0l.6-2.3h1.6l.7 2.3c.2.7 1.2.7 1.4 0l1.2-4.8c1-2 2-4 2-7C17 5.5 15.5 4 14 4c-1.2 0-1.8.6-2 1.2-.3-.6-.9-1.2-2-1.2s-2 .6-3 0z" />
-            </svg>
-        );
-    }
-
-    if (n.includes('jantung')) {
-        return (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-            >
-                <path d="M12 20s-7-4.3-9-8.3C1.8 9 3 6 6 6c2 0 3 1 4 2l2 2 2-2c1-1 2-2 4-2 3 0 4.2 3 3 5.7-2 4-9 8.3-9 8.3z" />
-            </svg>
-        );
-    }
-
-    if (n.includes('mata')) {
-        return (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-            >
-                <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" />
-                <circle cx="12" cy="12" r="3" />
-            </svg>
-        );
-    }
-
-    if (n.includes('umum')) {
-        return (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-            >
-                <path d="M3 10h3l2 7 3-13 2 9 1-3h4" />
-            </svg>
+            <img
+                src={imageUrl}
+                alt={name}
+                className="h-12 w-12 object-contain"
+            />
         );
     }
 
     return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-7 w-7"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-        >
-            <rect x="5" y="3" width="14" height="18" rx="2" />
-            <path d="M9 7h6M9 11h6M9 15h4" />
-        </svg>
+        <img
+            src={match?.src ?? '/icons/iconDok1.svg'}
+            alt={name}
+            className="h-12 w-12 object-contain"
+        />
     );
 };
 
@@ -265,18 +193,18 @@ export default function KioskTicker() {
                         </div>
                     ) : view === 'polis' ? (
                         <div className="animate-fade-in-up flex flex-1 flex-col">
-                            <div className="flex items-center justify-between gap-3 rounded-3xl bg-white/95 p-5 shadow-2xl">
+                            <div className="flex items-center justify-between gap-3 overflow-hidden rounded-3xl bg-gradient-to-br from-[#07577f] to-[#0a8fd4] p-6 text-white shadow-2xl sm:p-7">
                                 <div className="flex min-w-0 items-center gap-4">
-                                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#07577f] to-[#0a8fd4] text-white shadow-lg">
+                                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white/15 ring-1 ring-white/30 backdrop-blur">
                                         <PoliIcon name="Poliklinik" />
                                     </div>
 
                                     <div className="min-w-0">
-                                        <p className="text-[12px] font-semibold tracking-[0.18em] text-[#07577f] uppercase">
+                                        <p className="text-[12px] font-semibold tracking-[0.2em] text-white/70 uppercase">
                                             Poliklinik
                                         </p>
 
-                                        <h2 className="mt-0.5 truncate text-xl font-black text-gray-800 sm:text-2xl">
+                                        <h2 className="mt-1 truncate text-2xl font-black sm:text-3xl">
                                             Pilih Poliklinik
                                         </h2>
                                     </div>
@@ -285,7 +213,7 @@ export default function KioskTicker() {
                                 <button
                                     type="button"
                                     onClick={backHome}
-                                    className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-gray-100 px-5 text-[13px] font-semibold text-gray-600 transition hover:bg-gray-200"
+                                    className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-white/15 px-5 text-[13px] font-semibold text-white ring-1 ring-white/30 transition hover:bg-white/25"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -314,10 +242,7 @@ export default function KioskTicker() {
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                                        {polis.map((poli, index) => {
-                                            const accent =
-                                                ACCENTS[index % ACCENTS.length];
-
+                                        {polis.map((poli) => {
                                             return (
                                                 <button
                                                     key={poli.id}
@@ -326,11 +251,9 @@ export default function KioskTicker() {
                                                     onClick={() =>
                                                         handlePick(poli)
                                                     }
-                                                    className="group flex flex-col items-center overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 text-center shadow-md transition hover:-translate-y-1 hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
+                                                    className="group flex flex-col items-center rounded-3xl border border-white/70 bg-white/90 p-6 text-center shadow-lg backdrop-blur transition hover:-translate-y-1 hover:border-sky-200 hover:shadow-2xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                                                 >
-                                                    <div
-                                                        className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${accent} text-white shadow-lg transition group-hover:scale-105`}
-                                                    >
+                                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-50 to-blue-100 shadow-sm ring-1 ring-sky-100 transition group-hover:scale-105">
                                                         <PoliIcon
                                                             name={poli.name}
                                                         />

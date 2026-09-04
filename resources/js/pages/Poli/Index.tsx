@@ -164,92 +164,23 @@ export default function PoliIndex() {
                                     key={poli.id}
                                     className="group overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                                 >
-                                    {/* IMAGE */}
+                                    {/* BANNER */}
                                     <Link
                                         href={`/polis/${poli.id}`}
-                                        className="block h-[140px]"
+                                        className="relative block h-[110px] bg-gradient-to-br from-[#07577f] to-[#0a8fd4]"
                                     >
-                                        {(poli.dokters?.length ?? 0) > 0 ? (
-                                            <div className="relative flex h-full w-full bg-[#07577f]">
-                                                {poli.dokters
-                                                    ?.slice(0, 2)
-                                                    .map((dokter, index) =>
-                                                        dokter.image_url ? (
-                                                            <img
-                                                                key={dokter.id}
-                                                                src={
-                                                                    dokter.image_url
-                                                                }
-                                                                alt={
-                                                                    dokter.name
-                                                                }
-                                                                className={
-                                                                    'h-full object-cover ' +
-                                                                    ((poli
-                                                                        .dokters
-                                                                        ?.length ??
-                                                                        0) > 1
-                                                                        ? 'w-1/2'
-                                                                        : 'w-full')
-                                                                }
-                                                                style={{
-                                                                    objectPosition: `center ${index === 0 ? '20%' : '35%'}`,
-                                                                }}
-                                                            />
-                                                        ) : (
-                                                            <div
-                                                                key={dokter.id}
-                                                                className={
-                                                                    (poli
-                                                                        .dokters
-                                                                        ?.length ??
-                                                                        0) > 1
-                                                                        ? 'flex w-1/2 items-center justify-center text-lg font-bold text-white'
-                                                                        : 'flex h-full w-full items-center justify-center text-3xl font-bold text-white'
-                                                                }
-                                                            >
-                                                                {dokter.name
-                                                                    ?.charAt(0)
-                                                                    ?.toUpperCase()}
-                                                            </div>
-                                                        ),
-                                                    )}
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/15 text-3xl font-black text-white ring-1 ring-white/30">
+                                                {poli.name
+                                                    ?.charAt(0)
+                                                    ?.toUpperCase()}
+                                            </span>
+                                        </div>
 
-                                                {(poli.dokters?.length ?? 0) >
-                                                    2 && (
-                                                    <span className="absolute right-2 bottom-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-[11px] font-bold text-white">
-                                                        +
-                                                        {poli.dokters!.length -
-                                                            2}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        ) : poli.image_url ? (
-                                            <img
-                                                src={poli.image_url}
-                                                alt={poli.name}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="flex h-full w-full items-center justify-center bg-[#07577f]/10">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-12 w-12 text-[#07577f]/40"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="1.2"
-                                                >
-                                                    <rect
-                                                        x="5"
-                                                        y="3"
-                                                        width="14"
-                                                        height="18"
-                                                        rx="2"
-                                                    />
-                                                    <path d="M9 7h6M9 11h6M9 15h4" />
-                                                </svg>
-                                            </div>
+                                        {poli.queue_prefix && (
+                                            <span className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-xs font-bold text-white ring-1 ring-white/30">
+                                                {poli.queue_prefix}
+                                            </span>
                                         )}
                                     </Link>
 

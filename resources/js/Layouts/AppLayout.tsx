@@ -49,15 +49,11 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
         <div className="min-h-screen w-full bg-[#f7f9fb]">
             <aside className="fixed top-0 left-0 z-50 hidden h-screen w-[250px] bg-[#07577f] text-white lg:flex lg:flex-col">
                 <div className="flex h-[86px] shrink-0 items-center border-b border-white/10 px-7">
-                    <div>
-                        <h1 className="text-[21px] font-bold tracking-tight">
-                            Rs Merdeka
-                        </h1>
-
-                        <p className="mt-0.5 text-[11px] font-medium tracking-wide text-white/50">
-                            Management System
-                        </p>
-                    </div>
+                    <img
+                        src="/assets/rs.png"
+                        alt="RS Merdeka"
+                        className="max-h-[60px] max-w-[200px] object-contain"
+                    />
                 </div>
                 <div className="flex-1 overflow-y-auto px-4 py-5">
                     <div className="mb-6">
