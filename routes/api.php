@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AntrianController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\DokterController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\JadwalDokterController;
@@ -30,6 +31,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
     Route::prefix('kiosk')->group(function () {
         Route::get('/polis', [KioskController::class, 'polis']);
         Route::get('/dokters', [KioskController::class, 'dokters']);
+        Route::get('/beritas', [KioskController::class, 'beritas']);
         Route::post('/tickets', [KioskController::class, 'store']);
         Route::get('/now-serving', [KioskController::class, 'nowServing']);
         Route::post('/attendance/scan', [
@@ -63,6 +65,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::apiResource('pasiens', PasienController::class);
         Route::apiResource('pendaftarans', PendaftaranController::class);
         Route::apiResource('antrians', AntrianController::class);
+        Route::apiResource('beritas', BeritaController::class);
         Route::apiResource('dokters', DokterController::class);
         Route::apiResource('perawats', PerawatController::class);
         Route::apiResource('presensis', PresensiController::class);

@@ -1,4 +1,5 @@
 import About from '@/components/About';
+import Berita from '@/components/Berita';
 import Dokter from '@/components/Dokter';
 import HeroSection from '@/components/HeroSection';
 import Jadwal from '@/components/Jadwal';
@@ -16,8 +17,9 @@ export default function welcome() {
                 <HeroSection />
                 <Dokter />
                 <About />
-                <LayananKencana />
                 <Jadwal />
+                <Berita />
+                <LayananKencana />
             </main>
         </>
     );

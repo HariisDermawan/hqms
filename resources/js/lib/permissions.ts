@@ -15,6 +15,7 @@ const MENU_PREFIX: Record<string, string> = {
     monitoring: '/monitorings',
     pasien: '/pasiens',
     poli: '/polis',
+    berita: '/beritas',
     dokter: '/dokters',
     jadwalDokter: '/jadwal-dokters',
     perawat: '/perawats',

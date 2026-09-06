@@ -1,11 +1,30 @@
 <?php
 
 use App\Models\Antrian;
+use App\Models\Berita;
 use App\Models\Dokter;
 use App\Models\Poli;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
+it('lists beritas publicly', function () {
+    $first = Berita::factory()->create([
+        'title' => 'Berita Pertama',
+        'slug' => 'berita-pertama',
+    ]);
+    Berita::factory()->create([
+        'title' => 'Berita Kedua',
+        'slug' => 'berita-kedua',
+    ]);
+
+    $this->getJson('/api/v1/kiosk/beritas')
+        ->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonCount(2, 'data.items')
+        ->assertJsonPath('data.items.0.id', $first->id)
+        ->assertJsonPath('data.items.0.title', 'Berita Pertama');
+});
 
 it('lists only active polis publicly', function () {
     $active = Poli::factory()->create(['is_active' => true]);

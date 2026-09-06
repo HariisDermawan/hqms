@@ -113,8 +113,8 @@ export default function LayananKencana() {
                     <p className="mt-4 max-w-[580px] text-sm leading-6 text-white/90 sm:text-base">
                         Nikmati pengalaman berobat yang istimewa dengan
                         pelayanan eksekutif berkelas, didukung tenaga medis
-                        profesional dan fasilitas premium yang telah
-                        disesuaikan untuk kenyamanan maksimal Anda.
+                        profesional dan fasilitas premium yang telah disesuaikan
+                        untuk kenyamanan maksimal Anda.
                     </p>
 
                     <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2">

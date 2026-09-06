@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ScanAttendanceRequest;
 use App\Http\Requests\StoreAntrianRequest;
 use App\Http\Resources\AntrianResource;
+use App\Http\Resources\BeritaResource;
 use App\Http\Resources\DokterResource;
 use App\Http\Resources\PoliResource;
 use App\Models\Antrian;
 use App\Models\Perawat;
 use App\Services\AntrianService;
+use App\Services\BeritaService;
 use App\Services\DokterService;
 use App\Services\PoliService;
 use App\Services\PresensiService;
@@ -22,6 +24,7 @@ class KioskController extends Controller
 {
     public function __construct(
         private readonly AntrianService $antrianService,
+        private readonly BeritaService $beritaService,
         private readonly DokterService $dokterService,
         private readonly PoliService $poliService,
         private readonly PresensiService $presensiService,
@@ -55,6 +58,22 @@ class KioskController extends Controller
             'message' => 'Active doctors retrieved successfully.',
             'data' => [
                 'items' => DokterResource::collection($dokters),
+            ],
+        ]);
+    }
+
+    /**
+     * List latest news available on the public landing page.
+     */
+    public function beritas(): JsonResponse
+    {
+        $beritas = $this->beritaService->getActive();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Latest news retrieved successfully.',
+            'data' => [
+                'items' => BeritaResource::collection($beritas),
             ],
         ]);
     }

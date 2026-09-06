@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Antrian;
+use App\Models\Berita;
 use App\Models\Dokter;
 use App\Models\Faq;
 use App\Models\JadwalDokter;
@@ -276,6 +277,26 @@ Route::get('/pembayarans/{pembayaran}', function (Pembayaran $pembayaran) {
 Route::get('/pembayarans', function () {
     return Inertia::render('Pembayaran/Index');
 })->name('pembayarans.index');
+
+Route::get('/beritas/create', function () {
+    return Inertia::render('Berita/Create');
+})->name('beritas.create');
+
+Route::get('/beritas/{berita}/edit', function (Berita $berita) {
+    return Inertia::render('Berita/Edit', [
+        'id' => $berita->id,
+    ]);
+})->name('beritas.edit');
+
+Route::get('/beritas/{berita}', function (Berita $berita) {
+    return Inertia::render('Berita/Show', [
+        'id' => $berita->id,
+    ]);
+})->name('beritas.show');
+
+Route::get('/beritas', function () {
+    return Inertia::render('Berita/Index');
+})->name('beritas.index');
 
 Route::get('/profile', function () {
     return Inertia::render('Profile/Index');
