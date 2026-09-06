@@ -170,7 +170,7 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 
 # Repository notes (RS Merdeka / HQMS)
 
-Stack: Laravel 13 (PHP 8.3) backend + Inertia v3 / React 19 SPA, session-based Sanctum auth, Spatie permissions. No README, no `.ai/rules` directory, and no repo-local OpenCode config (the boost block's project-rules step is a no-op here). Vite wrapper is `vite-plus` (`vp`), configured in `vite.config.ts` (not `.js`). CI runs in `.github/workflows/tests.yml`.
+Stack: Laravel 13 (PHP 8.3) backend + Inertia v3 / React 19 SPA, session-based Sanctum auth, Spatie permissions. There is no `.ai/rules` directory and no repo-local OpenCode config (the boost block's project-rules step is a no-op here). Vite wrapper is `vite-plus` (`vp`), configured in `vite.config.ts` (not `.js`). CI runs in `.github/workflows/tests.yml`. The `README.md` is a stale marketing skeleton (HRS Medika branding, "Sesuaikan dengan teknologi yang digunakan") — trust these notes and the code, not it.
 
 ## Commands
 
@@ -212,7 +212,7 @@ Stack: Laravel 13 (PHP 8.3) backend + Inertia v3 / React 19 SPA, session-based S
 
 ## Auth gotchas (hard-won)
 
-- Auth is cookie/session-based (Sanctum "stateful" requests), NOT bearer tokens. Stateful hosts come from `SANCTUM_STATEFUL_DOMAINS` env or the `config/sanctum.php` fallback (`localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1` — it is not set in `.env`/`.env.example`). If the host:port you open the app with is missing from that list: login succeeds, but the first authenticated API call after a page load returns 401 and the SPA bounces back to login.
+- Auth is cookie/session-based (Sanctum "stateful" requests), NOT bearer tokens. Stateful hosts come from `SANCTUM_STATEFUL_DOMAINS` env or the `config/sanctum.php` fallback (`localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1` — `.env.example` does not set it, though the local `.env` sets `127.0.0.1:8000,localhost:8000`). If the host:port you open the app with is missing from the effective list: login succeeds, but the first authenticated API call after a page load returns 401 and the SPA bounces back to login.
 - Seeded accounts (all password `password`, see `AdminSeeder`): `admin@hqms` (Super Admin), `staf_loket@hqms` (Staf Loket), `staf_obat@hqms` (Staf Obat), and five Dokter logins (`dr.budi@hqms`, `drg.siti@hqms`, `dr.andi@hqms`, `dr.dewi@hqms`, `dr.rahmat@hqms`).
 - Never hardcode the API base URL; keep `axios` requests same-origin (`resources/js/lib/axios.ts` uses `import.meta.env.VITE_API_URL || ''` with `withCredentials` + `withXSRFToken`). Leave `VITE_API_URL` unset unless the API is deliberately hosted elsewhere.
 - Manual API testing (curl/PowerShell) must replay the browser flow: load a web page or `/sanctum/csrf-cookie` to obtain the `XSRF-TOKEN` cookie, send it as `X-XSRF-TOKEN` on stateful POSTs, and reuse the cookie jar. In PowerShell, call `curl.exe` (plain `curl` aliases to `Invoke-WebRequest`).
