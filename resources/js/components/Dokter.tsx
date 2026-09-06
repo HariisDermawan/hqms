@@ -1,12 +1,14 @@
 import { Link } from '@inertiajs/react';
 import { getKioskDokters } from '@/api/kiosk';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface DokterCard {
     id: number;
     name: string;
     image_url: string | null;
 }
+
+const DRAG_THRESHOLD = 6;
 
 const getInitials = (name: string): string =>
     name
@@ -20,6 +22,85 @@ const getInitials = (name: string): string =>
 export default function Dokter() {
     const [dokters, setDokters] = useState<DokterCard[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isDragging, setIsDragging] = useState(false);
+    const scrollerRef = useRef<HTMLDivElement>(null);
+    const drag = useRef({
+        down: false,
+        moved: false,
+        startX: 0,
+        startLeft: 0,
+    });
+
+    const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (event.pointerType !== 'mouse' || event.button !== 0) {
+            return;
+        }
+
+        const scroller = scrollerRef.current;
+
+        if (!scroller) {
+            return;
+        }
+
+        drag.current = {
+            down: true,
+            moved: false,
+            startX: event.clientX,
+            startLeft: scroller.scrollLeft,
+        };
+    };
+
+    const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (!drag.current.down) {
+            return;
+        }
+
+        const scroller = scrollerRef.current;
+
+        if (!scroller) {
+            return;
+        }
+
+        if (!drag.current.moved) {
+            const delta = event.clientX - drag.current.startX;
+
+            if (Math.abs(delta) > DRAG_THRESHOLD) {
+                drag.current.moved = true;
+            }
+        }
+
+        if (drag.current.moved) {
+            scroller.scrollLeft =
+                drag.current.startLeft - (event.clientX - drag.current.startX);
+        }
+    };
+
+    const endDrag = () => {
+        drag.current.down = false;
+        setIsDragging(false);
+    };
+
+    const onPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+        if (event.pointerType !== 'mouse') {
+            return;
+        }
+
+        endDrag();
+    };
+
+    const onPointerLeave = () => {
+        endDrag();
+    };
+
+    const onClickCapture = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (drag.current.moved) {
+            event.preventDefault();
+            event.stopPropagation();
+            drag.current.moved = false;
+        }
+
+        setIsDragging(false);
+    };
 
     useEffect(() => {
         let active = true;
@@ -59,7 +140,7 @@ export default function Dokter() {
     return (
         <section className="bg-white py-16 sm:py-20">
             <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 md:px-10 lg:px-14">
-                <div className="flex items-end justify-between gap-4 sm:mb-10">
+                <div className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
                     <div>
                         <h2 className="text-2xl font-extrabold tracking-tight text-[#075985] sm:text-3xl">
                             Dokter
@@ -101,14 +182,24 @@ export default function Dokter() {
                         Belum ada dokter yang tersedia.
                     </p>
                 ) : (
-                    <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-5 pb-2 [scrollbar-width:none] sm:-mx-8 sm:px-8 md:-mx-10 md:px-10 lg:-mx-14 lg:px-14 [&::-webkit-scrollbar]:hidden">
+                    <div
+                        ref={scrollerRef}
+                        onPointerDown={onPointerDown}
+                        onPointerMove={onPointerMove}
+                        onPointerUp={onPointerUp}
+                        onPointerLeave={onPointerLeave}
+                        onClickCapture={onClickCapture}
+                        className={`-mx-5 flex snap-x snap-mandatory [scrollbar-width:none] gap-4 overflow-x-auto px-5 pb-3 sm:-mx-8 sm:px-8 md:-mx-10 md:px-10 lg:-mx-14 lg:px-14 [&::-webkit-scrollbar]:hidden ${
+                            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+                        }`}
+                    >
                         {dokters.map((dokter) => (
                             <Link
                                 key={dokter.id}
                                 href="/dokters"
                                 className="group w-[75%] shrink-0 snap-start rounded-3xl border border-slate-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:border-[#0284c7] hover:shadow-xl hover:shadow-sky-100 sm:w-[45%] md:w-[30%] lg:w-[24%]"
                             >
-                                <div className="mx-auto flex aspect-[3/4] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-2xl bg-[#075985]/10">
+                                <div className="mx-auto flex aspect-[3/4] w-full max-w-[220px] items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-[#075985]/10">
                                     {dokter.image_url ? (
                                         <img
                                             src={dokter.image_url}

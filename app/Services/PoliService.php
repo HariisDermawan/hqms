@@ -26,6 +26,7 @@ class PoliService
     public function getActive(): Collection
     {
         return Poli::query()
+            ->with('jadwalDokters.dokter')
             ->where('is_active', true)
             ->orderBy('name')
             ->get();

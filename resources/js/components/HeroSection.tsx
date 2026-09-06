@@ -52,7 +52,7 @@ function FloatingPoliCard() {
     }, []);
 
     return (
-        <div className="pointer-events-auto relative z-30 mx-auto -mt-20 w-[92%] max-w-7xl sm:-mt-24 sm:w-[88%]">
+        <div className="pointer-events-auto relative z-30 mx-auto mt-6 w-[92%] max-w-7xl sm:mt-8 sm:w-[88%] md:-mt-24">
             <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/95 shadow-2xl shadow-sky-950/30 backdrop-blur-xl">
                 {loading ? (
                     <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 sm:p-6 md:grid-cols-6">
