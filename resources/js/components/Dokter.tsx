@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { getKioskDokters, getKioskPolis, type KioskPoli } from '@/api/kiosk';
+import { getKioskDokters } from '@/api/kiosk';
 import { useEffect, useRef, useState } from 'react';
 
 interface JadwalCard {
@@ -12,6 +12,7 @@ interface JadwalCard {
 
 interface DokterCard {
     id: number;
+    slug: string | null;
     name: string;
     specialization?: string | null;
     image_url: string | null;
@@ -42,51 +43,71 @@ const getInitials = (name: string): string =>
 const selectClass =
     'h-12 w-full rounded-xl border border-slate-300 bg-white px-4 text-sm text-slate-700 outline-none transition focus:border-[#0284c7] focus:ring-2 focus:ring-[#0284c7]/20';
 
-function SearchDoctorCard({ specializations }: { specializations: string[] }) {
-    const [polis, setPolis] = useState<KioskPoli[]>([]);
+const DAY_TO_KEY: Record<string, string> = {
+    Senin: 'monday',
+    Selasa: 'tuesday',
+    Rabu: 'wednesday',
+    Kamis: 'thursday',
+    Jumat: 'friday',
+    Sabtu: 'saturday',
+    Minggu: 'sunday',
+};
+
+function SearchDoctorCard({ dokters }: { dokters: DokterCard[] }) {
     const [query, setQuery] = useState('');
     const [spec, setSpec] = useState('');
     const [hari, setHari] = useState('');
 
-    useEffect(() => {
-        let active = true;
-
-        const load = async () => {
-            try {
-                const response = await getKioskPolis();
-                if (active) {
-                    setPolis(response.data?.items ?? []);
-                }
-            } catch {
-                if (active) {
-                    setPolis([]);
-                }
-            }
-        };
-
-        void load();
-
-        return () => {
-            active = false;
-        };
-    }, []);
-
     const uniqueSpecs = Array.from(
         new Set(
-            specializations
+            dokters
+                .map((dokter) => dokter.specialization ?? '')
+                .filter((value) => Boolean(value && value.trim()))
+                .map((value) => value.trim()),
+        ),
+    );
+
+    const uniquePolis = Array.from(
+        new Set(
+            dokters
+                .flatMap((dokter) =>
+                    dokter.schedules.map((schedule) => schedule.poli ?? ''),
+                )
                 .filter((value) => Boolean(value && value.trim()))
                 .map((value) => value.trim()),
         ),
     );
 
     const combinedOptions = Array.from(
-        new Set(
-            [
-                ...uniqueSpecs,
-                ...polis.map((poli) => poli.name).filter(Boolean),
-            ].filter((value) => Boolean(value && value.trim())),
-        ),
+        new Set([...uniqueSpecs, ...uniquePolis]),
     );
+
+    const target = (() => {
+        const keyword = query.trim().toLowerCase();
+
+        let match: DokterCard | undefined = dokters.find(
+            (dokter) =>
+                dokter.name.toLowerCase().includes(keyword) ||
+                (dokter.specialization ?? '').toLowerCase().includes(keyword),
+        );
+
+        if (!match && spec) {
+            match = dokters.find(
+                (dokter) =>
+                    (dokter.specialization ?? '') === spec ||
+                    dokter.schedules.some((schedule) => schedule.poli === spec),
+            );
+        }
+
+        if (!match && hari) {
+            const dayKey = DAY_TO_KEY[hari];
+            match = dokters.find((dokter) =>
+                dokter.schedules.some((schedule) => schedule.day === dayKey),
+            );
+        }
+
+        return match;
+    })();
 
     return (
         <div className="relative z-10 mb-12 overflow-hidden rounded-3xl border border-[#075985]/10 bg-white shadow-2xl shadow-sky-100/70">
@@ -160,7 +181,11 @@ function SearchDoctorCard({ specializations }: { specializations: string[] }) {
                     </select>
 
                     <Link
-                        href="/dokters"
+                        href={
+                            target?.slug
+                                ? `/dokter/${target.slug}`
+                                : '/cari-dokter'
+                        }
                         className="flex h-12 items-center justify-center gap-2 rounded-xl bg-[#075985] px-5 text-sm font-bold text-white shadow-md shadow-sky-200/60 transition hover:bg-[#064e73] hover:shadow-lg active:scale-[0.98]"
                     >
                         <svg
@@ -280,6 +305,7 @@ export default function Dokter() {
                 setDokters(
                     (response.data?.items ?? []).map((dokter) => ({
                         id: dokter.id,
+                        slug: dokter.slug,
                         name: dokter.name,
                         specialization: dokter.specialization ?? null,
                         image_url: dokter.image_url ?? null,
@@ -307,11 +333,7 @@ export default function Dokter() {
     return (
         <section className="bg-white py-16 sm:py-20">
             <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 md:px-10 lg:px-14">
-                <SearchDoctorCard
-                    specializations={dokters.map(
-                        (dokter) => dokter.specialization ?? '',
-                    )}
-                />
+                <SearchDoctorCard dokters={dokters} />
 
                 <div className="mb-10 flex flex-col items-start gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div className="text-left">
@@ -324,7 +346,7 @@ export default function Dokter() {
                     </div>
 
                     <Link
-                        href="/dokters"
+                        href="/cari-dokter"
                         className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[#0369a1] transition hover:text-[#075985]"
                     >
                         Lihat Semua
@@ -377,7 +399,7 @@ export default function Dokter() {
                         {dokters.map((dokter) => (
                             <Link
                                 key={dokter.id}
-                                href="/dokters"
+                                href="/cari-dokter"
                                 className="group w-[75%] shrink-0 snap-start overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-md transition duration-300 hover:-translate-y-1.5 hover:border-[#bae6fd] hover:shadow-2xl hover:shadow-sky-100 sm:w-[45%] md:w-[30%] lg:w-[24%]"
                             >
                                 <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#f0f9ff]">

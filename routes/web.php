@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Resources\DokterResource;
 use App\Models\Antrian;
 use App\Models\Berita;
 use App\Models\Dokter;
@@ -21,6 +22,20 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::inertia('/', 'welcome')->name('home');
+Route::get('/cari-dokter', function () {
+    return Inertia::render('Dokter/Cari');
+})->name('cari-dokter');
+Route::get('/dokter/{dokter:slug}', function (Dokter $dokter) {
+    if (! $dokter->is_active) {
+        abort(404);
+    }
+
+    return Inertia::render('Dokter/Detail', [
+        'dokter' => (new DokterResource(
+            $dokter->load(['jadwalDokters.poli']),
+        ))->resolve(),
+    ]);
+})->name('dokter.detail');
 Route::get('/register', function () {
     return Inertia::render('Auth/Register');
 })->name('register');

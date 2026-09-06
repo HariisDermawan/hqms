@@ -12,6 +12,7 @@ class DokterSeeder extends Seeder
     {
         $dokters = [
             [
+                'slug' => 'dr-budi-santoso',
                 'code' => 'DR001',
                 'name' => 'dr. Budi Santoso',
                 'specialization' => 'Dokter Umum',
@@ -21,6 +22,7 @@ class DokterSeeder extends Seeder
                 'is_active' => true,
             ],
             [
+                'slug' => 'drg-siti-aminah',
                 'code' => 'DR002',
                 'name' => 'drg. Siti Aminah',
                 'specialization' => 'Dokter Gigi',
@@ -30,6 +32,7 @@ class DokterSeeder extends Seeder
                 'is_active' => true,
             ],
             [
+                'slug' => 'dr-andi-wijaya',
                 'code' => 'DR003',
                 'name' => 'dr. Andi Wijaya',
                 'specialization' => 'Dokter Mata',
@@ -39,6 +42,7 @@ class DokterSeeder extends Seeder
                 'is_active' => true,
             ],
             [
+                'slug' => 'dr-dewi-lestari',
                 'code' => 'DR004',
                 'name' => 'dr. Dewi Lestari',
                 'specialization' => 'Dokter Jantung',

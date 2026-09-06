@@ -10,6 +10,7 @@ export interface DokterSchedule {
 
 export interface Dokter {
     id: number;
+    slug: string | null;
     code: string;
     name: string;
     specialization?: string | null;

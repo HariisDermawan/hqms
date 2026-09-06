@@ -13,6 +13,7 @@ class DokterResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'slug' => $this->slug,
             'code' => $this->code,
             'name' => $this->name,
             'specialization' => $this->specialization,
