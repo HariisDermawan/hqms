@@ -1,5 +1,13 @@
 import api from '@/lib/axios';
 
+export interface DokterSchedule {
+    id: number;
+    day: string;
+    start_time: string;
+    end_time: string;
+    poli?: string | null;
+}
+
 export interface Dokter {
     id: number;
     code: string;
@@ -9,6 +17,7 @@ export interface Dokter {
     phone?: string | null;
     image_url?: string | null;
     is_active: boolean;
+    schedules?: DokterSchedule[];
 }
 
 export interface DokterPayload {

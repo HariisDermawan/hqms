@@ -14,7 +14,13 @@ const POLI_ICON_MAP: { keywords: string[]; src: string }[] = [
     { keywords: ['anak'], src: '/icons/iconDok1.svg' },
 ];
 
-const PoliIcon = ({ name, imageUrl }: { name: string; imageUrl?: string | null }) => {
+const PoliIcon = ({
+    name,
+    imageUrl,
+}: {
+    name: string;
+    imageUrl?: string | null;
+}) => {
     const n = name.toLowerCase();
     const match = POLI_ICON_MAP.find((entry) =>
         entry.keywords.some((keyword) => n.includes(keyword)),

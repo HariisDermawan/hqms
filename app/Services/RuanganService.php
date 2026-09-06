@@ -7,6 +7,7 @@ use App\Models\Pasien;
 use App\Models\Ruangan;
 use App\Models\RuanganPasien;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -22,6 +23,19 @@ class RuanganService
             ])
             ->latest()
             ->paginate($perPage);
+    }
+
+    /**
+     * @return Collection<int, Ruangan>
+     */
+    public function getActive(): Collection
+    {
+        return Ruangan::query()
+            ->with('poli')
+            ->where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('code')
+            ->get();
     }
 
     public function create(array $data): Ruangan

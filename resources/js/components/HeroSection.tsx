@@ -23,6 +23,7 @@ function poliIcon(poli: KioskPoli): string {
 function FloatingPoliCard() {
     const [polis, setPolis] = useState<KioskPoli[]>([]);
     const [loading, setLoading] = useState(true);
+    const [showAll, setShowAll] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -51,6 +52,7 @@ function FloatingPoliCard() {
         };
     }, []);
 
+    const visiblePolis = polis.slice(0, 5);
     return (
         <div className="pointer-events-auto relative z-30 mx-auto mt-6 w-[92%] max-w-7xl sm:mt-8 sm:w-[88%] md:-mt-24">
             <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/95 shadow-2xl shadow-sky-950/30 backdrop-blur-xl">
@@ -69,7 +71,7 @@ function FloatingPoliCard() {
                     </p>
                 ) : (
                     <div className="grid grid-cols-2 gap-3 overflow-x-auto p-4 sm:grid-cols-3 sm:p-6 md:grid-cols-6">
-                        {polis.map((poli) => (
+                        {visiblePolis.map((poli) => (
                             <Link
                                 key={poli.id}
                                 href="/ticket"
@@ -85,6 +87,39 @@ function FloatingPoliCard() {
                                 </span>
                             </Link>
                         ))}
+
+                        <button
+                            type="button"
+                            onClick={() => setShowAll((value) => !value)}
+                            className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#0284c7]/40 bg-[#f0f9ff] p-4 text-center transition hover:-translate-y-0.5 hover:border-[#0284c7] hover:bg-[#e0f2fe] hover:shadow-lg hover:shadow-sky-200/60"
+                        >
+                            <img
+                                src="/icons/dashboard.svg"
+                                alt="Show"
+                                className="h-10 w-10 shrink-0 object-contain transition group-hover:scale-110 sm:h-11 sm:w-11"
+                            />
+                            <span className="text-xs font-semibold text-[#075985] sm:text-sm">
+                                {showAll ? 'Show Less' : 'Show'}
+                            </span>
+                        </button>
+
+                        {showAll &&
+                            polis.slice(5).map((poli) => (
+                                <Link
+                                    key={poli.id}
+                                    href="/ticket"
+                                    className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-4 text-center transition hover:-translate-y-0.5 hover:border-[#0284c7] hover:shadow-lg hover:shadow-sky-200/60"
+                                >
+                                    <img
+                                        src={poliIcon(poli)}
+                                        alt={poli.name}
+                                        className="h-10 w-10 shrink-0 object-contain transition group-hover:scale-110 sm:h-11 sm:w-11"
+                                    />
+                                    <span className="line-clamp-2 text-xs leading-tight font-semibold text-slate-700 group-hover:text-[#075985] sm:text-sm">
+                                        {poli.name}
+                                    </span>
+                                </Link>
+                            ))}
                     </div>
                 )}
             </div>

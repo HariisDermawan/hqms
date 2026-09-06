@@ -28,6 +28,13 @@ class BeritaService
             ->get();
     }
 
+    public function getPaginated(int $perPage = 10): LengthAwarePaginator
+    {
+        return Berita::query()
+            ->latest()
+            ->paginate($perPage);
+    }
+
     public function create(array $data): Berita
     {
         return DB::transaction(function () use ($data) {

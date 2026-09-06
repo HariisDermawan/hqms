@@ -9,6 +9,7 @@ use App\Http\Resources\AntrianResource;
 use App\Http\Resources\BeritaResource;
 use App\Http\Resources\DokterResource;
 use App\Http\Resources\PoliResource;
+use App\Http\Resources\RuanganResource;
 use App\Models\Antrian;
 use App\Models\Perawat;
 use App\Services\AntrianService;
@@ -16,7 +17,9 @@ use App\Services\BeritaService;
 use App\Services\DokterService;
 use App\Services\PoliService;
 use App\Services\PresensiService;
+use App\Services\RuanganService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -28,6 +31,7 @@ class KioskController extends Controller
         private readonly DokterService $dokterService,
         private readonly PoliService $poliService,
         private readonly PresensiService $presensiService,
+        private readonly RuanganService $ruanganService,
     ) {}
 
     /**
@@ -63,17 +67,43 @@ class KioskController extends Controller
     }
 
     /**
-     * List latest news available on the public landing page.
+     * List latest news (paginated) available on the public landing page.
      */
-    public function beritas(): JsonResponse
+    public function beritas(Request $request): JsonResponse
     {
-        $beritas = $this->beritaService->getActive();
+        $beritas = $this->beritaService->getPaginated(
+            min(100, $request->integer('per_page', 8))
+        );
 
         return response()->json([
             'success' => true,
             'message' => 'Latest news retrieved successfully.',
             'data' => [
-                'items' => BeritaResource::collection($beritas),
+                'items' => BeritaResource::collection($beritas->items()),
+                'pagination' => [
+                    'current_page' => $beritas->currentPage(),
+                    'per_page' => $beritas->perPage(),
+                    'total' => $beritas->total(),
+                    'last_page' => $beritas->lastPage(),
+                    'from' => $beritas->firstItem(),
+                    'to' => $beritas->lastItem(),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * List active rooms available on the public landing page.
+     */
+    public function ruangans(): JsonResponse
+    {
+        $ruangans = $this->ruanganService->getActive();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Active rooms retrieved successfully.',
+            'data' => [
+                'items' => RuanganResource::collection($ruangans),
             ],
         ]);
     }

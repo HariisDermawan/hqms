@@ -4,6 +4,7 @@ use App\Models\Antrian;
 use App\Models\Berita;
 use App\Models\Dokter;
 use App\Models\Poli;
+use App\Models\Ruangan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -23,7 +24,26 @@ it('lists beritas publicly', function () {
         ->assertJsonPath('success', true)
         ->assertJsonCount(2, 'data.items')
         ->assertJsonPath('data.items.0.id', $first->id)
-        ->assertJsonPath('data.items.0.title', 'Berita Pertama');
+        ->assertJsonPath('data.items.0.title', 'Berita Pertama')
+        ->assertJsonPath('data.pagination.total', 2)
+        ->assertJsonPath('data.pagination.last_page', 1)
+        ->assertJsonPath('data.pagination.current_page', 1);
+});
+
+it('paginates beritas publicly', function () {
+    Berita::factory()->count(10)->create();
+
+    $this->getJson('/api/v1/kiosk/beritas?per_page=4')
+        ->assertOk()
+        ->assertJsonCount(4, 'data.items')
+        ->assertJsonPath('data.pagination.total', 10)
+        ->assertJsonPath('data.pagination.per_page', 4)
+        ->assertJsonPath('data.pagination.last_page', 3);
+
+    $this->getJson('/api/v1/kiosk/beritas?per_page=4&page=3')
+        ->assertOk()
+        ->assertJsonCount(2, 'data.items')
+        ->assertJsonPath('data.pagination.current_page', 3);
 });
 
 it('lists only active polis publicly', function () {
@@ -36,6 +56,23 @@ it('lists only active polis publicly', function () {
         ->assertJsonCount(1, 'data.items')
         ->assertJsonPath('data.items.0.id', $active->id)
         ->assertJsonMissing(['id' => $inactive->id]);
+});
+
+it('lists only active ruangans publicly', function () {
+    $active = Ruangan::factory()->create([
+        'name' => 'Kamar Anggrek',
+        'category' => 'Kamar VIP',
+        'is_active' => true,
+    ]);
+    Ruangan::factory()->create(['is_active' => false]);
+
+    $this->getJson('/api/v1/kiosk/ruangans')
+        ->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonCount(1, 'data.items')
+        ->assertJsonPath('data.items.0.id', $active->id)
+        ->assertJsonPath('data.items.0.name', 'Kamar Anggrek')
+        ->assertJsonPath('data.items.0.category', 'Kamar VIP');
 });
 
 it('lists only active doctors publicly', function () {

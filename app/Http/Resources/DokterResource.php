@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\JadwalDokter;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -23,6 +24,17 @@ class DokterResource extends JsonResource
                 : null,
 
             'is_active' => $this->is_active,
+
+            'schedules' => $this->jadwalDokters
+                ->where('is_active', true)
+                ->map(fn (JadwalDokter $jadwal): array => [
+                    'id' => $jadwal->id,
+                    'day' => $jadwal->day,
+                    'start_time' => $jadwal->start_time,
+                    'end_time' => $jadwal->end_time,
+                    'poli' => $jadwal->poli?->name,
+                ])
+                ->values(),
         ];
     }
 }

@@ -1,8 +1,10 @@
 import api from '@/lib/axios';
-import type { Berita } from './berita';
 import type { AntrianStatus } from './antrian';
+import type { Berita } from './berita';
 import type { Dokter } from './dokter';
+import type { Pagination } from './dokter';
 import type { Poli } from './poli';
+import type { Ruangan } from './ruangan';
 
 export interface KioskPoli extends Poli {}
 
@@ -53,6 +55,15 @@ export interface KioskBeritasResponse {
     message: string;
     data?: {
         items?: Berita[];
+        pagination?: Pagination;
+    };
+}
+
+export interface KioskRuangansResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        items?: Ruangan[];
     };
 }
 
@@ -86,9 +97,24 @@ export const getKioskDokters = async (): Promise<KioskDoktersResponse> => {
     return response.data;
 };
 
-export const getKioskBeritas = async (): Promise<KioskBeritasResponse> => {
+export const getKioskBeritas = async (
+    page = 1,
+): Promise<KioskBeritasResponse> => {
+    const searchParams = new URLSearchParams({
+        page: String(page),
+        per_page: '8',
+    });
+
     const response = await api.get<KioskBeritasResponse>(
-        '/api/v1/kiosk/beritas',
+        `/api/v1/kiosk/beritas?${searchParams.toString()}`,
+    );
+
+    return response.data;
+};
+
+export const getKioskRuangans = async (): Promise<KioskRuangansResponse> => {
+    const response = await api.get<KioskRuangansResponse>(
+        '/api/v1/kiosk/ruangans',
     );
 
     return response.data;

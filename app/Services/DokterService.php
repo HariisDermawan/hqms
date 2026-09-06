@@ -25,6 +25,7 @@ class DokterService
     {
         return Dokter::query()
             ->where('is_active', true)
+            ->with(['jadwalDokters.poli'])
             ->orderBy('name')
             ->get();
     }
