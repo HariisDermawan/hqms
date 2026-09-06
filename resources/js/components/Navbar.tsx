@@ -54,7 +54,7 @@ export default function Navbar() {
                     <Link href={register()} className="hidden rounded-full bg-[#075985] px-7 py-2.5 text-[12px] font-bold text-white transition hover:bg-[#064e73] hover:shadow-md lg:block" >
                         Buat Janji Tamu
                     </Link>
-
+                    
                     <Link href={register()} className="hidden rounded-full bg-[#075985] px-7 py-2.5 text-[12px] font-bold text-white transition hover:bg-[#064e73] hover:shadow-md lg:block">
                         Masuk / Daftar
                     </Link>
