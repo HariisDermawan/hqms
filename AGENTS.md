@@ -170,40 +170,49 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 
 # Repository notes (RS Merdeka / HQMS)
 
-Stack: Laravel 13 (PHP 8.3) backend + Inertia v3 / React 19 SPA, session-based Sanctum auth, Spatie permissions. No README, no CI workflows, no `.ai/rules` directory, and no repo-local OpenCode config (the boost block's project-rules step is a no-op here). Viten wrapper is `vite-plus` (`vp`), configured in `vite.config.ts` (not `.js`).
+Stack: Laravel 13 (PHP 8.3) backend + Inertia v3 / React 19 SPA, session-based Sanctum auth, Spatie permissions. No README, no `.ai/rules` directory, and no repo-local OpenCode config (the boost block's project-rules step is a no-op here). Vite wrapper is `vite-plus` (`vp`), configured in `vite.config.ts` (not `.js`). CI runs in `.github/workflows/tests.yml`.
 
 ## Commands
 
-- Dev: `composer run dev` (runs `php artisan dev`, starting Laravel server + Vite together). Frontend: `npm run dev` / `npm run build` (`vp build`)
+- Dev: `composer run dev` (runs `php artisan dev`, starting Laravel server + Vite together). Frontend: `npm run dev` / `npm run build` (`vp build`).
 - Verify after changes:
-    - PHP: `vendor/bin/pint` (or `composer run lint`), `composer run types:check` (= `phpstan analyse`, level 7 over `app/ config/ database/ routes/`), then `php artisan test --compact`.
-    - TS: `npm run types:check` (`tsc --noEmit`); `npm run check` (`vp check`, vite-plus formatter/lint gate, `denyWarnings: true`) — generated files under `resources/js/actions|routes|wayfinder` and `resources/js/components/ui/*` are ignore-listed in `vite.config.ts`.
+    - PHP: `vendor/bin/pint` (or `composer run lint`), then `php artisan test --compact`. (`composer run types:check` = phpstan, currently broken — see below.)
+    - TS: `npm run types:check` (`tsc --noEmit`); `npm run check` (`vp check`, vite-plus formatter/lint gate, `denyWarnings: true`). Only the generated dirs `resources/js/actions|routes|wayfinder` and `resources/js/components/ui/*` are ignore-listed in `vite.config.ts` — `resources/js/api/*` are hand-written and linted, so keep them formatted.
     - `composer run test` runs the full gate: config:clear → `pint --test` → phpstan → `php artisan test`. `composer run ci:check` = `npm run check` + `npm run types:check` + `composer run test`.
     - `npm run check` may fail on formatting even when `npm run types:check` passes — run `npm run check --fix` (or `vp check --fix`) to apply formatter.
-- Tests are Pest; feature tests auto-apply `RefreshDatabase` on in-memory SQLite (`phpunit.xml`). Run one test with `php artisan test --compact --filter=...` or `vendor/bin/pest <file>`.
+- CI (`.github/workflows/tests.yml`): on push to `main` and PRs runs `composer setup` (installs deps, copies `.env`, `key:generate`, migrates with `--force`, builds frontend; it does NOT seed) then `composer ci:check` — PHP 8.3, Node 22. Feature tests run against in-memory SQLite there, so new migrations must work on SQLite too.
+- Tests are Pest; feature tests run on in-memory SQLite (`phpunit.xml` sets `DB_CONNECTION=sqlite`, `:memory:`) and authenticate via `Sanctum::actingAs()` + `User::factory()` (see `tests/Feature/AntrianApiTest.php`). Run one test with `php artisan test --compact --filter=...` or `vendor/bin/pest <file>`.
 
-## Known broken gate (verify before relying on it)
+## Database divergence
 
-- **PHPStan currently cannot run** (`composer run test` and `composer run types:check` fail at bootstrap) with: `Undefined constant "Larastan\Larastan\LARAVEL_VERSION"` in `LarastanStubFilesExtension.php:25`. This is a Larastan 3.10 / Laravel 13 environment incompatibility that fails before analyzing any code — it is NOT caused by app changes. If you see it, fall back to `vendor/bin/pint` + `vendor/bin/pest` for PHP verification, and treat said two composer scripts as un-actionable until dependencies are fixed.
-- `vendor/bin/pint --test` is repo-wide; run `vendor/bin/pint` to fix all files (or `--dirty` for just changes) to keep the gate green.
+- Dev `.env` uses MySQL (`hqms_db`), but tests/CI run on in-memory SQLite. Keep migrations portable to both; avoid MySQL-only column types or raw SQL that SQLite rejects. Run tests locally (SQLite) before pushing.
+
+## Known broken gate (verified, not caused by your diff)
+
+- **PHPStan currently cannot run** — `composer run test` and `composer run types:check` fail at bootstrap with `Undefined constant "Larastan\Larastan\LARAVEL_VERSION"` in `LarastanStubFilesExtension.php:25`. This is a Larastan 3.x / Laravel 13 environment incompatibility that fails before analyzing any code — it is NOT caused by app changes. Fall back to `vendor/bin/pint` + `vendor/bin/pest` for PHP verification, and treat `composer run ci:check` / the GitHub `tests` workflow as failing at the phpstan step regardless of your diff.
+- `vendor/bin/pint --test` is repo-wide; run `vendor/bin/pint` to fix files (or `--dirty` for just changes) to keep the gate green.
 
 ## Architecture & conventions
 
-- API is versioned in `routes/api.php` under `Route::prefix('v1')`; every resource is behind `middleware('auth:sanctum')`.
+- API is versioned in `routes/api.php` under `Route::prefix('v1')->middleware(StartSession::class)`. This group has no `web` middleware, so the explicitly-added `StartSession::class` (`routes/api.php:24`) is what makes session auth work outside the web group — do not remove it.
+    - **Public (no auth):** `auth/register`, `auth/login`, and the `kiosk` group (polis, tickets, now-serving, attendance/scan).
+    - **`auth:sanctum`:** `auth/me`, `auth/me` PUT, `auth/me/password`, `auth/logout`; apiResources for `polis`, `ruangans`, `pasiens`, `pendaftarans`, `antrians`, `dokters`, `perawats`, `presensis`, `jadwal-dokters`, `pemeriksaans`, `obats`, `pembayarans`, `faqs`, `testimonials`, `messages`; custom ruangan sub-routes (`ruangans/{ruangan}/antrians`, `ruangans/{ruangan}/pasiens` POST/DELETE); and `monitoring` GET.
 - Per-resource pattern: `Api/*Controller` (thin, calls `Gate::authorize`) → `Services/*Service` (owns DB transactions) → `Requests/*Request` → `Resources/*Resource`.
 - Every API JSON response uses the envelope `{ success, message, data }`; list endpoints return `data.items` + `data.pagination` (see `PoliController::index`).
-- `routes/api.php` explicitly adds `StartSession::class` to the group — this is what makes session auth work outside the web group; do not remove it.
-- Frontend: pages in `resources/js/pages`; `routes/web.php` holds Inertia closures for the SPA pages. It renders far more than auth pages — one closure per CRUD route for Pasien, Poli, Dokter, JadwalDokter, Pendaftaran, Antrian, and a query-string-driven `Pemeriksaan/Create` (`/pemeriksaans/create?antrian_id=N`). API wrappers in `resources/js/api/*.ts` share the axios instance in `resources/js/lib/axios.ts`.
-- User resource exposes roles via Spatie (see `UserResource`). Seeders: `RolePermissionSeeder` + `AdminSeeder` + per-resource seeders.
+- Frontend: pages in `resources/js/pages` (per resource: `Index`/`Create`/`Edit`/`Show`, plus Kiosk, Dashboard, Monitoring, Auth, Profile). `routes/web.php` holds Inertia closures. Query-string-driven pages: `Pendaftaran/Create` (`?antrian_id=N`), `Pemeriksaan/Create` (`?antrian_id=N&pasien_id=N&poli_id=N`), `Obat/Create` and `Pembayaran/Create` (`?pemeriksaan_id=N`), `Message/Edit` (`?reply=1`). Kiosk routes: `/ticket`, `/antrians-ticker`, `/absen-karyawan`.
+- API wrappers in `resources/js/api/*.ts` share the axios instance in `resources/js/lib/axios.ts`. TS alias `@/*` → `resources/js/*`.
+- Wayfinder (`@laravel/vite-plugin-wayfinder`, `formVariants: true`) generates typed route functions at build/dev time into `resources/js/actions/**` (controllers) and `resources/js/routes|wayfinder/**` — treat those as generated; import from `@/actions/...` or `@/routes/...`.
+- User resource exposes roles via Spatie (`UserResource` → `getRoleNames()`). Seeders: `RolePermissionSeeder`, `AdminSeeder`, plus one seeder per resource.
 
 ## Domain rules (non-obvious)
 
-- **Queue number format** is `"{$poli->name} {$queue_prefix}-NNN"` (e.g. `Poli Umum A-002`), built in `PendaftaranService::create` from the poli's `queue_prefix` (A–Z, one letter per poli) + a 3-digit sequence per poli/date. `queue_prefix` lives on `polis` (added by migration `add_queue_prefix_to_polis_table`); `Antrian` copies `queue_number` from its `Pendaftaran`.
-- **Pendaftaran ↔ Antrian status are kept in sync** in `AntrianService`: `called`/`serving`/`completed` mirror directly; Antrian `skipped` resets Pendaftaran to `waiting`; deleting an Antrian reverts its Pendaftaran to `waiting`.
+- **Queue number format** is `"{$poli->queue_prefix}-NNN"` (e.g. `B-001`; no poli name prefix), built in `AntrianService::create` (per poli + date, including soft-deleted rows via `withTrashed()`) and `PendaftaranService::generateQueueNumber`. `queue_prefix` lives on `polis` (A–Z, one letter per poli, seeded). Carefully check the current format before writing tests or assertions — it changed with the ticket rework.
+- **Ticket ↔ Pendaftaran link**: the `antrian_id` FK lives on `pendaftarans` (migration `rework_antrian_ticket_and_pendaftaran_link`). When a Pendaftaran is created with `antrian_id` set, it copies the Antrian's `queue_number`/`poli_id`, assigns a `REG-YYYYMMDD-{prefix}NNN` registration number, and marks the Antrian `called`. `Pendaftaran` status mirrors `Antrian` status in `AntrianService::update`: `called`/`serving`/`completed` copy directly; Antrian `skipped` resets Pendaftaran to `waiting`; deleting an Antrian reverts its Pendaftaran to `waiting`.
+- `Antrian` and `Pendaftaran` each have their own `queue_number`; the Antrian number is generated independently at ticket time (per poli/date), while Pendaftaran copies it when linked to a ticket.
 
 ## Auth gotchas (hard-won)
 
-- Auth is cookie/session-based (Sanctum "stateful" requests), NOT bearer tokens. `.env` `SANCTUM_STATEFUL_DOMAINS` must contain the exact host you open the app with (currently `127.0.0.1:8000,localhost:8000`). If a host is missing there: login succeeds, but the first authenticated API call after a page load returns 401 (web pages encrypt the session cookie via `EncryptCookies`; non-stateful API requests don't get matching handling) and the SPA bounces back to login.
-- Seeded login: `admin@hqms` / `password` (role `Super Admin`).
-- Never hardcode the API base URL; keep `axios` requests same-origin (`resources/js/lib/axios.ts` uses `import.meta.env.VITE_API_URL || ''`). Leave `VITE_API_URL` unset unless the API is deliberately hosted elsewhere.
+- Auth is cookie/session-based (Sanctum "stateful" requests), NOT bearer tokens. Stateful hosts come from `SANCTUM_STATEFUL_DOMAINS` env or the `config/sanctum.php` fallback (`localhost,localhost:3000,127.0.0.1,127.0.0.1:8000,::1` — it is not set in `.env`/`.env.example`). If the host:port you open the app with is missing from that list: login succeeds, but the first authenticated API call after a page load returns 401 and the SPA bounces back to login.
+- Seeded accounts (all password `password`, see `AdminSeeder`): `admin@hqms` (Super Admin), `staf_loket@hqms` (Staf Loket), `staf_obat@hqms` (Staf Obat), and five Dokter logins (`dr.budi@hqms`, `drg.siti@hqms`, `dr.andi@hqms`, `dr.dewi@hqms`, `dr.rahmat@hqms`).
+- Never hardcode the API base URL; keep `axios` requests same-origin (`resources/js/lib/axios.ts` uses `import.meta.env.VITE_API_URL || ''` with `withCredentials` + `withXSRFToken`). Leave `VITE_API_URL` unset unless the API is deliberately hosted elsewhere.
 - Manual API testing (curl/PowerShell) must replay the browser flow: load a web page or `/sanctum/csrf-cookie` to obtain the `XSRF-TOKEN` cookie, send it as `X-XSRF-TOKEN` on stateful POSTs, and reuse the cookie jar. In PowerShell, call `curl.exe` (plain `curl` aliases to `Invoke-WebRequest`).
