@@ -29,6 +29,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
 
     Route::prefix('kiosk')->group(function () {
         Route::get('/polis', [KioskController::class, 'polis']);
+        Route::get('/dokters', [KioskController::class, 'dokters']);
         Route::post('/tickets', [KioskController::class, 'store']);
         Route::get('/now-serving', [KioskController::class, 'nowServing']);
         Route::post('/attendance/scan', [

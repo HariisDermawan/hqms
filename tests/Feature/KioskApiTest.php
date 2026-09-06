@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Antrian;
+use App\Models\Dokter;
 use App\Models\Poli;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -11,6 +12,18 @@ it('lists only active polis publicly', function () {
     $inactive = Poli::factory()->create(['is_active' => false]);
 
     $this->getJson('/api/v1/kiosk/polis')
+        ->assertOk()
+        ->assertJsonPath('success', true)
+        ->assertJsonCount(1, 'data.items')
+        ->assertJsonPath('data.items.0.id', $active->id)
+        ->assertJsonMissing(['id' => $inactive->id]);
+});
+
+it('lists only active doctors publicly', function () {
+    $active = Dokter::factory()->create(['is_active' => true]);
+    $inactive = Dokter::factory()->create(['is_active' => false]);
+
+    $this->getJson('/api/v1/kiosk/dokters')
         ->assertOk()
         ->assertJsonPath('success', true)
         ->assertJsonCount(1, 'data.items')
