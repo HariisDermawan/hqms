@@ -47,7 +47,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         ]);
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware(['auth:sanctum', 'session.fresh'])->group(function () {
         Route::prefix('auth')->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::put('/me', [AuthController::class, 'updateProfile']);

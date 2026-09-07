@@ -32,6 +32,11 @@ class AuthService
 
         request()->session()->regenerate();
 
+        request()->session()->put(
+            \App\Http\Middleware\EnsureSessionFreshness::LOGINED_AT_KEY,
+            now()->timestamp,
+        );
+
         return Auth::user();
     }
 

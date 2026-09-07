@@ -4,14 +4,7 @@ import { useState } from 'react';
 
 function MenuIcon() {
     return (
-        <svg
-            className="h-7 w-7"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-        >
+        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" >
             <path d="M4 6H20" />
             <path d="M4 12H20" />
             <path d="M4 18H20" />
@@ -21,14 +14,7 @@ function MenuIcon() {
 
 function CloseIcon() {
     return (
-        <svg
-            className="h-7 w-7"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-        >
+        <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" >
             <path d="M6 6L18 18" />
             <path d="M18 6L6 18" />
         </svg>
@@ -54,16 +40,8 @@ export default function Navbar() {
     return (
         <header className="fixed top-0 right-0 left-0 z-50 px-3 pt-3 sm:px-4 lg:px-6">
             <nav className="mx-auto flex h-[68px] w-full max-w-7xl items-center justify-between rounded-2xl border border-t-2 border-[#075985]/10 border-t-[#075985] bg-white/95 px-4 shadow-[0_8px_30px_rgba(0,0,0,0.08)] backdrop-blur-md sm:px-5 lg:px-8">
-                <Link
-                    href="/"
-                    onClick={closeMobile}
-                    className="flex shrink-0 items-center gap-2 text-[#075985]"
-                >
-                    <img
-                        src="/assets/LG1.png"
-                        alt="Rs Merdeka"
-                        className="h-20 w-auto object-contain sm:h-19"
-                    />
+                <Link href="/" onClick={closeMobile} className="flex shrink-0 items-center gap-2 text-[#075985]" >
+                    <img src="/assets/LG1.png" alt="Rs Merdeka" className="h-20 w-auto object-contain sm:h-19" />
                 </Link>
                 <div className="hidden items-center gap-5 lg:flex">
                     {navLinks.map((item) => (
