@@ -11,6 +11,7 @@ use App\Models\Obat;
 use App\Models\Pasien;
 use App\Models\Pembayaran;
 use App\Models\Pemeriksaan;
+use App\Models\Penawaran;
 use App\Models\Pendaftaran;
 use App\Models\Perawat;
 use App\Models\Poli;
@@ -312,6 +313,26 @@ Route::get('/beritas/{berita}', function (Berita $berita) {
 Route::get('/beritas', function () {
     return Inertia::render('Berita/Index');
 })->name('beritas.index');
+
+Route::get('/penawarans/create', function () {
+    return Inertia::render('Penawaran/Create');
+})->name('penawarans.create');
+
+Route::get('/penawarans/{penawaran}/edit', function (Penawaran $penawaran) {
+    return Inertia::render('Penawaran/Edit', [
+        'id' => $penawaran->id,
+    ]);
+})->name('penawarans.edit');
+
+Route::get('/penawarans/{penawaran}', function (Penawaran $penawaran) {
+    return Inertia::render('Penawaran/Show', [
+        'id' => $penawaran->id,
+    ]);
+})->name('penawarans.show');
+
+Route::get('/penawarans', function () {
+    return Inertia::render('Penawaran/Index');
+})->name('penawarans.index');
 
 Route::get('/profile', function () {
     return Inertia::render('Profile/Index');

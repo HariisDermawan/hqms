@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ObatController;
 use App\Http\Controllers\Api\PasienController;
 use App\Http\Controllers\Api\PembayaranController;
 use App\Http\Controllers\Api\PemeriksaanController;
+use App\Http\Controllers\Api\PenawaranController;
 use App\Http\Controllers\Api\PendaftaranController;
 use App\Http\Controllers\Api\PerawatController;
 use App\Http\Controllers\Api\PoliController;
@@ -32,6 +33,11 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::get('/polis', [KioskController::class, 'polis']);
         Route::get('/dokters', [KioskController::class, 'dokters']);
         Route::get('/beritas', [KioskController::class, 'beritas']);
+        Route::get('/penawarans', [KioskController::class, 'penawarans']);
+        Route::get('/jadwal-dokters', [
+            KioskController::class,
+            'jadwalDokters',
+        ]);
         Route::get('/ruangans', [KioskController::class, 'ruangans']);
         Route::post('/tickets', [KioskController::class, 'store']);
         Route::get('/now-serving', [KioskController::class, 'nowServing']);
@@ -67,6 +73,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::apiResource('pendaftarans', PendaftaranController::class);
         Route::apiResource('antrians', AntrianController::class);
         Route::apiResource('beritas', BeritaController::class);
+        Route::apiResource('penawarans', PenawaranController::class);
         Route::apiResource('dokters', DokterController::class);
         Route::apiResource('perawats', PerawatController::class);
         Route::apiResource('presensis', PresensiController::class);

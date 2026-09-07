@@ -6,6 +6,7 @@ import Jadwal from '@/components/Jadwal';
 import LayananKencana from '@/components/LayananKencana';
 import LayananRuangan from '@/components/LayananRuangan';
 import Navbar from '@/components/Navbar';
+import Penawaran from '@/components/Penawaran';
 import { Head } from '@inertiajs/react';
 import React from 'react';
 
@@ -18,6 +19,7 @@ export default function welcome() {
                 <HeroSection />
                 <Dokter />
                 <About />
+                <Penawaran />
                 <Jadwal />
                 <LayananRuangan />
                 <Berita />

@@ -95,7 +95,7 @@ export default function About() {
 
             <div className="pointer-events-none absolute bottom-0 left-[-40px] z-[2] h-[78%] w-[82%] sm:bottom-[-60px] sm:h-[78%] sm:w-[76%] md:bottom-[-20px] md:h-[74%] md:w-[54%] lg:bottom-[-10px] lg:h-[86%] lg:w-[52%] xl:bottom-0 xl:h-[90%] xl:w-[50%]">
                 <img
-                    src="/banner/hero.png"
+                    src="/banner/lg.png"
                     alt="Doctor"
                     className="absolute bottom-0 left-0 h-full w-auto max-w-none object-contain object-bottom sm:left-[-25px] md:left-[-15px] lg:left-[-10px] xl:left-0"
                 />

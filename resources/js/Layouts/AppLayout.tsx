@@ -669,6 +669,27 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                     <span>Berita</span>
                                 </Link>
                             )}
+
+                            {/* Penawaran */}
+                            {canAccess('/penawarans') && (
+                                <Link
+                                    href="/penawarans"
+                                    className={linkNav(isActive('/penawarans'))}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 7.65l.78.77L12 20.68l7.64-7.65.78-.77a5.4 5.4 0 0 0 0-7.68Z" />
+                                    </svg>
+
+                                    <span>Penawaran</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>

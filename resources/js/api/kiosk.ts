@@ -3,6 +3,7 @@ import type { AntrianStatus } from './antrian';
 import type { Berita } from './berita';
 import type { Dokter } from './dokter';
 import type { Pagination } from './dokter';
+import type { Penawaran } from './penawaran';
 import type { Poli } from './poli';
 import type { Ruangan } from './ruangan';
 
@@ -59,6 +60,15 @@ export interface KioskBeritasResponse {
     };
 }
 
+export interface KioskPenawaransResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        items?: Penawaran[];
+        pagination?: Pagination;
+    };
+}
+
 export interface KioskRuangansResponse {
     success: boolean;
     message: string;
@@ -107,6 +117,21 @@ export const getKioskBeritas = async (
 
     const response = await api.get<KioskBeritasResponse>(
         `/api/v1/kiosk/beritas?${searchParams.toString()}`,
+    );
+
+    return response.data;
+};
+
+export const getKioskPenawarans = async (
+    page = 1,
+): Promise<KioskPenawaransResponse> => {
+    const searchParams = new URLSearchParams({
+        page: String(page),
+        per_page: '8',
+    });
+
+    const response = await api.get<KioskPenawaransResponse>(
+        `/api/v1/kiosk/penawarans?${searchParams.toString()}`,
     );
 
     return response.data;

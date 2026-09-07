@@ -98,6 +98,12 @@ class RolePermissionSeeder extends Seeder
             'news.update',
             'news.delete',
 
+            // Penawaran
+            'offer.view',
+            'offer.create',
+            'offer.update',
+            'offer.delete',
+
             // Pengumuman
             'announcement.view',
             'announcement.create',
@@ -203,6 +209,11 @@ class RolePermissionSeeder extends Seeder
                 'news.create',
                 'news.update',
                 'news.delete',
+
+                'offer.view',
+                'offer.create',
+                'offer.update',
+                'offer.delete',
 
                 'announcement.view',
                 'announcement.create',

@@ -8,13 +8,17 @@ use App\Http\Requests\StoreAntrianRequest;
 use App\Http\Resources\AntrianResource;
 use App\Http\Resources\BeritaResource;
 use App\Http\Resources\DokterResource;
+use App\Http\Resources\JadwalDokterResource;
+use App\Http\Resources\PenawaranResource;
 use App\Http\Resources\PoliResource;
 use App\Http\Resources\RuanganResource;
 use App\Models\Antrian;
+use App\Models\JadwalDokter;
 use App\Models\Perawat;
 use App\Services\AntrianService;
 use App\Services\BeritaService;
 use App\Services\DokterService;
+use App\Services\PenawaranService;
 use App\Services\PoliService;
 use App\Services\PresensiService;
 use App\Services\RuanganService;
@@ -30,6 +34,7 @@ class KioskController extends Controller
         private readonly BeritaService $beritaService,
         private readonly DokterService $dokterService,
         private readonly PoliService $poliService,
+        private readonly PenawaranService $penawaranService,
         private readonly PresensiService $presensiService,
         private readonly RuanganService $ruanganService,
     ) {}
@@ -93,6 +98,40 @@ class KioskController extends Controller
     }
 
     /**
+     * List active doctor schedules (weekly) for the public jadwal poli page.
+     */
+    public function jadwalDokters(): JsonResponse
+    {
+        $dayOrder = [
+            'monday' => 0,
+            'tuesday' => 1,
+            'wednesday' => 2,
+            'thursday' => 3,
+            'friday' => 4,
+            'saturday' => 5,
+            'sunday' => 6,
+        ];
+
+        $jadwals = JadwalDokter::query()
+            ->with(['dokter', 'poli'])
+            ->where('is_active', true)
+            ->get()
+            ->sortBy(fn (JadwalDokter $jadwal) => [
+                $dayOrder[$jadwal->day] ?? 7,
+                $jadwal->start_time ?? '00:00:00',
+            ])
+            ->values();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Doctor schedules retrieved successfully.',
+            'data' => [
+                'items' => JadwalDokterResource::collection($jadwals),
+            ],
+        ]);
+    }
+
+    /**
      * List active rooms available on the public landing page.
      */
     public function ruangans(): JsonResponse
@@ -104,6 +143,32 @@ class KioskController extends Controller
             'message' => 'Active rooms retrieved successfully.',
             'data' => [
                 'items' => RuanganResource::collection($ruangans),
+            ],
+        ]);
+    }
+
+    /**
+     * List latest offers (paginated) available on the public landing page.
+     */
+    public function penawarans(Request $request): JsonResponse
+    {
+        $penawarans = $this->penawaranService->getAll(
+            min(100, $request->integer('per_page', 8))
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Latest offers retrieved successfully.',
+            'data' => [
+                'items' => PenawaranResource::collection($penawarans->items()),
+                'pagination' => [
+                    'current_page' => $penawarans->currentPage(),
+                    'per_page' => $penawarans->perPage(),
+                    'total' => $penawarans->total(),
+                    'last_page' => $penawarans->lastPage(),
+                    'from' => $penawarans->firstItem(),
+                    'to' => $penawarans->lastItem(),
+                ],
             ],
         ]);
     }
