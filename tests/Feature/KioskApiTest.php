@@ -61,7 +61,6 @@ it('lists only active polis publicly', function () {
 it('lists only active ruangans publicly', function () {
     $active = Ruangan::factory()->create([
         'name' => 'Kamar Anggrek',
-        'category' => 'Kamar VIP',
         'is_active' => true,
     ]);
     Ruangan::factory()->create(['is_active' => false]);

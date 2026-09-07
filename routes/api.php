@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BeritaController;
 use App\Http\Controllers\Api\DokterController;
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\FasilitasController;
 use App\Http\Controllers\Api\JadwalDokterController;
 use App\Http\Controllers\Api\KioskController;
 use App\Http\Controllers\Api\MessageController;
@@ -39,6 +40,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
             'jadwalDokters',
         ]);
         Route::get('/ruangans', [KioskController::class, 'ruangans']);
+        Route::get('/fasilitas', [FasilitasController::class, 'active']);
         Route::post('/tickets', [KioskController::class, 'store']);
         Route::get('/now-serving', [KioskController::class, 'nowServing']);
         Route::post('/attendance/scan', [
@@ -56,6 +58,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         });
 
         Route::apiResource('polis', PoliController::class);
+        Route::apiResource('fasilitas', FasilitasController::class);
         Route::apiResource('ruangans', RuanganController::class);
         Route::get('ruangans/{ruangan}/antrians', [
             RuanganController::class,

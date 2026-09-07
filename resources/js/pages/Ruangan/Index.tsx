@@ -81,33 +81,34 @@ export default function RuanganIndex() {
         return (
             ruangan.name.toLowerCase().includes(keyword) ||
             ruangan.code.toLowerCase().includes(keyword) ||
-            ruangan.category.toLowerCase().includes(keyword) ||
+            (ruangan.facility?.name ?? '').toLowerCase().includes(keyword) ||
             (ruangan.description ?? '').toLowerCase().includes(keyword)
         );
     });
 
-    const groupByCategory = (
+    const groupByFacility = (
         items: Ruangan[],
     ): Array<{
-        category: string;
+        facility: string;
         items: Ruangan[];
     }> => {
         const map = new Map<string, Ruangan[]>();
 
         items.forEach((item) => {
-            const list = map.get(item.category) ?? [];
+            const key = item.facility?.name ?? 'Tanpa Fasilitas';
+            const list = map.get(key) ?? [];
 
             list.push(item);
 
-            map.set(item.category, list);
+            map.set(key, list);
         });
 
         return Array.from(map.entries())
             .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([category, list]) => ({ category, items: list }));
+            .map(([facility, list]) => ({ facility, items: list }));
     };
 
-    const groups = groupByCategory(filtered);
+    const groups = groupByFacility(filtered);
 
     return (
         <>
@@ -162,7 +163,7 @@ export default function RuanganIndex() {
                             type="text"
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
-                            placeholder="Cari nama, kode, atau kategori ruangan..."
+                            placeholder="Cari nama, kode, atau nama fasilitas..."
                             className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400"
                         />
                     </div>
@@ -184,10 +185,10 @@ export default function RuanganIndex() {
                         </div>
                     ) : (
                         groups.map((group) => (
-                            <section key={group.category} className="mt-6">
+                            <section key={group.facility} className="mt-6">
                                 <h3 className="flex items-center gap-2 text-[13px] font-bold text-gray-700">
                                     <span className="h-2 w-2 rounded-full bg-[#07577f]" />
-                                    {group.category}
+                                    {group.facility}
                                     <span className="text-[11px] font-medium text-gray-400">
                                         ({group.items.length})
                                     </span>
@@ -221,7 +222,7 @@ export default function RuanganIndex() {
                                                     </p>
 
                                                     <p className="truncate text-[10px] font-semibold tracking-wide text-[#07577f]/60 uppercase">
-                                                        {ruangan.category}
+                                                        {ruangan.facility?.name ?? 'Tanpa Fasilitas'}
                                                     </p>
                                                 </div>
                                             </div>

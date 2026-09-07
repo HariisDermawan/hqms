@@ -25,10 +25,10 @@ class StoreRuanganRequest extends FormRequest
                 'string',
                 'max:255',
             ],
-            'category' => [
-                'required',
-                'string',
-                'max:100',
+            'facility_id' => [
+                'nullable',
+                'integer',
+                'exists:fasilitas,id',
             ],
             'poli_id' => [
                 'nullable',

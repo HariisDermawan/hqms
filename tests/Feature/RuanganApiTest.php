@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Antrian;
+use App\Models\Fasilitas;
 use App\Models\Pasien;
 use App\Models\Pendaftaran;
 use App\Models\Poli;
@@ -37,10 +38,12 @@ it('can list ruangans', function () {
 });
 
 it('can create a ruangan', function () {
+    $fasilitas = Fasilitas::factory()->create();
+
     $this->postJson('/api/v1/ruangans', [
         'code' => 'A-01',
         'name' => 'Ruang Anggrek 01',
-        'category' => 'Kamar VIP',
+        'facility_id' => $fasilitas->id,
         'description' => 'Kamar VIP.',
         'is_active' => true,
     ])
@@ -48,7 +51,8 @@ it('can create a ruangan', function () {
         ->assertJsonPath('success', true)
         ->assertJsonPath('data.ruangan.name', 'Ruang Anggrek 01')
         ->assertJsonPath('data.ruangan.code', 'A-01')
-        ->assertJsonPath('data.ruangan.category', 'Kamar VIP')
+        ->assertJsonPath('data.ruangan.facility.name', $fasilitas->name)
+        ->assertJsonPath('data.ruangan.facility.id', $fasilitas->id)
         ->assertJsonPath('data.ruangan.is_active', true);
 
     $this->assertDatabaseHas('ruangans', [
@@ -60,7 +64,7 @@ it('can create a ruangan', function () {
 it('validates required fields when creating a ruangan', function () {
     $this->postJson('/api/v1/ruangans', [])
         ->assertStatus(422)
-        ->assertJsonValidationErrors(['code', 'name', 'category']);
+        ->assertJsonValidationErrors(['code', 'name']);
 });
 
 it('rejects a duplicate ruangan code', function () {
@@ -69,7 +73,6 @@ it('rejects a duplicate ruangan code', function () {
     $this->postJson('/api/v1/ruangans', [
         'code' => 'A-01',
         'name' => 'Ruang Anggrek 02',
-        'category' => 'Kamar VIP',
     ])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['code']);
@@ -89,11 +92,12 @@ it('can show a ruangan', function () {
 
 it('can update a ruangan', function () {
     $ruangan = Ruangan::factory()->create();
+    $fasilitas = Fasilitas::factory()->create();
 
     $this->putJson("/api/v1/ruangans/{$ruangan->id}", [
         'code' => 'B-02',
         'name' => 'Ruang Mawar 02',
-        'category' => 'Kamar Kelas 1',
+        'facility_id' => $fasilitas->id,
         'description' => 'Kamar Kelas 1 baru.',
         'is_active' => false,
     ])
@@ -120,9 +124,7 @@ it('can delete a ruangan', function () {
 });
 
 it('can assign a pasien to a ruangan', function () {
-    $ruangan = Ruangan::factory()->create([
-        'category' => 'Kamar Kelas 1',
-    ]);
+    $ruangan = Ruangan::factory()->create();
     $pasien = Pasien::factory()->create();
 
     $this->postJson(
@@ -144,9 +146,7 @@ it('can assign a pasien to a ruangan', function () {
 });
 
 it('carries antrian and pendaftaran ids when assigning a pasien', function () {
-    $ruangan = Ruangan::factory()->create([
-        'category' => 'Kamar Kelas 1',
-    ]);
+    $ruangan = Ruangan::factory()->create();
     $paket = Pendaftaran::factory()->create();
     $antrian = Antrian::factory()->for($paket->poli)->create();
 
@@ -225,9 +225,10 @@ it('can remove a pasien from a ruangan', function () {
 });
 
 it('exposes a pasien assigned room in pasien detail', function () {
+    $fasilitas = Fasilitas::factory()->create();
     $ruangan = Ruangan::factory()->create([
         'name' => 'Ruang Mawar 01',
-        'category' => 'Kamar Kelas 1',
+        'facility_id' => $fasilitas->id,
     ]);
     $pasien = Pasien::factory()->create();
 
@@ -244,13 +245,15 @@ it('exposes a pasien assigned room in pasien detail', function () {
         ->assertOk()
         ->assertJsonCount(1, 'data.pasien.ruangans')
         ->assertJsonPath('data.pasien.ruangans.0.name', 'Ruang Mawar 01')
-        ->assertJsonPath('data.pasien.ruangans.0.category', 'Kamar Kelas 1');
+        ->assertJsonPath(
+            'data.pasien.ruangans.0.facility',
+            $fasilitas->name
+        );
 });
 
 it('requires an antrian ticket when assigning to a poli room', function () {
     $poli = Poli::factory()->create();
     $ruangan = Ruangan::factory()->create([
-        'category' => 'Poli',
         'poli_id' => $poli->id,
     ]);
     $pasien = Pasien::factory()->create();
@@ -267,7 +270,6 @@ it('rejects an antrian from a different poli for a poli room', function () {
     $ruanganPoli = Poli::factory()->create();
     $otherPoli = Poli::factory()->create();
     $ruangan = Ruangan::factory()->create([
-        'category' => 'Poli',
         'poli_id' => $ruanganPoli->id,
     ]);
     $paket = Pendaftaran::factory()->create(['poli_id' => $otherPoli->id]);
@@ -288,7 +290,6 @@ it('rejects an antrian from a different poli for a poli room', function () {
 it('lists assignable antrian tickets for a ruangan poli', function () {
     $poli = Poli::factory()->create();
     $ruangan = Ruangan::factory()->create([
-        'category' => 'Poli',
         'poli_id' => $poli->id,
     ]);
     $matching = Pendaftaran::factory()->create(['poli_id' => $poli->id]);

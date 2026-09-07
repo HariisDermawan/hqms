@@ -55,7 +55,7 @@ export default function RuanganShow() {
     const [adding, setAdding] = useState(false);
     const [showForm, setShowForm] = useState(false);
 
-    const isPoliRoom = ruangan?.category?.toLowerCase() === 'poli';
+    const isPoliRoom = ruangan?.poli?.id !== null && ruangan?.poli?.id !== undefined;
 
     const loadPasienOptions = async () => {
         try {
@@ -251,7 +251,7 @@ export default function RuanganShow() {
 
                                         <p className="mt-1 text-[12px]">
                                             <span className="font-semibold text-gray-700">
-                                                {ruangan.category}
+                                                {ruangan.facility?.name ?? 'Tanpa Fasilitas'}
                                             </span>
                                         </p>
                                     </div>
@@ -281,8 +281,8 @@ export default function RuanganShow() {
                                     {detailItem('ID', String(ruangan.id), true)}
                                     {detailItem('Kode', ruangan.code, true)}
                                     {detailItem(
-                                        'Kategori',
-                                        ruangan.category,
+                                        'Fasilitas',
+                                        ruangan.facility?.name ?? 'Tanpa Fasilitas',
                                         true,
                                     )}
                                     {detailItem('Nama Ruangan', ruangan.name)}

@@ -43,7 +43,7 @@ class PasienResource extends JsonResource
                             'id' => $item->ruangan->id,
                             'code' => $item->ruangan->code,
                             'name' => $item->ruangan->name,
-                            'category' => $item->ruangan->category,
+                            'facility' => $item->ruangan->facility?->name,
                             'tanggal_masuk' => $item->tanggal_masuk?->format(
                                 'Y-m-d'
                             ),

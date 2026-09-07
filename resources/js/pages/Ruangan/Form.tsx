@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState, type FormEvent } from 'react';
+import { getFasilitases, type Fasilitas } from '@/api/fasilitas';
 import { getPolis, type Poli } from '@/api/poli';
 import type { Ruangan, RuanganPayload } from '@/api/ruangan';
 
@@ -17,23 +18,6 @@ const inputClass =
 
 const labelClass = 'block text-[13px] text-[#333] mb-[4px]';
 
-const CATEGORIES = [
-    'IGD',
-    'Poli',
-    'Ruang Pemeriksaan',
-    'Ruang Rawat Inap',
-    'Kamar VIP',
-    'Kamar Kelas 1',
-    'Kamar Kelas 2',
-    'Kamar Kelas 3',
-    'Isolasi',
-    'ICU',
-    'NICU',
-    'PICU',
-    'Ruang Operasi',
-    'Ruang Khusus',
-];
-
 export default function RuanganForm({
     initial,
     processing,
@@ -42,15 +26,26 @@ export default function RuanganForm({
 }: RuanganFormProps) {
     const [code, setCode] = useState(initial?.code ?? '');
     const [name, setName] = useState(initial?.name ?? '');
-    const [category, setCategory] = useState(initial?.category ?? '');
+    const [facilityId, setFacilityId] = useState(
+        initial?.facility?.id ? String(initial.facility.id) : '',
+    );
     const [poliId, setPoliId] = useState(
         initial?.poli?.id ? String(initial.poli.id) : '',
     );
     const [description, setDescription] = useState(initial?.description ?? '');
     const [isActive, setIsActive] = useState(initial?.is_active ?? true);
+    const [fasilitases, setFasilitases] = useState<Fasilitas[]>([]);
     const [polis, setPolis] = useState<Poli[]>([]);
 
     useEffect(() => {
+        getFasilitases(1, 100)
+            .then((response) => {
+                setFasilitases(response.data?.items ?? []);
+            })
+            .catch((error: any) => {
+                console.error('Gagal memuat opsi fasilitas', error);
+            });
+
         getPolis(1, 100)
             .then((response) => {
                 setPolis(response.data?.items ?? []);
@@ -66,8 +61,8 @@ export default function RuanganForm({
         onSubmit({
             code,
             name,
-            category,
-            poli_id: category === 'Poli' && poliId ? Number(poliId) : undefined,
+            facility_id: facilityId ? Number(facilityId) : undefined,
+            poli_id: poliId ? Number(poliId) : undefined,
             description: description || undefined,
             is_active: isActive,
         });
@@ -132,64 +127,63 @@ export default function RuanganForm({
                     )}
                 </div>
 
-                {/* KATEGORI */}
+                {/* FASILITAS */}
                 <div>
-                    <label htmlFor="category" className={labelClass}>
-                        Kategori
+                    <label htmlFor="facility_id" className={labelClass}>
+                        Fasilitas
                     </label>
 
                     <select
-                        id="category"
-                        value={category}
-                        onChange={(event) => setCategory(event.target.value)}
+                        id="facility_id"
+                        value={facilityId}
+                        onChange={(event) => setFacilityId(event.target.value)}
                         className={inputClass}
                     >
-                        <option value="">Pilih kategori ruangan...</option>
+                        <option value="">Pilih fasilitas...</option>
 
-                        {CATEGORIES.map((item) => (
-                            <option key={item} value={item}>
-                                {item}
+                        {fasilitases.map((item) => (
+                            <option key={item.id} value={item.id}>
+                                {item.name}
                             </option>
                         ))}
                     </select>
 
-                    {errors.category && (
+                    {errors.facility_id && (
                         <p className="mt-1 text-[11px] text-red-500">
-                            {errors.category}
+                            {errors.facility_id}
                         </p>
                     )}
                 </div>
 
-                {category === 'Poli' && (
-                    <div>
-                        <label htmlFor="poli_id" className={labelClass}>
-                            Poli
-                        </label>
+                {/* POLI */}
+                <div>
+                    <label htmlFor="poli_id" className={labelClass}>
+                        Poli
+                    </label>
 
-                        <select
-                            id="poli_id"
-                            value={poliId}
-                            onChange={(event) => setPoliId(event.target.value)}
-                            className={inputClass}
-                        >
-                            <option value="">
-                                Pilih poli untuk ruangan ini...
+                    <select
+                        id="poli_id"
+                        value={poliId}
+                        onChange={(event) => setPoliId(event.target.value)}
+                        className={inputClass}
+                    >
+                        <option value="">
+                            Pilih poli untuk ruangan ini...
+                        </option>
+
+                        {polis.map((poli) => (
+                            <option key={poli.id} value={poli.id}>
+                                {poli.name}
                             </option>
+                        ))}
+                    </select>
 
-                            {polis.map((poli) => (
-                                <option key={poli.id} value={poli.id}>
-                                    {poli.name}
-                                </option>
-                            ))}
-                        </select>
-
-                        {errors.poli_id && (
-                            <p className="mt-1 text-[11px] text-red-500">
-                                {errors.poli_id}
-                            </p>
-                        )}
-                    </div>
-                )}
+                    {errors.poli_id && (
+                        <p className="mt-1 text-[11px] text-red-500">
+                            {errors.poli_id}
+                        </p>
+                    )}
+                </div>
 
                 {/* STATUS AKTIF */}
                 <div>

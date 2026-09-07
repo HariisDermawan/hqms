@@ -3,8 +3,8 @@ import type { Ruangan } from '@/api/ruangan';
 import { useEffect, useState } from 'react';
 import React from 'react';
 
-interface CategoryGroup {
-    category: string;
+interface FacilityGroup {
+    facility: string;
     rooms: Ruangan[];
 }
 
@@ -19,10 +19,10 @@ const ICON_PROPS = {
     strokeLinejoin: 'round',
 } as const;
 
-function categoryIcon(category: string): React.ReactNode {
-    const key = category.toLowerCase();
+function facilityIcon(facility: string): React.ReactNode {
+    const key = facility.toLowerCase();
 
-    if (key.includes('igd')) {
+    if (key.includes('igd') || key.includes('ugd')) {
         return (
             <svg {...ICON_PROPS}>
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -123,15 +123,15 @@ export default function LayananRuangan() {
         };
     }, []);
 
-    const groups: CategoryGroup[] = ruangans.reduce<CategoryGroup[]>(
+    const groups: FacilityGroup[] = ruangans.reduce<FacilityGroup[]>(
         (acc, ruangan) => {
-            const category = ruangan.category || 'Lainnya';
-            const existing = acc.find((group) => group.category === category);
+            const facilityName = ruangan.facility?.name ?? 'Lainnya';
+            const existing = acc.find((group) => group.facility === facilityName);
 
             if (existing) {
                 existing.rooms.push(ruangan);
             } else {
-                acc.push({ category, rooms: [ruangan] });
+                acc.push({ facility: facilityName, rooms: [ruangan] });
             }
 
             return acc;
@@ -171,15 +171,15 @@ export default function LayananRuangan() {
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         {groups.map((group) => (
                             <div
-                                key={group.category}
+                                key={group.facility}
                                 className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-[#0284c7] hover:shadow-xl hover:shadow-sky-100"
                             >
                                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#075985]/10 text-[#075985]">
-                                    {categoryIcon(group.category)}
+                                    {facilityIcon(group.facility)}
                                 </div>
 
                                 <h3 className="mt-4 text-base font-bold text-slate-800">
-                                    {group.category}
+                                    {group.facility}
                                 </h3>
                                 <p className="mt-0.5 text-xs font-medium text-slate-400">
                                     {group.rooms.length} Ruangan

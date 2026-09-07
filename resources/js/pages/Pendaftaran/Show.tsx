@@ -405,7 +405,7 @@ export default function PendaftaranShow() {
 
                                 {ruangans.map((ruangan) => (
                                     <option key={ruangan.id} value={ruangan.id}>
-                                        {ruangan.name} ({ruangan.category})
+                                        {ruangan.name} ({ruangan.facility?.name ?? 'Tanpa Fasilitas'})
                                     </option>
                                 ))}
                             </select>

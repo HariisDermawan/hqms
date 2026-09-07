@@ -13,7 +13,11 @@ class RuanganResource extends JsonResource
             'id' => $this->id,
             'code' => $this->code,
             'name' => $this->name,
-            'category' => $this->category,
+            'facility' => [
+                'id' => $this->facility?->id,
+                'name' => $this->facility?->name,
+                'slug' => $this->facility?->slug,
+            ],
             'description' => $this->description,
             'poli' => [
                 'id' => $this->poli?->id,

@@ -5,6 +5,7 @@ use App\Models\Antrian;
 use App\Models\Berita;
 use App\Models\Dokter;
 use App\Models\Faq;
+use App\Models\Fasilitas;
 use App\Models\JadwalDokter;
 use App\Models\Message;
 use App\Models\Obat;
@@ -104,6 +105,26 @@ Route::middleware('auth')->group(function () {
     Route::get('/polis', function () {
         return Inertia::render('Poli/Index');
     })->name('polis.index');
+
+    Route::get('/fasilitas', function () {
+        return Inertia::render('Fasilitas/Index');
+    })->name('fasilitas.index');
+
+    Route::get('/fasilitas/create', function () {
+        return Inertia::render('Fasilitas/Create');
+    })->name('fasilitas.create');
+
+    Route::get('/fasilitas/{fasilitas}/edit', function (Fasilitas $fasilitas) {
+        return Inertia::render('Fasilitas/Edit', [
+            'id' => $fasilitas->id,
+        ]);
+    })->name('fasilitas.edit');
+
+    Route::get('/fasilitas/{fasilitas:slug}', function (Fasilitas $fasilitas) {
+        return Inertia::render('Fasilitas/Show', [
+            'id' => $fasilitas->id,
+        ]);
+    })->name('fasilitas.show');
 
     Route::get('/ruangans/create', function () {
         return Inertia::render('Ruangan/Create');

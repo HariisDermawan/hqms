@@ -2,28 +2,47 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
 
 class StoreFasilitasRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+            'slug' => [
+                'required',
+                'string',
+                'max:255',
+                'unique:fasilitas,slug',
+            ],
+            'description' => [
+                'nullable',
+                'string',
+            ],
+            'is_active' => [
+                'sometimes',
+                'boolean',
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'slug.unique' => 'Slug sudah digunakan.',
+            'name.required' => 'Nama fasilitas wajib diisi.',
+            'slug.required' => 'Slug wajib diisi.',
         ];
     }
 }

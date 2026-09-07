@@ -17,6 +17,7 @@ class RuanganService
     {
         return Ruangan::query()
             ->with([
+                'facility',
                 'poli',
                 'ruanganPasiens.antrian.poli',
                 'ruanganPasiens.pendaftaran',
@@ -31,9 +32,9 @@ class RuanganService
     public function getActive(): Collection
     {
         return Ruangan::query()
-            ->with('poli')
+            ->with('facility')
             ->where('is_active', true)
-            ->orderBy('category')
+            ->orderBy('facility_id')
             ->orderBy('code')
             ->get();
     }
@@ -94,7 +95,7 @@ class RuanganService
             }
 
             if (
-                strtolower($ruangan->category) === 'poli'
+                $ruangan->poli_id !== null
                 && $antrianId === null
             ) {
                 throw ValidationException::withMessages([

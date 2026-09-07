@@ -77,7 +77,7 @@ class RuanganController extends Controller
         Gate::authorize('view', $ruangan);
 
         $ruangan->load([
-            'poli',
+            'facility',
             'poli',
             'ruanganPasiens.antrian.poli',
             'ruanganPasiens.pendaftaran',
@@ -182,6 +182,7 @@ class RuanganController extends Controller
         );
 
         $ruangan->load([
+            'facility',
             'poli',
             'ruanganPasiens.antrian.poli',
             'ruanganPasiens.pendaftaran',
@@ -225,6 +226,7 @@ class RuanganController extends Controller
         );
 
         $ruangan->load([
+            'facility',
             'poli',
             'ruanganPasiens.antrian.poli',
             'ruanganPasiens.pendaftaran',

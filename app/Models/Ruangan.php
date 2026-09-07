@@ -15,7 +15,7 @@ class Ruangan extends Model
     protected $fillable = [
         'code',
         'name',
-        'category',
+        'facility_id',
         'poli_id',
         'description',
         'is_active',
@@ -26,6 +26,11 @@ class Ruangan extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function facility(): BelongsTo
+    {
+        return $this->belongsTo(Fasilitas::class);
     }
 
     public function poli(): BelongsTo
