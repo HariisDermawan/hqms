@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Middleware\EnsureSessionFreshness;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,7 @@ class AuthService
         request()->session()->regenerate();
 
         request()->session()->put(
-            \App\Http\Middleware\EnsureSessionFreshness::LOGINED_AT_KEY,
+            EnsureSessionFreshness::LOGINED_AT_KEY,
             now()->timestamp,
         );
 

@@ -4,57 +4,45 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureSessionFreshness
 {
-    /**
-     * The session key that stores the login timestamp.
-     */
     public const LOGINED_AT_KEY = 'logined_at';
 
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Closure(Request): (Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! Auth::check()) {
+        $user = $request->user();
+        if ($user === null) {
             return $next($request);
         }
-
         $lifetime = (int) config('session.lifetime');
+        $session = $request->session();
+        $loginedAt = $session->get(self::LOGINED_AT_KEY);
+        if ($loginedAt === null) {
+            $session->put(self::LOGINED_AT_KEY, now()->timestamp);
 
-        $loginedAt = $request->session()->get(self::LOGINED_AT_KEY);
-
-        if ($loginedAt === null || (now()->timestamp - (int) $loginedAt) >= $lifetime * 60) {
-            $this->forgetSession($request);
-
-            if ($request->is('api/*') || $request->expectsJson()) {
+            return $next($request);
+        }
+        if ((now()->timestamp - (int) $loginedAt) >= $lifetime * 60) {
+            $this->logout($request);
+            if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Session expired. Please log in again.',
+                    'message' => 'Sesi anda sudah berakhir. Silakan login kembali.',
                     'data' => null,
                 ], 401);
             }
 
-            return redirect()->route('login')
-                ->with('error', 'Sesi anda sudah berakhir. Silakan login kembali.');
+            return redirect()->route('login');
         }
 
         return $next($request);
     }
 
-    private function forgetSession(Request $request): void
+    private function logout(Request $request): void
     {
-        $guard = Auth::guard();
-
-        $guard->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
     }
 }

@@ -11,12 +11,16 @@ beforeEach(function () {
     $this->user = User::factory()->create();
 });
 
+it('redirects guests away from protected pages', function () {
+    $this->get('/dashboard')
+        ->assertRedirect(route('login'));
+});
+
 it('redirects to login when session has exceeded its lifetime', function () {
     Sanctum::actingAs($this->user);
 
     $this->withSession([
-        EnsureSessionFreshness::LOGINED_AT_KEY =>
-            now()->subMinutes(config('session.lifetime') + 1)->timestamp,
+        EnsureSessionFreshness::LOGINED_AT_KEY => now()->subMinutes(config('session.lifetime') + 1)->timestamp,
     ])->get('/dashboard')
         ->assertRedirect();
 });
@@ -25,9 +29,8 @@ it('returns 401 JSON when session has exceeded its lifetime', function () {
     Sanctum::actingAs($this->user);
 
     $this->withSession([
-        EnsureSessionFreshness::LOGINED_AT_KEY =>
-            now()->subMinutes(config('session.lifetime') + 1)->timestamp,
-    ])->getJson('/api/v1/me')
+        EnsureSessionFreshness::LOGINED_AT_KEY => now()->subMinutes(config('session.lifetime') + 1)->timestamp,
+    ])->getJson('/api/v1/auth/me')
         ->assertUnauthorized()
         ->assertJsonStructure([
             'success',
@@ -41,6 +44,6 @@ it('keeps fresh session alive', function () {
 
     $this->withSession([
         EnsureSessionFreshness::LOGINED_AT_KEY => now()->timestamp,
-    ])->getJson('/api/v1/me')
+    ])->getJson('/api/v1/auth/me')
         ->assertOk();
 });
