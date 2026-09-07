@@ -2,10 +2,12 @@ import api from '@/lib/axios';
 import type { AntrianStatus } from './antrian';
 import type { Berita } from './berita';
 import type { Dokter } from './dokter';
+import type { Faq } from './faq';
 import type { Pagination } from './dokter';
 import type { Penawaran } from './penawaran';
 import type { Poli } from './poli';
 import type { Ruangan } from './ruangan';
+import type { Testimonial } from './testimonial';
 
 export interface KioskPoli extends Poli {}
 
@@ -77,6 +79,22 @@ export interface KioskRuangansResponse {
     };
 }
 
+export interface KioskFaqsResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        items?: Faq[];
+    };
+}
+
+export interface KioskTestimonialsResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        items?: Testimonial[];
+    };
+}
+
 export interface KioskNowServingResponse {
     success: boolean;
     message: string;
@@ -144,6 +162,21 @@ export const getKioskRuangans = async (): Promise<KioskRuangansResponse> => {
 
     return response.data;
 };
+
+export const getKioskFaqs = async (): Promise<KioskFaqsResponse> => {
+    const response = await api.get<KioskFaqsResponse>('/api/v1/kiosk/faqs');
+
+    return response.data;
+};
+
+export const getKioskTestimonials =
+    async (): Promise<KioskTestimonialsResponse> => {
+        const response = await api.get<KioskTestimonialsResponse>(
+            '/api/v1/kiosk/testimonials',
+        );
+
+        return response.data;
+    };
 
 export const getNowServing = async (): Promise<KioskNowServingResponse> => {
     const response = await api.get<KioskNowServingResponse>(

@@ -8,13 +8,17 @@ use App\Http\Requests\StoreAntrianRequest;
 use App\Http\Resources\AntrianResource;
 use App\Http\Resources\BeritaResource;
 use App\Http\Resources\DokterResource;
+use App\Http\Resources\FaqResource;
 use App\Http\Resources\JadwalDokterResource;
 use App\Http\Resources\PenawaranResource;
 use App\Http\Resources\PoliResource;
 use App\Http\Resources\RuanganResource;
+use App\Http\Resources\TestimonialResource;
 use App\Models\Antrian;
+use App\Models\Faq;
 use App\Models\JadwalDokter;
 use App\Models\Perawat;
+use App\Models\Testimonial;
 use App\Services\AntrianService;
 use App\Services\BeritaService;
 use App\Services\DokterService;
@@ -93,6 +97,44 @@ class KioskController extends Controller
                     'from' => $beritas->firstItem(),
                     'to' => $beritas->lastItem(),
                 ],
+            ],
+        ]);
+    }
+
+    /**
+     * List active FAQs (ordered) available on the public landing page.
+     */
+    public function faqs(): JsonResponse
+    {
+        $faqs = Faq::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'FAQs retrieved successfully.',
+            'data' => [
+                'items' => FaqResource::collection($faqs),
+            ],
+        ]);
+    }
+
+    /**
+     * List active testimonials (ordered) available on the public landing page.
+     */
+    public function testimonials(): JsonResponse
+    {
+        $testimonials = Testimonial::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Testimonials retrieved successfully.',
+            'data' => [
+                'items' => TestimonialResource::collection($testimonials),
             ],
         ]);
     }

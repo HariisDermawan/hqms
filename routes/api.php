@@ -35,6 +35,8 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         Route::get('/dokters', [KioskController::class, 'dokters']);
         Route::get('/beritas', [KioskController::class, 'beritas']);
         Route::get('/penawarans', [KioskController::class, 'penawarans']);
+        Route::get('/faqs', [KioskController::class, 'faqs']);
+        Route::get('/testimonials', [KioskController::class, 'testimonials']);
         Route::get('/jadwal-dokters', [
             KioskController::class,
             'jadwalDokters',
