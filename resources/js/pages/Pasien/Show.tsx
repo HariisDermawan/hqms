@@ -123,7 +123,8 @@ export default function PasienShow() {
                                                 <path d="M10 21v-3h4v3" />
                                             </svg>
                                             {currentRoom.name} ·{' '}
-                                            {currentRoom.facility ?? 'Tanpa Fasilitas'}
+                                            {currentRoom.facility ??
+                                                'Tanpa Fasilitas'}
                                         </p>
                                     )}
                                 </div>
@@ -237,7 +238,8 @@ export default function PasienShow() {
 
                                                         <td className="px-4 py-3">
                                                             <span className="rounded-md bg-[#07577f]/10 px-2 py-0.5 text-[11px] font-semibold text-[#07577f]">
-                                                                {room.facility ?? 'Tanpa Fasilitas'}
+                                                                {room.facility ??
+                                                                    'Tanpa Fasilitas'}
                                                             </span>
                                                         </td>
 

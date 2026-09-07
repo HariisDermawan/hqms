@@ -14,6 +14,7 @@ class Fasilitas extends Model
         'name',
         'slug',
         'description',
+        'image',
         'is_active',
     ];
 

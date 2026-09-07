@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\Fasilitas;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class FasilitasService
 {
@@ -39,6 +41,16 @@ class FasilitasService
     public function create(array $data): Fasilitas
     {
         return DB::transaction(function () use ($data) {
+
+            /** @var UploadedFile|null $image */
+            $image = $data['image'] ?? null;
+
+            unset($data['image']);
+
+            if ($image) {
+                $data['image'] = $image->store('fasilitas', 'public');
+            }
+
             return Fasilitas::create($data);
         });
     }
@@ -46,6 +58,20 @@ class FasilitasService
     public function update(Fasilitas $fasilitas, array $data): Fasilitas
     {
         return DB::transaction(function () use ($fasilitas, $data) {
+
+            /** @var UploadedFile|null $image */
+            $image = $data['image'] ?? null;
+
+            unset($data['image']);
+
+            if ($image) {
+                if ($fasilitas->image) {
+                    Storage::disk('public')->delete($fasilitas->image);
+                }
+
+                $data['image'] = $image->store('fasilitas', 'public');
+            }
+
             $fasilitas->update($data);
 
             return $fasilitas->fresh();
@@ -55,6 +81,11 @@ class FasilitasService
     public function delete(Fasilitas $fasilitas): void
     {
         DB::transaction(function () use ($fasilitas) {
+
+            if ($fasilitas->image) {
+                Storage::disk('public')->delete($fasilitas->image);
+            }
+
             $fasilitas->delete();
         });
     }

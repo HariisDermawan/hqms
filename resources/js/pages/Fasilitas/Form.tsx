@@ -1,7 +1,6 @@
-import { Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import type { Fasilitas } from '@/api/fasilitas';
-import AppLayout from '@/Layouts/AppLayout';
+import { Link } from '@inertiajs/react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
+import type { Fasilitas, FasilitasPayload } from '@/api/fasilitas';
 
 const slugify = (value: string): string =>
     value
@@ -12,182 +11,250 @@ const slugify = (value: string): string =>
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '');
 
-interface FasilitasFormData {
-    name: string;
-    slug: string;
-    description: string;
-    is_active: boolean;
+const inputClass =
+    'w-full h-[42px] px-[12px] rounded-[12px] bg-[#d9d9d9] text-[13px] text-gray-700 placeholder:text-[#999] outline-none focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30 transition';
+
+const labelClass = 'block text-[13px] text-[#333] mb-[4px]';
+
+interface FasilitasFormProps {
+    initial?: Fasilitas | null;
+    processing: boolean;
+    errors?: Record<string, string | undefined> & {
+        general?: string;
+    };
+    onSubmit: (payload: FasilitasPayload, image?: File) => void;
 }
 
-interface FormProps {
-    fasilitas?: Fasilitas;
-    mode: 'create' | 'edit';
-}
+export default function FasilitasForm({
+    initial,
+    processing,
+    errors = {},
+    onSubmit,
+}: FasilitasFormProps) {
+    const isEdit = Boolean(initial);
 
-export default function Form({ fasilitas, mode }: FormProps) {
-    const isEdit = mode === 'edit';
+    const [name, setName] = useState(initial?.name ?? '');
+    const [slug, setSlug] = useState(initial?.slug ?? '');
+    const [description, setDescription] = useState(initial?.description ?? '');
+    const [isActive, setIsActive] = useState(initial?.is_active ?? true);
 
-    const { data, setData, post, put, processing, errors } =
-        useForm<FasilitasFormData>({
-            name: fasilitas?.name ?? '',
-            slug: fasilitas?.slug ?? '',
-            description: fasilitas?.description ?? '',
-            is_active: fasilitas?.is_active ?? true,
-        });
+    const [image, setImage] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [autoSlug, setAutoSlug] = useState(!isEdit);
 
-    const [autoSlug, setAutoSlug] = useState(isEdit);
+    useEffect(() => {
+        setPreview(initial?.image_url ?? null);
+    }, [initial?.image_url]);
 
-    const handleChangeName = (name: string) => {
-        setData('name', name);
+    const handleNameChange = (value: string) => {
+        setName(value);
 
         if (autoSlug) {
-            setData('slug', slugify(name));
+            setSlug(slugify(value));
         }
     };
 
-    const handleChangeSlug = (slug: string) => {
+    const handleSlugChange = (value: string) => {
         setAutoSlug(false);
-        setData('slug', slug);
+        setSlug(value);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
 
-        if (isEdit && fasilitas?.id) {
-            put(`/api/v1/fasilitas/${fasilitas.id}`, {
-                preserveScroll: true,
-                onSuccess: () => {
-                    window.location.href = '/fasilitas';
-                },
-            });
-        } else {
-            post('/api/v1/fasilitas', {
-                preserveScroll: true,
-                onSuccess: () => {
-                    window.location.href = '/fasilitas';
-                },
-            });
+        if (!file) {
+            return;
         }
+
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    };
+
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        onSubmit(
+            {
+                name,
+                slug,
+                description: description || undefined,
+                is_active: isActive,
+            },
+            image ?? undefined,
+        );
     };
 
     return (
-        <AppLayout wide>
-            <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                    <h2 className="text-lg font-bold text-gray-800 sm:text-xl">
-                        {isEdit ? 'Ubah Fasilitas' : 'Tambah Fasilitas'}
-                    </h2>
+        <form
+            onSubmit={handleSubmit}
+            className="mt-4 rounded-xl bg-white p-5 shadow-sm sm:p-6"
+        >
+            {errors.general && (
+                <div className="mb-4 rounded-[10px] bg-red-50 px-3 py-2 text-[12px] text-red-500">
+                    {errors.general}
+                </div>
+            )}
 
-                    <p className="mt-1 text-xs text-gray-400 sm:text-sm">
-                        {isEdit
-                            ? `Edit data fasilitas "${fasilitas?.name}".`
-                            : 'Isi data berikut untuk menambahkan fasilitas baru.'}
-                    </p>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {/* GAMBAR */}
+                <div className="sm:col-span-2">
+                    <span className={labelClass}>Gambar Fasilitas</span>
+
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-[88px] w-[88px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#f7f9fb]">
+                            {preview ? (
+                                <img
+                                    src={preview}
+                                    alt="Preview"
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-8 w-8 text-gray-300"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.5"
+                                >
+                                    <rect
+                                        x="4"
+                                        y="5"
+                                        width="16"
+                                        height="14"
+                                        rx="2"
+                                    />
+                                    <path d="m4 15 4-4 3 3 3-4 6 6" />
+                                </svg>
+                            )}
+                        </div>
+
+                        <div className="flex-1">
+                            <label className="inline-flex h-[43px] cursor-pointer items-center gap-2 rounded-[12px] bg-[#d9d9d9] px-5 text-[13px] font-bold text-gray-600 transition hover:bg-[#c9c9c9]">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="1.8"
+                                >
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <path d="m17 8-5-5-5 5M12 3v12" />
+                                </svg>
+
+                                {initial
+                                    ? image
+                                        ? 'Ganti Gambar'
+                                        : 'Ubah Gambar'
+                                    : 'Pilih Gambar'}
+
+                                <input
+                                    type="file"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                />
+                            </label>
+
+                            <p className="mt-2 text-[11px] text-gray-400">
+                                {initial
+                                    ? 'Kosongkan jika tidak ingin mengubah gambar'
+                                    : 'Format JPG, PNG, WebP. Maks 2MB'}{' '}
+                                {image && (
+                                    <span className="text-[#07577f]">
+                                        — {image.name}
+                                    </span>
+                                )}
+                            </p>
+                        </div>
+                    </div>
+
+                    {errors.image && (
+                        <p className="mt-1 text-[11px] text-red-500">
+                            {errors.image}
+                        </p>
+                    )}
                 </div>
 
-                <Link
-                    href="/fasilitas"
-                    className="flex h-9 items-center gap-1.5 rounded-lg bg-gray-100 px-3 text-[11px] font-semibold text-gray-600 transition hover:bg-gray-200"
-                >
-                    ← Kembali
-                </Link>
-            </div>
-
-            <form
-                onSubmit={handleSubmit}
-                className="mt-4 max-w-[480px] space-y-5 rounded-xl bg-white p-6 shadow-sm"
-            >
-                {/* Name */}
-                <div>
-                    <label
-                        htmlFor="name"
-                        className="mb-1.5 block text-[12px] font-bold text-gray-500 uppercase"
-                    >
+                {/* NAMA */}
+                <div className="sm:col-span-2">
+                    <label htmlFor="name" className={labelClass}>
                         Nama Fasilitas
                     </label>
 
                     <input
                         id="name"
                         type="text"
-                        value={data.name}
-                        onChange={(e) => handleChangeName(e.target.value)}
-                        placeholder="contoh: Unit Gawat Darurat"
-                        className={`h-11 w-full rounded-lg border bg-white px-3 text-[13px] text-gray-700 outline-none transition placeholder:text-gray-300 focus:border-[#07577f]/40 focus:ring-[3px] focus:ring-[#07577f]/10 ${
-                            errors.name
-                                ? 'border-red-300 focus:border-red-400 focus:ring-red-50'
-                                : 'border-gray-200'
-                        }`}
+                        value={name}
+                        onChange={(event) =>
+                            handleNameChange(event.target.value)
+                        }
+                        placeholder="Contoh: Unit Gawat Darurat"
+                        className={inputClass}
                     />
 
                     {errors.name && (
-                        <p className="mt-1.5 text-[11px] text-red-500">
+                        <p className="mt-1 text-[11px] text-red-500">
                             {errors.name}
                         </p>
                     )}
                 </div>
 
-                {/* Slug */}
-                <div>
-                    <label
-                        htmlFor="slug"
-                        className="mb-1.5 block text-[12px] font-bold text-gray-500 uppercase"
-                    >
+                {/* SLUG */}
+                <div className="sm:col-span-2">
+                    <label htmlFor="slug" className={labelClass}>
                         Slug
                     </label>
 
                     <input
                         id="slug"
                         type="text"
-                        value={data.slug}
-                        onChange={(e) => handleChangeSlug(e.target.value)}
-                        placeholder="contoh: ugd-igd"
-                        className={`h-11 w-full rounded-lg border bg-white px-3 text-[13px] text-gray-700 outline-none transition placeholder:text-gray-300 focus:border-[#07577f]/40 focus:ring-[3px] focus:ring-[#07577f]/10 ${
-                            errors.slug
-                                ? 'border-red-300 focus:border-red-400 focus:ring-red-50'
-                                : 'border-gray-200'
-                        }`}
+                        value={slug}
+                        onChange={(event) =>
+                            handleSlugChange(event.target.value)
+                        }
+                        placeholder="Contoh: unit-gawat-darurat"
+                        className={inputClass}
                     />
 
                     {errors.slug && (
-                        <p className="mt-1.5 text-[11px] text-red-500">
+                        <p className="mt-1 text-[11px] text-red-500">
                             {errors.slug}
                         </p>
                     )}
                 </div>
 
-                {/* Description */}
-                <div>
-                    <label
-                        htmlFor="description"
-                        className="mb-1.5 block text-[12px] font-bold text-gray-500 uppercase"
-                    >
+                {/* DESKRIPSI */}
+                <div className="sm:col-span-2">
+                    <label htmlFor="description" className={labelClass}>
                         Deskripsi
                     </label>
 
                     <textarea
                         id="description"
-                        rows={3}
-                        value={data.description}
-                        onChange={(e) =>
-                            setData('description', e.target.value)
-                        }
+                        value={description}
+                        onChange={(event) => setDescription(event.target.value)}
                         placeholder="Deskripsi singkat tentang fasilitas ini..."
-                        className={`w-full rounded-lg border bg-white px-3 py-2 text-[13px] text-gray-700 outline-none transition placeholder:text-gray-300 focus:border-[#07577f]/40 focus:ring-[3px] focus:ring-[#07577f]/10 ${
-                            errors.description
-                                ? 'border-red-300 focus:border-red-400 focus:ring-red-50'
-                                : 'border-gray-200'
-                        }`}
+                        rows={5}
+                        className="w-full rounded-[12px] bg-[#d9d9d9] px-[12px] py-[10px] text-[13px] text-gray-700 transition outline-none placeholder:text-[#999] focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30"
                     />
+
+                    {errors.description && (
+                        <p className="mt-1 text-[11px] text-red-500">
+                            {errors.description}
+                        </p>
+                    )}
                 </div>
 
-                {/* Active status */}
-                <div>
+                {/* STATUS */}
+                <div className="sm:col-span-2">
                     <label className="flex items-center gap-2.5">
                         <input
                             type="checkbox"
-                            checked={data.is_active}
-                            onChange={(e) =>
-                                setData('is_active', e.target.checked)
+                            checked={isActive}
+                            onChange={(event) =>
+                                setIsActive(event.target.checked)
                             }
                             className="h-4 w-4 rounded border-gray-300 text-[#07577f] focus:ring-[#07577f]/30"
                         />
@@ -197,25 +264,24 @@ export default function Form({ fasilitas, mode }: FormProps) {
                         </span>
                     </label>
                 </div>
+            </div>
 
-                {/* Submit */}
-                <div className="flex items-center gap-3 pt-2">
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="flex h-11 items-center gap-2 rounded-lg bg-[#07577f] px-6 text-[13px] font-bold text-white transition hover:bg-[#063f62] disabled:opacity-60"
-                    >
-                        {processing ? 'Menyimpan...' : 'Simpan'}
-                    </button>
+            <div className="mt-6 flex items-center justify-end gap-3">
+                <Link
+                    href="/fasilitas"
+                    className="h-[43px] rounded-[12px] bg-[#d9d9d9] px-5 text-[13px] font-bold text-gray-600 transition hover:bg-[#c9c9c9]"
+                >
+                    Batal
+                </Link>
 
-                    <Link
-                        href="/fasilitas"
-                        className="flex h-11 items-center rounded-lg border border-gray-200 px-5 text-[13px] font-semibold text-gray-500 transition hover:bg-gray-50"
-                    >
-                        Batal
-                    </Link>
-                </div>
-            </form>
-        </AppLayout>
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="h-[43px] rounded-[12px] bg-[#084e7a] px-6 text-[13px] font-bold text-white transition hover:bg-[#063f62] hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                    {processing ? 'Menyimpan...' : 'Simpan'}
+                </button>
+            </div>
+        </form>
     );
 }

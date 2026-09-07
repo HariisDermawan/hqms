@@ -19,6 +19,7 @@ class FasilitasFactory extends Factory
             'name' => $name,
             'slug' => Str::slug($name),
             'description' => fake()->optional()->sentence(),
+            'image' => null,
             'is_active' => true,
         ];
     }

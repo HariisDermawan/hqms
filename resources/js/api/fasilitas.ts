@@ -6,6 +6,7 @@ export interface Fasilitas {
     name: string;
     slug: string;
     description: string | null;
+    image_url: string | null;
     is_active: boolean;
     ruangans_count?: number;
 }
@@ -54,31 +55,54 @@ export const getFasilitases = async (
 export const getFasilitas = async (
     idOrSlug: number | string,
 ): Promise<FasilitasResponse & { data?: { ruangans?: any[] } }> => {
-    const response = await api.get(
-        `/api/v1/fasilitas/${idOrSlug}`,
-    );
+    const response = await api.get(`/api/v1/fasilitas/${idOrSlug}`);
 
     return response.data;
 };
 
 export const storeFasilitas = async (
     payload: FasilitasPayload,
+    image?: File,
 ): Promise<FasilitasResponse> => {
+    const formData = new FormData();
+
+    formData.append('name', payload.name);
+    formData.append('slug', payload.slug);
+    formData.append('description', payload.description ?? '');
+    formData.append('is_active', String(payload.is_active ?? true));
+
+    if (image) {
+        formData.append('image', image);
+    }
+
     const response = await api.post<FasilitasResponse>(
         '/api/v1/fasilitas',
-        payload,
+        formData,
     );
 
     return response.data;
 };
 
 export const updateFasilitas = async (
-    id: number,
+    id: number | string,
     payload: FasilitasPayload,
+    image?: File,
 ): Promise<FasilitasResponse> => {
-    const response = await api.put<FasilitasResponse>(
+    const formData = new FormData();
+
+    formData.append('_method', 'PUT');
+    formData.append('name', payload.name);
+    formData.append('slug', payload.slug);
+    formData.append('description', payload.description ?? '');
+    formData.append('is_active', String(payload.is_active ?? true));
+
+    if (image) {
+        formData.append('image', image);
+    }
+
+    const response = await api.post<FasilitasResponse>(
         `/api/v1/fasilitas/${id}`,
-        payload,
+        formData,
     );
 
     return response.data;

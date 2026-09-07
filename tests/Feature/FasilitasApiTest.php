@@ -3,6 +3,7 @@
 use App\Models\Fasilitas;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
@@ -43,7 +44,26 @@ it('can create a fasilitas', function () {
         ->assertJsonPath('success', true)
         ->assertJsonPath('data.fasilitas.name', 'Unit Gawat Darurat')
         ->assertJsonPath('data.fasilitas.slug', 'ugd-igd')
-        ->assertJsonPath('data.fasilitas.is_active', true);
+        ->assertJsonPath('data.fasilitas.is_active', true)
+        ->assertJsonPath('data.fasilitas.image_url', null);
+
+    $this->assertDatabaseHas('fasilitas', [
+        'name' => 'Unit Gawat Darurat',
+        'slug' => 'ugd-igd',
+    ]);
+});
+
+it('can create a fasilitas with an image', function () {
+    $this->post('/api/v1/fasilitas', [
+        'name' => 'Unit Gawat Darurat',
+        'slug' => 'ugd-igd',
+        'description' => 'Layanan gawat darurat 24 jam.',
+        'image' => UploadedFile::fake()->image('fasilitas.jpg', 800, 400),
+    ])
+        ->assertCreated()
+        ->assertJsonPath('success', true)
+        ->assertJsonPath('data.fasilitas.name', 'Unit Gawat Darurat')
+        ->assertJsonPath('data.fasilitas.image_url', fn (string $url) => str_contains($url, '/storage/fasilitas/'));
 
     $this->assertDatabaseHas('fasilitas', [
         'name' => 'Unit Gawat Darurat',
@@ -104,13 +124,27 @@ it('can update a fasilitas', function () {
         ->assertOk()
         ->assertJsonPath('data.fasilitas.name', 'Rawat Jalan Baru')
         ->assertJsonPath('data.fasilitas.slug', 'rawat-jalan-baru')
-        ->assertJsonPath('data.fasilitas.is_active', false);
+        ->assertJsonPath('data.fasilitas.is_active', false)
+        ->assertJsonPath('data.fasilitas.image_url', null);
 
     $this->assertDatabaseHas('fasilitas', [
         'id' => $fasilitas->id,
         'name' => 'Rawat Jalan Baru',
         'slug' => 'rawat-jalan-baru',
     ]);
+});
+
+it('can update a fasilitas with an image', function () {
+    $fasilitas = Fasilitas::factory()->create();
+
+    $this->put('/api/v1/fasilitas/'.$fasilitas->id, [
+        'name' => 'Rawat Jalan Baru',
+        'slug' => 'rawat-jalan-baru',
+        'image' => UploadedFile::fake()->image('fasilitas.jpg', 800, 400),
+    ])
+        ->assertOk()
+        ->assertJsonPath('data.fasilitas.slug', 'rawat-jalan-baru')
+        ->assertJsonPath('data.fasilitas.image_url', fn (string $url) => str_contains($url, '/storage/fasilitas/'));
 });
 
 it('can delete a fasilitas', function () {

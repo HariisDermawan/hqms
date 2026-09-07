@@ -222,7 +222,9 @@ export default function RuanganIndex() {
                                                     </p>
 
                                                     <p className="truncate text-[10px] font-semibold tracking-wide text-[#07577f]/60 uppercase">
-                                                        {ruangan.facility?.name ?? 'Tanpa Fasilitas'}
+                                                        {ruangan.facility
+                                                            ?.name ??
+                                                            'Tanpa Fasilitas'}
                                                     </p>
                                                 </div>
                                             </div>

@@ -124,7 +124,7 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Fasilitas/Show', [
             'id' => $fasilitas->id,
         ]);
-    })->name('fasilitas.show');
+    })->name('fasilitas.detail');
 
     Route::get('/ruangans/create', function () {
         return Inertia::render('Ruangan/Create');

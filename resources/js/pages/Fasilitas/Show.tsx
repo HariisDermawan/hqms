@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 import { deleteFasilitas, getFasilitas, type Fasilitas } from '@/api/fasilitas';
 import type { Ruangan } from '@/api/ruangan';
@@ -34,7 +34,8 @@ export default function Show() {
             }
 
             setError(
-                err.response?.data?.message || 'Gagal mengambil data fasilitas.',
+                err.response?.data?.message ||
+                    'Gagal mengambil data fasilitas.',
             );
         } finally {
             setLoading(false);
@@ -131,6 +132,16 @@ export default function Show() {
                         </Link>
                     </div>
                 </div>
+
+                {fasilitas.image_url && (
+                    <div className="mt-4 overflow-hidden rounded-xl bg-white shadow-sm">
+                        <img
+                            src={fasilitas.image_url}
+                            alt={fasilitas.name}
+                            className="max-h-[320px] w-full object-cover"
+                        />
+                    </div>
+                )}
 
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div className="rounded-xl bg-white p-5 shadow-sm">

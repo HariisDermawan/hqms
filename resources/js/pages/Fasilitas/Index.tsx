@@ -167,32 +167,42 @@ export default function FasilitasIndex() {
                                     key={item.id}
                                     className="group overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                                 >
-                                    <div className="flex h-[100px] items-center justify-center gap-3 bg-[#07577f]/5 px-4">
-                                        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#07577f]/10">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-7 w-7 text-[#07577f]/60"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                            >
-                                                <path d="M3 21h18" />
-                                                <path d="M5 21V7l8-4v18" />
-                                                <path d="M19 21V11l-6-4" />
-                                                <path d="M9 9h.01M9 13h.01M9 17h.01" />
-                                            </svg>
-                                        </div>
+                                    <div className="flex h-[100px] items-center justify-center bg-[#07577f]/5 px-4">
+                                        {item.image_url ? (
+                                            <img
+                                                src={item.image_url}
+                                                alt={item.name}
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="flex items-center justify-center gap-3">
+                                                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#07577f]/10">
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        className="h-7 w-7 text-[#07577f]/60"
+                                                        viewBox="0 0 24 24"
+                                                        fill="none"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.5"
+                                                    >
+                                                        <path d="M3 21h18" />
+                                                        <path d="M5 21V7l8-4v18" />
+                                                        <path d="M19 21V11l-6-4" />
+                                                        <path d="M9 9h.01M9 13h.01M9 17h.01" />
+                                                    </svg>
+                                                </div>
 
-                                        <div className="min-w-0 text-center">
-                                            <p className="text-[14px] font-bold text-[#07577f]">
-                                                {item.name}
-                                            </p>
+                                                <div className="min-w-0 text-center">
+                                                    <p className="text-[14px] font-bold text-[#07577f]">
+                                                        {item.name}
+                                                    </p>
 
-                                            <p className="truncate text-[10px] font-semibold tracking-wide text-[#07577f]/60 uppercase">
-                                                {item.slug}
-                                            </p>
-                                        </div>
+                                                    <p className="truncate text-[10px] font-semibold tracking-wide text-[#07577f]/60 uppercase">
+                                                        {item.slug}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="p-4">

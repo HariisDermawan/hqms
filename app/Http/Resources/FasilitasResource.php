@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class FasilitasResource extends JsonResource
 {
@@ -14,6 +15,11 @@ class FasilitasResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
+
+            'image_url' => $this->image
+                ? Storage::disk('public')->url($this->image)
+                : null,
+
             'is_active' => (bool) $this->is_active,
             'ruangans_count' => $this->whenCounted('ruangans'),
         ];

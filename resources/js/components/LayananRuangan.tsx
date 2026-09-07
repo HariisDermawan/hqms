@@ -126,7 +126,9 @@ export default function LayananRuangan() {
     const groups: FacilityGroup[] = ruangans.reduce<FacilityGroup[]>(
         (acc, ruangan) => {
             const facilityName = ruangan.facility?.name ?? 'Lainnya';
-            const existing = acc.find((group) => group.facility === facilityName);
+            const existing = acc.find(
+                (group) => group.facility === facilityName,
+            );
 
             if (existing) {
                 existing.rooms.push(ruangan);

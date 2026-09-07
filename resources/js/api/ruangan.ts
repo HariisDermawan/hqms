@@ -21,7 +21,11 @@ export interface Ruangan {
     id: number;
     code: string;
     name: string;
-    facility: { id: number | null; name: string | null; slug: string | null } | null;
+    facility: {
+        id: number | null;
+        name: string | null;
+        slug: string | null;
+    } | null;
     description: string | null;
     poli: { id: number | null; name: string | null } | null;
     is_active: boolean;

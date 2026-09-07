@@ -13,7 +13,7 @@ export interface PasienRuangan {
     id: number;
     code: string;
     name: string;
-    category: string;
+    facility: string | null;
     tanggal_masuk: string | null;
 }
 

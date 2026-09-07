@@ -324,6 +324,30 @@ export default function AppLayout({ children, wide = false }: AppLayoutProps) {
                                 </Link>
                             )}
 
+                            {/* Fasilitas */}
+                            {canAccess('/fasilitas') && (
+                                <Link
+                                    href="/fasilitas"
+                                    className={linkNav(isActive('/fasilitas'))}
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-[18px] w-[18px]"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="1.8"
+                                    >
+                                        <path d="M3 21h18" />
+                                        <path d="M5 21V7l8-4v18" />
+                                        <path d="M19 21V11l-6-4" />
+                                        <path d="M9 9h.01M9 13h.01M9 17h.01" />
+                                    </svg>
+
+                                    <span>Fasilitas</span>
+                                </Link>
+                            )}
+
                             {/* Ruangan */}
                             {canAccess('/ruangans') && (
                                 <Link

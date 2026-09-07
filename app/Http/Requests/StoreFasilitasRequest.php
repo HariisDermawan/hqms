@@ -29,6 +29,12 @@ class StoreFasilitasRequest extends FormRequest
                 'nullable',
                 'string',
             ],
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
             'is_active' => [
                 'sometimes',
                 'boolean',
