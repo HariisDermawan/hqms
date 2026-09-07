@@ -70,8 +70,7 @@ it('lists only active ruangans publicly', function () {
         ->assertJsonPath('success', true)
         ->assertJsonCount(1, 'data.items')
         ->assertJsonPath('data.items.0.id', $active->id)
-        ->assertJsonPath('data.items.0.name', 'Kamar Anggrek')
-        ->assertJsonPath('data.items.0.category', 'Kamar VIP');
+        ->assertJsonPath('data.items.0.name', 'Kamar Anggrek');
 });
 
 it('lists only active doctors publicly', function () {

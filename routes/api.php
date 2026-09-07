@@ -49,7 +49,7 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         ]);
     });
 
-        Route::middleware(['auth:sanctum', 'session.fresh'])->group(function () {
+    Route::middleware(['auth:sanctum', 'session.fresh'])->group(function () {
         Route::prefix('auth')->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::put('/me', [AuthController::class, 'updateProfile']);
@@ -58,7 +58,8 @@ Route::prefix('v1')->middleware(StartSession::class)->group(function () {
         });
 
         Route::apiResource('polis', PoliController::class);
-        Route::apiResource('fasilitas', FasilitasController::class);
+        Route::apiResource('fasilitas', FasilitasController::class)
+            ->parameters(['fasilitas' => 'fasilitas']);
         Route::apiResource('ruangans', RuanganController::class);
         Route::get('ruangans/{ruangan}/antrians', [
             RuanganController::class,

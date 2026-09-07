@@ -10,6 +10,9 @@ return new class extends Migration
     {
         Schema::table('ruangans', function (Blueprint $table) {
             $table->foreignId('facility_id')->nullable()->after('code')->constrained('fasilitas')->nullOnDelete();
+        });
+
+        Schema::table('ruangans', function (Blueprint $table) {
             $table->dropColumn('category');
         });
     }
@@ -18,6 +21,9 @@ return new class extends Migration
     {
         Schema::table('ruangans', function (Blueprint $table) {
             $table->dropConstrainedForeignId('facility_id');
+        });
+
+        Schema::table('ruangans', function (Blueprint $table) {
             $table->string('category', 100)->after('name');
         });
     }

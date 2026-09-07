@@ -49,9 +49,9 @@ class RuanganSeeder extends Seeder
             ['code' => 'M-01', 'name' => 'Ruang Mawar 01',        'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 1.', 'is_active' => true],
             ['code' => 'M-02', 'name' => 'Ruang Mawar 02',        'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 1.', 'is_active' => true],
             ['code' => 'M-03', 'name' => 'Ruang Mawar 03',        'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 1.', 'is_active' => true],
-            ['code' => 'ML-01','name' => 'Ruang Melati 01',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 2.', 'is_active' => true],
-            ['code' => 'ML-02','name' => 'Ruang Melati 02',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 2.', 'is_active' => true],
-            ['code' => 'ML-03','name' => 'Ruang Melati 03',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 2.', 'is_active' => true],
+            ['code' => 'ML-01', 'name' => 'Ruang Melati 01',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 2.', 'is_active' => true],
+            ['code' => 'ML-02', 'name' => 'Ruang Melati 02',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 2.', 'is_active' => true],
+            ['code' => 'ML-03', 'name' => 'Ruang Melati 03',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 2.', 'is_active' => true],
             ['code' => 'D-01', 'name' => 'Ruang Dahlia 01',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 3.', 'is_active' => true],
             ['code' => 'D-02', 'name' => 'Ruang Dahlia 02',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 3.', 'is_active' => true],
             ['code' => 'D-03', 'name' => 'Ruang Dahlia 03',       'facility_id' => $iri?->id, 'poli_code' => null, 'description' => 'Kamar Kelas 3.', 'is_active' => true],
@@ -65,8 +65,8 @@ class RuanganSeeder extends Seeder
             ['code' => 'PICU', 'name' => 'Ruang PICU',            'facility_id' => $icu?->id, 'poli_code' => null, 'description' => 'Pediatric Intensive Care Unit — perawatan intensif anak.', 'is_active' => true],
 
             // ── Kamar Operasi ────────────────────────────
-            ['code' => 'OK-01','name' => 'Ruang Operasi 01',      'facility_id' => $ok?->id,  'poli_code' => null, 'description' => 'Ruang operasi bedah umum.', 'is_active' => true],
-            ['code' => 'OK-02','name' => 'Ruang Operasi 02',      'facility_id' => $ok?->id,  'poli_code' => null, 'description' => 'Ruang operasi bedah spesialis.', 'is_active' => true],
+            ['code' => 'OK-01', 'name' => 'Ruang Operasi 01',      'facility_id' => $ok?->id,  'poli_code' => null, 'description' => 'Ruang operasi bedah umum.', 'is_active' => true],
+            ['code' => 'OK-02', 'name' => 'Ruang Operasi 02',      'facility_id' => $ok?->id,  'poli_code' => null, 'description' => 'Ruang operasi bedah spesialis.', 'is_active' => true],
             ['code' => 'PRE',  'name' => 'Ruang Pra-Operasi',     'facility_id' => $ok?->id,  'poli_code' => null, 'description' => 'Persiapan pasien sebelum operasi.', 'is_active' => true],
             ['code' => 'PAS',  'name' => 'Ruang Pasca-Operasi',   'facility_id' => $ok?->id,  'poli_code' => null, 'description' => 'Pemulihan pasien pasca operasi.', 'is_active' => true],
 

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Fasilitas;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Fasilitas>
@@ -16,7 +17,7 @@ class FasilitasFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name),
+            'slug' => Str::slug($name),
             'description' => fake()->optional()->sentence(),
             'is_active' => true,
         ];

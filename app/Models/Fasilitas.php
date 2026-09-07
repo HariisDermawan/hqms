@@ -26,6 +26,6 @@ class Fasilitas extends Model
 
     public function ruangans(): HasMany
     {
-        return $this->hasMany(Ruangan::class);
+        return $this->hasMany(Ruangan::class, 'facility_id');
     }
 }
