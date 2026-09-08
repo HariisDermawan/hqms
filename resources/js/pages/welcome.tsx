@@ -1,10 +1,13 @@
 import About from '@/components/About';
 import Berita from '@/components/Berita';
+import Chatbot from '@/components/Chatbot/Chatbot';
 import Dokter from '@/components/Dokter';
 import FaqSection from '@/components/Faq/FaqSection';
 import FasilitasSection from '@/components/Fasilitas/Section';
+import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
 import LayananKencana from '@/components/LayananKencana';
+import MessageSection from '@/components/Message/MessageSection';
 import Navbar from '@/components/Navbar';
 import Penawaran from '@/components/Penawaran';
 import TestimonialSection from '@/components/Testimonial/TestimonialSection';
@@ -26,6 +29,9 @@ export default function welcome() {
                 <Berita />
                 <FaqSection />
                 <TestimonialSection />
+                <MessageSection />
+                <Footer />
+                <Chatbot />
             </main>
         </>
     );

@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ScanAttendanceRequest;
 use App\Http\Requests\StoreAntrianRequest;
+use App\Http\Requests\StoreMessageRequest;
 use App\Http\Resources\AntrianResource;
 use App\Http\Resources\BeritaResource;
 use App\Http\Resources\DokterResource;
 use App\Http\Resources\FaqResource;
 use App\Http\Resources\JadwalDokterResource;
+use App\Http\Resources\MessageResource;
 use App\Http\Resources\PenawaranResource;
 use App\Http\Resources\PoliResource;
 use App\Http\Resources\RuanganResource;
@@ -22,6 +24,7 @@ use App\Models\Testimonial;
 use App\Services\AntrianService;
 use App\Services\BeritaService;
 use App\Services\DokterService;
+use App\Services\MessageService;
 use App\Services\PenawaranService;
 use App\Services\PoliService;
 use App\Services\PresensiService;
@@ -37,6 +40,7 @@ class KioskController extends Controller
         private readonly AntrianService $antrianService,
         private readonly BeritaService $beritaService,
         private readonly DokterService $dokterService,
+        private readonly MessageService $messageService,
         private readonly PoliService $poliService,
         private readonly PenawaranService $penawaranService,
         private readonly PresensiService $presensiService,
@@ -137,6 +141,25 @@ class KioskController extends Controller
                 'items' => TestimonialResource::collection($testimonials),
             ],
         ]);
+    }
+
+    /**
+     * Store a public contact message sent from the landing page.
+     */
+    public function storeMessage(
+        StoreMessageRequest $request
+    ): JsonResponse {
+        $message = $this->messageService->create(
+            $request->validated()
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message sent successfully.',
+            'data' => [
+                'message' => new MessageResource($message),
+            ],
+        ], 201);
     }
 
     /**

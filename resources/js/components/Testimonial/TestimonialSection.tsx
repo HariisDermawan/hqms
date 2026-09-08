@@ -107,12 +107,9 @@ export default function TestimonialSection() {
         });
 
     return (
-        <section className="relative overflow-hidden bg-gradient-to-b from-sky-50 to-white py-16 sm:py-20">
-            <div className="pointer-events-none absolute -top-20 -left-24 h-72 w-72 rounded-full bg-sky-200/50 blur-3xl" />
-            <div className="pointer-events-none absolute -right-24 -bottom-24 h-80 w-80 rounded-full bg-cyan-200/40 blur-3xl" />
-
-            <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 md:px-10 lg:px-14">
-                <div className="mb-8 text-center sm:mb-12">
+        <section className="bg-white py-16 sm:py-20">
+            <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 md:px-10 lg:px-14">
+                <div className="mb-8 text-center sm:mb-10">
                     <span className="text-xs font-bold tracking-widest text-[#0284c7] uppercase">
                         Testimoni
                     </span>
@@ -127,50 +124,39 @@ export default function TestimonialSection() {
                 </div>
 
                 <div className="relative mx-auto max-w-3xl">
-                    <div className="grid overflow-hidden rounded-[2rem] bg-white shadow-xl ring-1 shadow-sky-100 ring-slate-100 md:grid-cols-[240px_1fr]">
-                        <div className="relative flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-[#0c4a6e] via-[#0284c7] to-[#22d3ee] px-8 py-10 text-white">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="absolute top-4 right-5 h-12 w-12 text-white/15"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                            >
-                                <path d="M9.983 3v7.391c0 5.704-3.731 9.57-8.983 10.609l-.995-2.151c2.432-.917 3.995-3.638 3.995-5.849h-4v-10h9.983zm14.017 0v7.391c0 5.704-3.748 9.571-9 10.609l-.996-2.151c2.433-.917 3.996-3.638 3.996-5.849h-3.983v-10h9.983z" />
-                            </svg>
-
-                            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/15 text-3xl font-bold ring-2 ring-white/40 backdrop-blur">
+                    <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
+                        <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left">
+                            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#e0f2fe] text-xl font-bold text-[#0284c7]">
                                 {getInitials(current.name)}
                             </div>
 
-                            <div className="text-center">
-                                <div className="text-lg font-semibold">
+                            <div className="mt-4 sm:mt-0 sm:ml-5 sm:flex-1">
+                                <div className="font-semibold text-slate-800">
                                     {current.name}
                                 </div>
 
                                 {current.role && (
-                                    <div className="mt-0.5 text-sm text-sky-100">
+                                    <div className="mt-0.5 text-sm text-slate-500">
                                         {current.role}
                                     </div>
                                 )}
                             </div>
-                        </div>
 
-                        <div className="flex flex-col justify-center gap-4 px-8 py-10 sm:px-12">
-                            <div className="flex [&>svg]:mx-0.5">
+                            <div className="mt-4 flex sm:mt-0 [&>svg]:mx-0.5">
                                 {renderStars(current.rating)}
                             </div>
-
-                            <blockquote className="text-base leading-relaxed text-slate-600 italic sm:text-lg">
-                                &ldquo;{current.message}&rdquo;
-                            </blockquote>
                         </div>
+
+                        <blockquote className="mt-6 border-t border-slate-100 pt-6 text-base leading-relaxed text-slate-600 italic sm:text-lg">
+                            &ldquo;{current.message}&rdquo;
+                        </blockquote>
                     </div>
 
                     <div className="mt-6 flex items-center justify-center gap-3">
                         <button
                             type="button"
                             onClick={prev}
-                            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-[#075985] hover:text-white"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-[#075985] hover:text-white"
                             aria-label="Testimoni sebelumnya"
                         >
                             <svg
@@ -204,7 +190,7 @@ export default function TestimonialSection() {
                         <button
                             type="button"
                             onClick={next}
-                            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-[#075985] hover:text-white"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-[#075985] hover:text-white"
                             aria-label="Testimoni berikutnya"
                         >
                             <svg

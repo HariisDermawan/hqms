@@ -69,7 +69,7 @@ export const storeFasilitas = async (
     formData.append('name', payload.name);
     formData.append('slug', payload.slug);
     formData.append('description', payload.description ?? '');
-    formData.append('is_active', String(payload.is_active ?? true));
+    formData.append('is_active', payload.is_active ? '1' : '0');
 
     if (image) {
         formData.append('image', image);
@@ -94,7 +94,7 @@ export const updateFasilitas = async (
     formData.append('name', payload.name);
     formData.append('slug', payload.slug);
     formData.append('description', payload.description ?? '');
-    formData.append('is_active', String(payload.is_active ?? true));
+    formData.append('is_active', payload.is_active ? '1' : '0');
 
     if (image) {
         formData.append('image', image);
