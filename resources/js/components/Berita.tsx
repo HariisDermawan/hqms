@@ -1,16 +1,16 @@
 import { Link } from '@inertiajs/react';
 import { getKioskBeritas } from '@/api/kiosk';
+import type { Berita } from '@/api/berita';
 import { useEffect, useRef, useState } from 'react';
 
-interface BeritaCard {
-    id: number;
-    title: string;
-    slug: string;
-    description: string | null;
-    image_url: string | null;
-}
-
 const DRAG_THRESHOLD = 6;
+
+const stripHtml = (html: string | null): string =>
+    (html ?? '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 
 const formatDate = (): string => {
     return new Date()
@@ -24,7 +24,7 @@ const formatDate = (): string => {
 };
 
 export default function Berita() {
-    const [beritas, setBeritas] = useState<BeritaCard[]>([]);
+    const [beritas, setBeritas] = useState<Berita[]>([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [total, setTotal] = useState(0);
@@ -122,15 +122,7 @@ export default function Berita() {
                     return;
                 }
 
-                setBeritas(
-                    (response.data?.items ?? []).map((berita) => ({
-                        id: berita.id,
-                        title: berita.title,
-                        slug: berita.slug,
-                        description: berita.description ?? null,
-                        image_url: berita.image_url ?? null,
-                    })),
-                );
+                setBeritas(response.data?.items ?? []);
                 setLastPage(response.data?.pagination?.last_page ?? 1);
                 setTotal(response.data?.pagination?.total ?? 0);
             } catch {
@@ -253,7 +245,8 @@ export default function Berita() {
                                         </h3>
 
                                         <p className="mt-3 line-clamp-2 hidden max-w-2xl text-sm leading-relaxed text-white/80 sm:block">
-                                            {featured.description || '-'}
+                                            {stripHtml(featured.description) ||
+                                                '-'}
                                         </p>
 
                                         <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-sky-300 transition group-hover:gap-2.5">
@@ -329,7 +322,9 @@ export default function Berita() {
                                             </h3>
 
                                             <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-slate-500">
-                                                {berita.description || '-'}
+                                                {stripHtml(
+                                                    berita.description,
+                                                ) || '-'}
                                             </p>
 
                                             <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13px] font-semibold text-[#075985]">

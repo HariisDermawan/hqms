@@ -1,4 +1,12 @@
 import type { Auth } from '@/types/auth';
+import type { JQueryStatic } from 'jquery';
+
+declare global {
+    interface Window {
+        $: JQueryStatic;
+        jQuery: JQueryStatic;
+    }
+}
 
 declare module 'react' {
     interface InputHTMLAttributes<T> {

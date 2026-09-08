@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Resources\BeritaResource;
 use App\Http\Resources\DokterResource;
 use App\Models\Antrian;
 use App\Models\Berita;
@@ -38,13 +39,19 @@ Route::get('/dokter/{dokter:slug}', function (Dokter $dokter) {
         ))->resolve(),
     ]);
 })->name('dokter.detail');
+
+Route::get('/berita/{berita:slug}', function (Berita $berita) {
+    return Inertia::render('Berita/Detail', [
+        'berita' => (new BeritaResource($berita))->resolve(),
+    ]);
+})->name('berita.detail');
+
 Route::get('/register', function () {
     return Inertia::render('Auth/Register');
 })->name('register');
 Route::get('/login', function () {
     return Inertia::render('Auth/Login');
 })->name('login');
-
 Route::get('/ticket', function () {
     return Inertia::render('Kiosk/TicketDisplay');
 })->name('ticket');

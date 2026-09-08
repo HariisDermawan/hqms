@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { Berita, BeritaPayload } from '@/api/berita';
+import SummernoteEditor from '@/components/SummernoteEditor';
 
 interface BeritaFormProps {
     initial?: Berita | null;
@@ -198,26 +199,18 @@ export default function BeritaForm({
                     )}
                 </div>
 
-                {/* DESKRIPSI */}
+                {/* KONTEN */}
                 <div className="sm:col-span-2">
-                    <label htmlFor="description" className={labelClass}>
-                        Deskripsi
+                    <label htmlFor="content" className={labelClass}>
+                        Konten Berita
                     </label>
 
-                    <textarea
-                        id="description"
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                        placeholder="Isi berita"
-                        rows={5}
-                        className="w-full rounded-[12px] bg-[#d9d9d9] px-[12px] py-[10px] text-[13px] text-gray-700 transition outline-none placeholder:text-[#999] focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30"
+                    <SummernoteEditor
+                        value={initial?.description ?? ''}
+                        onChange={setDescription}
+                        placeholder="Tulis isi berita di sini..."
+                        error={errors.content || errors.description}
                     />
-
-                    {errors.description && (
-                        <p className="mt-1 text-[11px] text-red-500">
-                            {errors.description}
-                        </p>
-                    )}
                 </div>
             </div>
 

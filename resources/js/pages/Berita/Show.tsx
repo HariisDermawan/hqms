@@ -30,9 +30,16 @@ export default function BeritaShow() {
             });
     }, [id]);
 
-    const description = berita?.description
-        ? berita.description[0].toUpperCase() + berita.description.slice(1)
+    const excerpt = berita?.description
+        ? berita.description
+              .replace(/<[^>]*>/g, ' ')
+              .replace(/&nbsp;/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+              .slice(0, 60)
         : '-';
+
+    const description = berita?.description ? berita.description : '';
 
     return (
         <>
@@ -103,7 +110,7 @@ export default function BeritaShow() {
                                         </h3>
 
                                         <p className="mt-1 text-[13px] text-gray-500">
-                                            {description}
+                                            {excerpt || '-'}
                                         </p>
                                     </div>
                                 </div>
@@ -137,8 +144,17 @@ export default function BeritaShow() {
                                                 Deskirpsi
                                             </p>
 
-                                            <p className="mt-1 text-[13px] leading-relaxed font-normal whitespace-pre-line text-gray-700">
-                                                {description}
+                                            <p className="mt-1 text-[13px] leading-relaxed font-normal text-gray-700">
+                                                {description ? (
+                                                    <div
+                                                        className="prose-slate max-w-none space-y-4 break-words [&_a]:text-[#075985] [&_a]:underline [&_blockquote]:my-4 [&_blockquote]:rounded-r-2xl [&_blockquote]:border-l-4 [&_blockquote]:border-[#0284c7] [&_blockquote]:bg-[#f0f9ff] [&_blockquote]:px-5 [&_blockquote]:py-4 [&_blockquote]:italic [&_h1]:mb-3 [&_h1]:text-2xl [&_h1]:font-extrabold [&_h1]:text-slate-900 [&_h2]:mb-3 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h3]:mb-2 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-slate-900 [&_img]:my-4 [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded-xl [&_ol]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:my-3 [&_ul]:list-disc [&_ul]:pl-5"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: description,
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    '-'
+                                                )}
                                             </p>
                                         </div>
                                     </div>
