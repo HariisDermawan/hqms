@@ -45,7 +45,7 @@ HQMS adalah aplikasi manajemen rumah sakit untuk **RS Merdeka** yang mencakup an
 ### 1. Clone Repository
 
 ```bash
-git clone <url-repository-anda> hqms
+git clone https://github.com/HariisDermawan/hqms.git
 cd hqms
 ```
 
