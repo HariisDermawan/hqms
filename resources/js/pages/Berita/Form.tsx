@@ -199,10 +199,10 @@ export default function BeritaForm({
                     )}
                 </div>
 
-                {/* KONTEN */}
+                {/* DESKRIPSI */}
                 <div className="sm:col-span-2">
                     <label htmlFor="content" className={labelClass}>
-                        Konten Berita
+                        Deskripsi
                     </label>
 
                     <SummernoteEditor

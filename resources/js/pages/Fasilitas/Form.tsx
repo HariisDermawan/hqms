@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { Fasilitas, FasilitasPayload } from '@/api/fasilitas';
+import SummernoteEditor from '@/components/SummernoteEditor';
 
 const slugify = (value: string): string =>
     value
@@ -231,20 +232,12 @@ export default function FasilitasForm({
                         Deskripsi
                     </label>
 
-                    <textarea
-                        id="description"
-                        value={description}
-                        onChange={(event) => setDescription(event.target.value)}
-                        placeholder="Deskripsi singkat tentang fasilitas ini..."
-                        rows={5}
-                        className="w-full rounded-[12px] bg-[#d9d9d9] px-[12px] py-[10px] text-[13px] text-gray-700 transition outline-none placeholder:text-[#999] focus:bg-[#d5d5d5] focus:ring-2 focus:ring-[#084e7a]/30"
+                    <SummernoteEditor
+                        value={initial?.description ?? ''}
+                        onChange={setDescription}
+                        placeholder="Deskripsi tentang fasilitas ini..."
+                        error={errors.description}
                     />
-
-                    {errors.description && (
-                        <p className="mt-1 text-[11px] text-red-500">
-                            {errors.description}
-                        </p>
-                    )}
                 </div>
 
                 {/* STATUS */}

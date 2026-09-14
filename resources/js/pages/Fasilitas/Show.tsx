@@ -177,9 +177,18 @@ export default function Show() {
                             Deskripsi
                         </p>
 
-                        <p className="mt-1.5 text-[13px] text-gray-600">
-                            {fasilitas.description || '-'}
-                        </p>
+                        {!fasilitas.description ? (
+                            <p className="mt-1.5 text-[13px] text-gray-600">
+                                -
+                            </p>
+                        ) : (
+                            <div
+                                className="mt-1.5 text-[13px] leading-relaxed text-gray-600 [&_a]:text-[#07577f] [&_a]:underline [&_h1]:text-[18px] [&_h1]:font-bold [&_h2]:text-[16px] [&_h2]:font-bold [&_h3]:text-[14px] [&_h3]:font-bold [&_img]:my-3 [&_img]:max-w-full [&_img]:rounded-lg [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-1 [&_pre]:overflow-x-auto [&_pre]:rounded-lg [&_pre]:bg-gray-100 [&_pre]:p-3 [&_ul]:list-disc [&_ul]:pl-6"
+                                dangerouslySetInnerHTML={{
+                                    __html: fasilitas.description,
+                                }}
+                            />
+                        )}
                     </div>
                 </div>
 

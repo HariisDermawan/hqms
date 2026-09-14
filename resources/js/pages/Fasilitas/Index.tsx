@@ -7,6 +7,12 @@ import {
 } from '@/api/fasilitas';
 import AppLayout from '@/Layouts/AppLayout';
 
+const stripHtml = (html: string): string =>
+    html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
 export default function FasilitasIndex() {
     const [items, setItems] = useState<Fasilitas[]>([]);
     const [page, setPage] = useState(1);
@@ -225,7 +231,9 @@ export default function FasilitasIndex() {
                                         </div>
 
                                         <p className="mt-2 line-clamp-2 min-h-[32px] text-[12px] leading-relaxed text-gray-500">
-                                            {item.description || '-'}
+                                            {item.description
+                                                ? stripHtml(item.description)
+                                                : '-'}
                                         </p>
 
                                         {item.ruangans_count !== undefined && (
