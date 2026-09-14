@@ -1,5 +1,7 @@
 <div align="center">
 
+![HQMS Banner](https://github.com/HariisDermawan/hqms/blob/main/public/banner/bn.png)
+
 # 🏥 HQMS — Hospital Queue Management System
 
 **Sistem Manajemen Rumah Sakit dengan Kiosk Antrean Self-Service — RS Merdeka**
@@ -109,19 +111,6 @@ Password semua akun: **`password`**
 | `dr.budi@hqms`    | Dokter      |
 | `drg.siti@hqms`   | Dokter      |
 
-## 📸 Screenshot
-
-### Dashboard
-
-![Dashboard](screenshots/dashboard.png)
-
-### Kiosk Antrean
-
-![Kiosk](screenshots/kiosk.png)
-
-### TV Antrean
-
-![TV Antrean](screenshots/ticker.png)
 
 ## 🧪 Testing
 
