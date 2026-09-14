@@ -2,7 +2,7 @@
 
 # 🏥 HQMS — Hospital Queue Management System
 
-**Sistem Manajemen Rumah Sakit dengan Antrean Kiosk Self-Service**
+**Sistem Manajemen Rumah Sakit dengan Antrean Kiosk Self-Service (RS Merdeka)**
 
 [![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?style=flat&logo=php&logoColor=white)](https://php.net)
 [![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
@@ -13,82 +13,71 @@
 
 </div>
 
+HQMS adalah sistem manajemen rumah sakit lengkap untuk **RS Merdeka** dengan antrean **kiosk self-service** (pasien mengambil tiket sendiri), alur pelayanan dari pendaftaran sampai pembayaran, hingga tampilan **ticker/TV antrean** di ruang tunggu. Dibangun sebagai **Single Page Application (SPA)** dengan pola **Inertia.js v3** — Laravel di sisi server, React + TypeScript di sisi klien.
+
 ---
 
 ## 📋 Daftar Isi
 
-- [Deskripsi](#-deskripsi)
 - [Fitur Utama](#-fitur-utama)
+- [Alur Penggunaan](#-alur-penggunaan)
 - [Teknologi](#-teknologi)
-- [Arsitektur](#-arsitektur)
-- [Peran Pengguna (RBAC)](#-peran-pengguna-rbac)
-- [Cara Instalasi & Menjalankan](#-cara-instalasi--menjalankan)
+- [Prasyarat](#-prasyarat)
+- [Cara Instalasi](#-cara-instalasi)
 - [Akun Demo](#-akun-demo)
-- [Modul & Halaman](#-modul--halaman)
+- [Halaman & Modul](#-halaman--modul)
+- [Menjalankan Server](#-menjalankan-server)
 - [Testing](#-testing)
 - [Struktur Proyek](#-struktur-proyek)
-- [Dokumentasi API](#-dokumentasi-api)
+- [Rangkuman API](#-rangkuman-api)
+- [Troubleshooting](#-troubleshooting)
 - [Kontribusi](#-kontribusi)
 - [Lisensi](#-lisensi)
 
 ---
 
-## 📖 Deskripsi
+## ✨ Fitur Utama
 
-**HQMS** adalah sistem manajemen rumah sakit (Hospital Management System) yang dirancang untuk RS Merdeka. Aplikasi ini menggabungkan:
+### 🎫 Antrean Kiosk & TV Ticker
+- Pengambilan **tiket antrean mandiri** di kiosk; pasien memilih poli aktif → dapat nomor.
+- Nomor antrean otomatis **per poli per hari**, format `{KODE-POLI}-NNN` (contoh: `B-001`). Kode berasal dari `queue_prefix` (satu huruf A–Z) milik masing-masing poli.
+- Pengelolaan antrean oleh staf: `called` (panggil) → `serving` (layani) → `completed` (selesai), plus `skipped` (lewati) dan panggil ulang, lengkap dengan penomoran **loket**.
+- Halaman **"Now Serving"** + **ticker antrean** real-time untuk TV ruang tunggu.
 
-1. **Kiosk pengambilan tiket antrean mandiri (self-service)** — pasien memilih poli lalu mendapatkan nomor antrean (contoh: `B-001`).
-2. **Alur pelayanan pasien** dari pendaftaran, antrean, pemeriksaan dokter, peresepan obat, hingga pembayaran.
-3. **Manajemen operasional RS** — poli, dokter, perawat, jadwal dokter, kamar/ruangan, fasilitas, presensi karyawan, serta konten publik (berita, penawaran, FAQ, testimoni).
-4. **Tampilan TV / ticker antrean** untuk ruang tunggu, lengkap dengan informasi nomor yang sedang dilayani per loket.
+### 🧑‍⚕️ Alur Pelayanan Pasien
+- **Pasien** — data pasien dengan nomor rekam medis (RM) & NIK.
+- **Pendaftaran** — mendaftarkan pasien ke poli. Bisa langsung dari tiket antrean (`?antrian_id=N`), menghasilkan nomor registrasi `REG-YYYYMMDD-{KODE}NNN`, dan tiket otomatis ditandai `called`.
+- **Pemeriksaan** — catatan dokter (keluhan, diagnosis, tindakan) terkait antrean & pasien.
+- **Obat** — resep obat per pemeriksaan.
+- **Pembayaran** — transaksi pembayaran atas pemeriksaan.
 
-Aplikasi dibangun sebagai **Single Page Application (SPA)** dengan pola **Inertia.js** — backend Laravel mengelola data (MySQL/SQLite), sedangkan antarmukanya di-render oleh React di sisi klien.
+### 🏥 Data Master Rumah Sakit
+- **Fasilitas** (UGD, IRJ, perawatan, OK, penunjang, umum) → **Ruangan/Kamar** (hierarki fasilitas→ruangan).
+- **Poli**, **Dokter** (aktif/non-aktif, SIP), **Jadwal Dokter** mingguan, **Perawat** dengan kartu **RFID**.
+- **Presensi RFID** — scan kartu di kiosk → check-in/check-out otomatis + riwayat harian.
+
+### 📢 Konten & Frontend Publik
+- Landing page, **Cari Dokter**, detail dokter/fasilitas, **Berita** & **Penawaran**, **FAQ**, **Testimoni**, dan formulir **Pesan/Message**.
+
+### 📊 Dashboard & Monitoring
+- Dashboard ringkasan statistik; halaman monitoring dengan grafik (Recharts): pasien per bulan/poli, pendaftaran per hari/poli, dan status antrean.
+
+### 🔐 Keamanan
+- Autentikasi **session/cookie** (Laravel Sanctum *stateful*), bukan bearer token.
+- **RBAC** dengan `spatie/laravel-permission`: 5 peran dengan izin per modul.
+- Sesi kedaluwarsa otomatis (default 24 jam, diatur `SESSION_LIFETIME`).
 
 ---
 
-## ✨ Fitur Utama
+## 🚦 Alur Penggunaan
 
-### 🎫 Manajemen Antrean & Kiosk
-- **Pengambilan tiket mandiri** di kiosk dengan pemilihan poli aktif.
-- Nomor antrean otomatis per poli per hari, format `KODE-POLI-NNN` (contoh: `B-001`).
-- Pengelolaan antrean: panggil (`called`), layani (`serving`), selesaikan (`completed`), lewati (`skipped`), batalkan, dan panggil ulang.
-- Penomoran loket untuk setiap antrean yang sedang dilayani.
-- Tampilan **"Now Serving"** untuk TV ruang tunggu.
-- **Ticker antrean** real-time (antrian yang sudah dipanggil/dilayani hari itu).
-
-### 🧑‍⚕️ Alur Pelayanan Pasien
-- **Pasien**: data pasien dengan nomor rekam medis, NIK, dll.
-- **Pendaftaran**: mendaftarkan pasien ke poli (bisa langsung dari tiket antrean), menghasilkan nomor registrasi `REG-YYYYMMDD-KODE-NNN`.
-- **Pemeriksaan**: catatan pemeriksaan dokter (keluhan, diagnosis, tindakan) yang terhubung ke antrean & pasien.
-- **Obat**: resep obat per pemeriksaan.
-- **Pembayaran**: transaksi pembayaran atas pemeriksaan.
-
-### 🏥 Data Master Rumah Sakit
-- **Fasilitas**: unit layanan utama (UGD, IRJ, perawatan, OK, penunjang, umum) yang bisa menampung banyak ruangan.
-- **Ruangan / Kamar**: kamar atau bangsal di bawah fasilitas, bisa dihubungkan ke poli, dan menampung pasien.
-- **Poli**: unit poliklinik dengan kode antrean (prefix).
-- **Dokter**: dokter aktif/non-aktif, spesialisasi, nomor SIP, jadwal.
-- **Jadwal Dokter**: jadwal mingguan (hari + jam praktik) per dokter.
-- **Perawat**: data perawat lengkap dengan kartu RFID untuk presensi.
-
-### 🕐 Presensi & Kehadiran
-- **Presensi berbasis RFID**: scan kartu/perangkat RFID di kiosk → check-in / check-out otomatis.
-- Riwayat presensi per perawat per hari dengan status.
-
-### 📢 Konten Publik (Landing Page)
-- Halaman depan publik: daftar dokter, jadwal poli, fasilitas, ruangan.
-- **Berita** & **Penawaran** (promosi layanan) dengan paginasi.
-- **FAQ** dan **Testimoni** yang dapat diurutkan.
-- **Formulir pesan** untuk pengunjung yang ingin menghubungi RS.
-
-### 📊 Dashboard & Monitoring
-- **Dashboard** ringkasan statistik (jumlah pasien, poli, dll).
-- **Monitoring antrean**: grafik pasien per bulan, pasien per poli, pendaftaran per hari, pendaftaran per poli, dan status antrean.
-
-### 🔐 Keamanan & Hak Akses
-- Autentikasi berbasis **session/cookie** (Sanctum — *stateful*).
-- **RBAC** dengan Spatie Permission: 6 peran bawaan dengan izin terperinci per modul.
-- Sesi kadaluarsa otomatis setelah masa aktif berakhir.
+1. **Pasien di kiosk** membuka halaman `/ticket`, memilih poli, dan mendapat tiket bernomor (mis. `B-001`).
+2. Nomor muncul di **ticker / now-serving** (`/antrians-ticker`) untuk TV ruang tunggu.
+3. **Staf Loket** mendaftarkan pasien: menu **Pendaftaran → Create** dengan `?antrian_id=N` → status antrean berubah `called`, terbentuk nomor registrasi `REG-...`.
+4. **Dokter** mengelola antrean (panggil/layani/selesaikan) dan membuat **Pemeriksaan** pada pasien.
+5. **Staf Obat** membuat resep **Obat** per pemeriksaan, lalu **Staf Loket/Admin** menyelesaikannya di **Pembayaran**.
+6. **Perawat** men–scan kartu RFID di `/absen-karyawan` untuk presensi harian.
+7. **Admin** memantau semuanya lewat **Dashboard** & **Monitoring** serta mengelola data master dan konten publik.
 
 ---
 
@@ -98,136 +87,111 @@ Aplikasi dibangun sebagai **Single Page Application (SPA)** dengan pola **Inerti
 | --- | --- |
 | **Backend** | Laravel 13 · PHP 8.3 · Eloquent ORM |
 | **Frontend** | React 19 · TypeScript · Tailwind CSS 4 |
-| **Integrasi** | Inertia.js v3 (SPA tanpa REST API manual) |
+| **Integrasi** | Inertia.js v3 (SPA) |
 | **Auth** | Laravel Sanctum (session-based) |
-| **OTORISASI** | spatie/laravel-permission (RBAC) |
-| **Build Tool** | Vite 8 · vite-plus (`vite.config.ts`) · @vitejs/plugin-react |
-| **Generasi Route TS** | laravel/wayfinder (typed routes dari sisi Laravel) |
+| **Otorisasi** | spatie/laravel-permission (RBAC) |
+| **Build Tool** | Vite 8 via `vite-plus` (`vite.config.ts`) |
+| **Route TS** | laravel/wayfinder (typed routes) |
 | **Chart** | Recharts |
-| **Database** | MySQL (pengembangan) / SQLite (testing) |
-| **Testing** | Pest (PHP) · PHPUnit |
-| **Static Analysis** | Pint (format) · PHPStan (opsional) · `tsc` |
+| **Editor Konten** | Summernote |
+| **Database** | MySQL (dev) / SQLite in-memory (test) |
+| **Testing** | Pest |
+| **Kualitas Kode** | Pint (format) · tsc · vite-plus check |
 | **CI** | GitHub Actions (`.github/workflows/tests.yml`) |
 
 ---
 
-## 🏗️ Arsitektur
+## 📋 Prasyarat
 
-Aplikasi mengikuti pola **Controller → Service → Request → Resource** per modul:
-
-```
-Http\Controllers\Api\PoliController
-        │  (thin, hanya memanggil service)
-        ▼
-Services\PoliService
-        │  (mengelola logika bisnis & transaksi DB)
-        ▼
-Http\Requests\StorePoliRequest
-        │  (validasi)
-        ▼
-Http\Resources\PoliResource
-        (transformasi output JSON)
-```
-
-### Envelope Respons API
-Seluruh endpoint JSON memakai format konsisten:
-
-```json
-{
-  "success": true,
-  "message": "Pesan singkat.",
-  "data": {
-    "items": [],
-    "pagination": { "current_page": 1, "per_page": 10, "total": 0, "last_page": 1 }
-  }
-}
-```
-
-### Struktur API (`/api/v1`)
-- **Publik (tanpa login)** — `auth/register`, `auth/login`, dan grup `kiosk/*`.
-- **Terproteksi (`auth:sanctum`)** — `auth/me`, `auth/logout`, dan CRUD seluruh resource (`polis`, `pasiens`, `pendaftarans`, `antrians`, `dokters`, `perawats`, `presensis`, `jadwal-dokters`, `pemeriksaans`, `obats`, `pembayarans`, `fasilitas`, `ruangans`, `beritas`, `penawarans`, `faqs`, `testimonials`, `messages`), serta endpoint `monitoring`.
-
----
-
-## 👥 Peran Pengguna (RBAC)
-
-Terdapat **6 peran** (Spatie Permission) yang masing-masing memiliki izin berbeda:
-
-| Peran | Cakupan akses utama |
-| --- | --- |
-| **Super Admin** | Semua izin (CRUD seluruh modul + user) |
-| **Admin** | CRUD poli, ruangan, dokter, perawat, presensi, jadwal, pasien, obat, pembayaran, antrean, & konten; izin user view/create/update |
-| **Dokter** | Lihat poli, dokter, jadwal, pasien; resep obat (`medicine.create`); kelola antrean (panggil/layani/selesaikan) |
-| **Staf Loket** | Kelola pasien & antrean penuh (create, call, recall, skip, complete, cancel), monitoring, dashboard |
-| **Staf Obat** | Lihat pasien & antrean; kelola obat (`create`/`update`); lihat pembayaran; dashboard |
-| **Perawat** | Lihat poli, dokter, jadwal, pasien, ruangan; kelola data perawat & presensi; kelola antrean |
-
----
-
-## 🚀 Cara Instalasi & Menjalankan
-
-### Prasyarat
-- **PHP** versi 8.3 atau lebih baru
+- **PHP 8.3+** dengan ekstensi umum (`pdo_mysql`, `mbstring`, `openssl`, dll.)
 - **Composer**
-- **Node.js** (versi 20+)
-- **npm** (atau pnpm — proyek ini mendukung keduanya)
-- Server database (MySQL/MariaDB untuk pengembangan, atau SQLite untuk tes cepat)
+- **Node.js 20+** dan **npm**
+- **MySQL/MariaDB** (untuk dev) — atau SQLite untuk pemasangan ringan
 
-### 1. Clone & install dependency
+---
+
+## 🚀 Cara Instalasi
+
+### 1. Clone project
 
 ```bash
 git clone <url-repository-anda> hqms
 cd hqms
+```
 
+### 2. Install dependency
+
+```bash
 composer install
 npm install
 ```
 
-### 2. Siapkan aplikasi
+### 3. Konfigurasi environment
 
 ```bash
+cp .env.example .env      # Windows: copy .env.example .env
 php artisan key:generate
 ```
 
-Atur koneksi database pada konfigurasi aplikasi (buat database sesuai yang digunakan, misalnya `hqms_db`). Pastikan struktur tabel menunggu migrasi di langkah berikutnya.
+Sesuaikan `.env` dengan database Anda (contoh MySQL):
 
-### 3. Migrasi database & seed data contoh
+```env
+APP_NAME=HQMS
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=hqms_db
+DB_USERNAME=root
+DB_PASSWORD=
+
+SESSION_DRIVER=database
+```
+
+Buat database-nya mis. `hqms_db`, lalu atur `SANCTUM_STATEFUL_DOMAINS` agar memuat host yang Anda pakai:
+
+```env
+SANCTUM_STATEFUL_DOMAINS=localhost,localhost:8000,127.0.0.1,127.0.0.1:8000
+```
+
+> **Penting (session auth):** aplikasi ini memakai cookie (bukan bearer token). Jika Anda membuka aplikasi di host/port lain (mis. `hqms.test` dari Laragon/XAMPP), port tersebut **wajib** ditambahkan ke `SANCTUM_STATEFUL_DOMAINS`, jika tidak login berhasil tetapi permintaan API pertama tetap berbalas `401`.
+
+> **Ingin hemat tanpa MySQL?** Biarkan `DB_CONNECTION=sqlite` dari `.env.example`, buat file `database/database.sqlite`, dan lanjut ke langkah 4.
+
+### 4. Migrasi database & seed data contoh
 
 ```bash
 php artisan migrate --seed
 ```
 
-Perintah ini membuat seluruh tabel sekaligus mengisi **data contoh** (poli, fasilitas, ruangan, pasien, dokter, perawat, jadwal, obat, berita, penawaran, FAQ, testimoni, pesan, hingga akun demo).
+Perintah ini membuat seluruh tabel **dan** mengisi data contoh (poli, fasilitas, ruangan, pasien, dokter, perawat, jadwal, obat, berita, penawaran, FAQ, testimoni, pesan, hingga akun demo).
 
-> Untuk hanya membuat struktur tabel tanpa data contoh: `php artisan migrate`.
+> Hanya struktur tabel tanpa data contoh: `php artisan migrate`.
 
-### 4. Bangun aset frontend
-
-```bash
-npm run build
-```
-
-Untuk pengembangan frontend secara real-time (hot reload), gunakan:
+### 5. Symlink untuk gambar (upload)
 
 ```bash
-npm run dev
+php artisan storage:link
 ```
 
-### 5. Jalankan aplikasi
+Diperlukan agar foto/gambar (fasilitas, dokter, berita, dll.) bisa tampil di browser.
+
+### 6. Bangun & jalankan
 
 ```bash
 composer run dev
 ```
 
-Perintah ini menjalankan server Laravel **dan** Vite secara bersamaan. Buka **http://localhost:8000** di browser.
+Perintah ini menjalankan server Laravel **dan** Vite (hot reload) bersamaan. Buka **http://localhost:8000**.
 
-> Jika aset tidak termuat (error *manifest*), jalankan `npm run build` terlebih dahulu.
+> Alternatif manual: jalankan `php artisan serve` + `npm run dev` terpisah, atau `npm run build` (produksi) + `php artisan serve`.
 
 ---
 
 ## 👤 Akun Demo
 
-Semua akun berikut menggunakan password: **`password`**
+Semua akun memakai password **`password`** (lihat `database/seeders/AdminSeeder.php`):
 
 | Email | Peran |
 | --- | --- |
@@ -242,60 +206,58 @@ Semua akun berikut menggunakan password: **`password`**
 
 ---
 
-## 🧩 Modul & Halaman
+## 🧭 Halaman & Modul
 
-### Public (tanpa login)
+### Publik (tanpa login)
+
 | Halaman | URL |
 | --- | --- |
-| Beranda (landing) | `/` |
+| Beranda / landing | `/` |
 | Cari Dokter | `/cari-dokter` |
 | Detail Dokter | `/dokter/{slug}` |
 | Detail Berita | `/berita/{slug}` |
+| Detail Fasilitas | `/fasilitas/{slug}` |
 | Login | `/login` |
 | Register | `/register` |
-| Kiosk pengambilan tiket | `/ticket` |
-| Ticker antrean (TV) | `/antrians-ticker` |
-| Absen Karyawan (scan RFID) | `/absen-karyawan` |
-| Detail Fasilitas | `/fasilitas/{slug}` |
+| **Kiosk ambil tiket** | `/ticket` |
+| **Ticker antrean (TV)** | `/antrians-ticker` |
+| **Absen karyawan (scan RFID)** | `/absen-karyawan` |
 
-### Terproteksi (perlu login)
-- **Dashboard** — `/dashboard`
-- **Monitoring Antrean** — `/monitorings`
-- **Profil** — `/profile`
-- CRUD per modul (Index/Create/Edit/Show): `polis`, `pasiens`, `pendaftarans`, `antrians`, `dokters`, `jadwal-dokters`, `perawats`, `presensis`, `pemeriksaans`, `obats`, `pembayarans`, `fasilitas`, `ruangans`, `beritas`, `penawarans`, `faqs`, `testimonials`, `messages`.
+### Terproteksi (harus login)
 
-Beberapa halaman *Create* mendukung *query parameter* untuk alur kerja cepat:
-- `…/pendaftarans/create?antrian_id=N`
-- `…/pemeriksaans/create?antrian_id=N&pasien_id=N&poli_id=N`
-- `…/obats/create?pemeriksaan_id=N`
-- `…/pembayarans/create?pemeriksaan_id=N`
-- `…/messages/{id}/edit?reply=1`
+- **Dashboard** (`/dashboard`) dan **Monitoring** (`/monitorings`)
+- **Profil** (`/profile`)
+- CRUD per modul — `Index`/`Create`/`Edit`/`Show`: `pasiens`, `polis`, `fasilitas`, `ruangans`, `dokters`, `perawats`, `presensis`, `jadwal-dokters`, `pendaftarans`, `antrians`, `pemeriksaans`, `obats`, `pembayarans`, `beritas`, `penawarans`, `faqs`, `testimonials`, `messages`.
+
+Halaman *Create* mendukung *query parameter* untuk alur kerja cepat:
+
+| Halaman | Query |
+| --- | --- |
+| Pendaftaran baru | `pendaftarans/create?antrian_id=N` |
+| Pemeriksaan baru | `pemeriksaans/create?antrian_id=N&pasien_id=N&poli_id=N` |
+| Obat baru | `obats/create?pemeriksaan_id=N` |
+| Pembayaran baru | `pembayarans/create?pemeriksaan_id=N` |
+| Balas pesan | `messages/{id}/edit?reply=1` |
 
 ---
 
 ## 🧪 Testing
 
-Proyek menggunakan **Pest** untuk pengujian. Tes berjalan di atas SQLite in-memory sehingga cepat dan tidak membutuhkan MySQL.
+Tes menggunakan **Pest** dan berjalan di **SQLite in-memory** (tanpa MySQL):
 
 ```bash
-# Jalankan seluruh suite
-php artisan test --compact
-
-# Jalankan satu file/filter tertentu
-php artisan test --filter=NamaTest
-vendor/bin/pest tests/Feature/AntrianApiTest.php
+php artisan test --compact                      # seluruh suite
+php artisan test --filter=NamaTest              # satu test/filter
+vendor/bin/pest tests/Feature/AntrianApiTest.php # satu file
 ```
 
-Perintah verifikasi lain yang tersedia:
+Verifikasi kode lainnya:
 
 ```bash
-vendor/bin/pint                     # Format kode PHP
-php artisan test --compact          # Tes PHP (Pest)
-npm run types:check                 # Cek tipe TypeScript (tsc)
-npm run check                       # Lint + format frontend (vite-plus)
+vendor/bin/pint              # format kode PHP
+npm run types:check          # cek tipe TypeScript (tsc)
+npm run check                # lint + format frontend (vite-plus)
 ```
-
-Pipeline CI (GitHub Actions) otomatis menjalankan: install dependency → salin konfigurasi → generate key → migrasi (`--force`) → build frontend → verifikasi kode & seluruh tes.
 
 ---
 
@@ -305,81 +267,83 @@ Pipeline CI (GitHub Actions) otomatis menjalankan: install dependency → salin 
 hqms/
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/Api/        # Controller API per modul (tipis)
-│   │   ├── Requests/               # Form Request / validasi
-│   │   └── Resources/              # Eloquent API Resources (output JSON)
-│   ├── Models/                     # Model Eloquent (Poli, Pasien, Antrian, ...)
-│   ├── Services/                   # Logika bisnis & transaksi database
-│   └── Policies/                   # (bila ada) otorisasi Gate
-├── bootstrap/
-├── config/                         # Konfigurasi aplikasi
+│   │   ├── Controllers/Api/   # Controller API per modul (tipis)
+│   │   ├── Requests/          # Form Request / validasi
+│   │   └── Resources/         # Eloquent API Resources
+│   ├── Models/                # Model Eloquent
+│   ├── Services/              # Logika bisnis & transaksi DB
+│   └── Policies/              # Otorisasi Gate
+├── config/
 ├── database/
-│   ├── factories/                  # Factory untuk testing/seeding
-│   ├── migrations/                 # Skema database (portabel MySQL & SQLite)
-│   └── seeders/                    # Data contoh per modul
+│   ├── factories/             # Factory untuk testing/seeding
+│   ├── migrations/            # Skema portabel (MySQL & SQLite)
+│   └── seeders/               # Data contoh per modul
 ├── resources/
-│   ├── css/                        # Gaya global (Tailwind)
 │   └── js/
-│       ├── pages/                  # Halaman React per modul (Index/Create/Edit/Show)
-│       ├── components/             # Komponen UI (shadcn-style)
-│       ├── api/                    # Pembungkus axios per modul
-│       └── lib/                    # Utilitas (axios instance, format, dsb.)
+│       ├── pages/             # Halaman React per modul
+│       ├── components/        # Komponen UI
+│       ├── api/               # Pembungkus axios per modul
+│       └── lib/               # Utilitas (axios instance, format)
 ├── routes/
-│   ├── web.php                     # Halaman Inertia (SPA)
-│   └── api.php                     # API v1
-├── tests/                          # Pest feature/unit tests
-├── vite.config.ts                  # Konfigurasi Vite (vite-plus)
-└── composer.json                   # Dependency PHP & script
+│   ├── web.php                # Halaman Inertia (SPA)
+│   └── api.php                # API v1
+├── tests/                     # Pest feature/unit tests
+├── vite.config.ts             # Vite (vite-plus)
+└── composer.json
+```
+
+Pola per modul: **Controller (tipis) → Service (transaksi DB) → Request (validasi) → Resource (output JSON)**, dengan envelope respons JSON konsisten:
+
+```json
+{
+  "success": true,
+  "message": "Pesan singkat.",
+  "data": {
+    "items": [],
+    "pagination": { "current_page": 1, "per_page": 10, "total": 0, "last_page": 1 }
+  }
+}
 ```
 
 ---
 
-## 📡 Dokumentasi API
+## 📡 Rangkuman API
 
-Dokumentasi lengkap endpoint terbagi dua:
+Seluruh API di-prefix `/api/v1`:
 
-**1. Kiosk & Public (`/api/v1/kiosk`)**
-- `GET  /kiosk/polis` — daftar poli aktif
-- `GET  /kiosk/dokters` — daftar dokter aktif
-- `GET  /kiosk/beritas` — berita terkini (paginasi)
-- `GET  /kiosk/penawarans` — penawaran terkini (paginasi)
-- `GET  /kiosk/faqs` — FAQ aktif
-- `GET  /kiosk/testimonials` — testimoni aktif
-- `POST /kiosk/messages` — kirim pesan kontak
-- `GET  /kiosk/jadwal-dokters` — jadwal dokter aktif
-- `GET  /kiosk/ruangans` — daftar ruangan aktif
-- `GET  /kiosk/fasilitas` — daftar fasilitas aktif
-- `POST /kiosk/tickets` — **buat tiket antrean** (pilih poli → nomor antrean)
-- `GET  /kiosk/now-serving` — antrean yang sedang dipanggil/dilayani
-- `POST /kiosk/attendance/scan` — scan RFID untuk presensi (check-in/out)
+**Kiosk & Publik (tanpa auth):** `kiosk/polis`, `kiosk/dokters`, `kiosk/beritas`, `kiosk/penawarans`, `kiosk/faqs`, `kiosk/testimonials`, `kiosk/jadwal-dokters`, `kiosk/ruangans`, `kiosk/fasilitas`, `POST kiosk/tickets` (buat tiket antrean), `kiosk/now-serving`, `POST kiosk/attendance/scan` (RFID), `POST kiosk/messages`, serta `auth/register` & `auth/login`.
 
-**2. Autentikasi (`/api/v1/auth`)**
-- `POST /auth/register` · `POST /auth/login` · `POST /auth/logout`
-- `GET  /auth/me` · `PUT /auth/me` · `POST /auth/me/password`
+**Auth (di bawah `auth:sanctum`):** `auth/me` (GET/PUT), `auth/me/password`, `auth/logout`.
 
-**3. Resource Terproteksi (`auth:sanctum`)**
-`apiResource` standar (index/show/store/update/destroy) untuk: `polis`, `fasilitas`, `ruangans`, `pasiens`, `pendaftarans`, `antrians`, `beritas`, `penawarans`, `dokters`, `perawats`, `presensis`, `jadwal-dokters`, `pemeriksaans`, `obats`, `pembayarans`, `faqs`, `testimonials`, `messages` — plus:
-- `GET /ruangans/{ruangan}/antrians`
-- `POST /ruangans/{ruangan}/pasiens` · `DELETE /ruangans/{ruangan}/pasiens/{ruanganPasien}`
-- `GET /monitoring`
+**Resource terproteksi (CRUD `apiResource`):** `polis`, `fasilitas`, `ruangans`, `pasiens`, `pendaftarans`, `antrians`, `beritas`, `penawarans`, `dokters`, `perawats`, `presensis`, `jadwal-dokters`, `pemeriksaans`, `obats`, `pembayarans`, `faqs`, `testimonials`, `messages` — plus `ruangans/{ruangan}/antrians`, `POST/DELETE ruangans/{ruangan}/pasiens`, dan `monitoring`.
 
-> Versi API saat ini: **v1** (`/api/v1/...`).
+---
+
+## 🛠️ Troubleshooting
+
+| Gejala | Solusi |
+| --- | --- |
+| Login sukses tapi API langsung `401` (terlempar ke `/login`) | Host/port yang dibuka belum ada di `SANCTUM_STATEFUL_DOMAINS` — tambahkan dan restart server |
+| Error *"Unable to locate file in Vite manifest"* | Jalankan `npm run build` (atau gunakan `composer run dev` / `npm run dev` agar Vite aktif) |
+| Gambar/foto tidak tampil | Jalankan `php artisan storage:link` |
+| "Symlink storage" gagal di Windows/Laragon | Pastikan folder `storage/app/public` ada, lalu ulangi `php artisan storage:link` |
+| Sesi logout tiba-tiba | Default `SESSION_LIFETIME=1440` (24 jam); atur di `.env` bila perlu |
 
 ---
 
 ## 🤝 Kontribusi
 
-1. Kerjakan dari cabang (`git checkout -b fitur/fitur-baru`).
-2. Pastikan mengikuti konvensi pola `Controller → Service → Request → Resource`.
-3. Format kode PHP dengan Pint sebelum commit: `vendor/bin/pint`.
+1. Kerjakan dari cabang: `git checkout -b fitur/fitur-baru`.
+2. Ikuti pola `Controller → Service → Request → Resource`.
+3. Format kode PHP: `vendor/bin/pint`.
 4. Tambahkan tes Pest untuk setiap perubahan logika.
-5. Jalankan tes sebelum membuat Pull Request: `php artisan test --compact`.
+5. Jalankan tes sebelum PR: `php artisan test --compact`.
 
 ---
 
 ## 📄 Lisensi
 
-Proyek ini dilisensikan di bawah **MIT License**. Lihat file `composer.json` untuk detail.
+Proyek ini dilisensikan di bawah **MIT License**.
 
 ---
 
