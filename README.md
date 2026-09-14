@@ -119,13 +119,6 @@ Menjalankan seluruh test:
 ```bash
 php artisan test
 ```
-
-Format kode PHP:
-
-```bash
-vendor/bin/pint
-```
-
 ---
 
 <div align="center">
